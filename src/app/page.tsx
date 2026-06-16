@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { ferries } from "@/lib/ferry-data"
+import { ferries, wandoFerries } from "@/lib/ferry-data"
 import DepartureBoard from "@/components/DepartureBoard"
 
 export const metadata = {
@@ -34,7 +34,7 @@ export default function Page() {
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         <Suspense fallback={<BoardSkeleton />}>
-          <DepartureBoard initial={ferries} />
+          <DepartureBoard initial={ferries} wandoInitial={wandoFerries} />
         </Suspense>
       </div>
     </main>
