@@ -95,7 +95,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
 
           {/* 예약 버튼 */}
           <a
-            href="https://www.ferry.or.kr"
+            href="https://island.theksa.co.kr"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full rounded-xl bg-blue-600 py-3.5 text-center text-sm font-semibold text-white hover:bg-blue-700 active:bg-blue-800 transition-colors"

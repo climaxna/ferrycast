@@ -65,7 +65,7 @@ export default function Page() {
               🌐 완도군청 여객선
             </a>
             <a
-              href="https://www.ferry.or.kr"
+              href="https://island.theksa.co.kr"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-white px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-50"
