@@ -7,7 +7,7 @@
 
 ## 🟢 지금 여기
 
-**TAGO API 실시간 연동 완료 → KOMSA 결항 정보 연동 또는 M2 진행 선택**
+**TAGO + KOMSA 실시간 연동 완료 → M2 진행 (커스텀 도메인 · PWA · 애드센스)**
 
 > **Claude Code 지시**: 태스크 하나 완료할 때마다 이 섹션을 자동으로 업데이트할 것.
 > 완료된 항목은 마일스톤 현황에서 [x] 체크할 것.
@@ -42,7 +42,7 @@
 - [x] 메인 화면 구현 (M1 완료)
 - [x] 기상청 API 연동 (날씨 카드)
 - [x] TAGO API 실시간 연동 완료 (제주·청산도·소안도·보길도 실시간 시간표)
-- [ ] KOMSA API 연동 (결항 정보 — 엔드포인트 확인 필요)
+- [x] KOMSA API 연동 완료 (결항 정보 실시간 연동 — nvg_stts_nm=결항 감지)
 
 ---
 
@@ -158,7 +158,7 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 - [x] 메인 레이아웃 (모바일 375px, max-w-lg, sticky 헤더)
 - [x] WeatherCard — 기상청 apihub 초단기실황 연동 (기온·날씨·풍속·습도, 5분 캐시)
 - [x] RouteList + RouteItem — TAGO 실시간 연동 (제주·청산도·소안도·보길도), fallback 자동 전환
-- [x] 운항 배지 🟢 — TAGO 데이터로 운항 표시, 결항(🔴)은 KOMSA 연동 후 완성
+- [x] 운항/결항 배지 🟢🔴 — TAGO 시간표 + KOMSA 결항 감지 실시간 연동 완성
 - [x] API 오류 fallback — 날씨·항로 각각 노란 안내 박스
 - [x] 면책 문구 + 공식 링크 (완도군청, 해운조합)
 - [x] 광고 슬롯 placeholder (AdSense 승인 후 활성화)
@@ -176,9 +176,16 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 
 ## 지금 당장 다음 할 일
 
-1. **Vercel 환경변수 확인** — `DATAGOKR_API_KEY`, `KMA_API_KEY` 설정 여부 → 날씨·항로 실제 동작 확인
-2. **KOMSA API 결항 정보 연동** — data.go.kr 승인된 KOMSA 서비스 엔드포인트 확인 → 결항 배지 🔴 활성화
-3. **M2 시작**: 커스텀 도메인 → PWA → 애드센스 신청
+1. **Vercel 환경변수 확인** — `DATAGOKR_API_KEY`, `KMA_API_KEY` 설정 여부 → 운영 서버에서 실시간 동작 확인
+2. **M2 시작**: 커스텀 도메인 → PWA manifest → 애드센스 신청
+
+### KOMSA API 연동 메모 (다음 세션 참고)
+
+- **Endpoint**: `https://apis.data.go.kr/B554035/ferry-route-info-v4/get-ferry-route-info-v4`
+- **필수 파라미터**: `rlvtYmd=YYYYMMDD` (출항일자), `dataType=JSON`
+- **선택 파라미터**: `psnshpNm` (여객선명 필터), `numOfRows`, `pageNo`
+- **성공 코드**: `resultCode: "200"` (표준 "00" 아님!)
+- **결항 감지**: `nvg_stts_nm === "결항"`
 
 ---
 
