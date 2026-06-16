@@ -5,9 +5,9 @@
 
 ---
 
-## 🟡 지금 여기
+## 🟢 지금 여기
 
-**M1 완료 → M2 시작 대기**
+**TAGO API 실시간 연동 완료 → KOMSA 결항 정보 연동 또는 M2 진행 선택**
 
 > **Claude Code 지시**: 태스크 하나 완료할 때마다 이 섹션을 자동으로 업데이트할 것.
 > 완료된 항목은 마일스톤 현황에서 [x] 체크할 것.
@@ -41,8 +41,8 @@
 - [x] Vercel Analytics 설치
 - [x] 메인 화면 구현 (M1 완료)
 - [x] 기상청 API 연동 (날씨 카드)
-- [ ] TAGO API 연동 (서비스 활용신청 승인 대기중 — 현재 정적 시간표 표시중)
-- [ ] KOMSA API 연동 (엔드포인트 확인 필요)
+- [x] TAGO API 실시간 연동 완료 (제주·청산도·소안도·보길도 실시간 시간표)
+- [ ] KOMSA API 연동 (결항 정보 — 엔드포인트 확인 필요)
 
 ---
 
@@ -91,13 +91,20 @@
 - 경도(lon): 126.7544
 - 기상청 격자: X=57, Y=74
 
-### 주요 항로 (MVP 범위)
+### 주요 항로 (MVP 범위 — TAGO 실제 데이터 기준)
 
-- 완도 ↔ 제주
-- 완도 ↔ 목포
-- 완도 ↔ 녹동
-- 완도 ↔ 여수
-- _(섬↔섬 내부 항로는 MVP 제외)_
+- 완도 → 제주 (SEA31020, TAGO 실시간 ✅)
+- 완도 → 청산도 (SEA31020, TAGO 실시간 ✅)
+- 완도_화흥포 → 소안도 (SEA31022, TAGO 실시간 ✅)
+- 완도_화흥포 → 보길도·노화 (SEA31022, TAGO 실시간 ✅)
+- _(목포·녹동·여수는 TAGO 데이터 없음 — 별도 확인 필요)_
+
+### TAGO API 연동 정보
+
+- **Base URL**: `https://apis.data.go.kr/1613000/DmstcShipNvgInfo`
+- **Operations**: PascalCase (`GetShipOpratInfoList`, `GetPortList`, `GetPsnshipTrminlList`)
+- **완도항 nodeId**: `SEA31020` / **화흥포 nodeId**: `SEA31022`
+- **날짜 파라미터**: `depPlandTime=YYYYMMDD`
 
 ---
 
@@ -150,8 +157,8 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 
 - [x] 메인 레이아웃 (모바일 375px, max-w-lg, sticky 헤더)
 - [x] WeatherCard — 기상청 apihub 초단기실황 연동 (기온·날씨·풍속·습도, 5분 캐시)
-- [x] RouteList + RouteItem — TAGO 시도 후 정적 fallback 자동 전환
-- [x] 운항/결항 배지 🟢🔴 — UI 완성, KOMSA 엔드포인트 확인 후 실시간 연동 예정
+- [x] RouteList + RouteItem — TAGO 실시간 연동 (제주·청산도·소안도·보길도), fallback 자동 전환
+- [x] 운항 배지 🟢 — TAGO 데이터로 운항 표시, 결항(🔴)은 KOMSA 연동 후 완성
 - [x] API 오류 fallback — 날씨·항로 각각 노란 안내 박스
 - [x] 면책 문구 + 공식 링크 (완도군청, 해운조합)
 - [x] 광고 슬롯 placeholder (AdSense 승인 후 활성화)
@@ -167,12 +174,11 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 
 ---
 
-## 지금 당장 다음 할 일 (M2 진행 전)
+## 지금 당장 다음 할 일
 
-1. **Vercel 환경변수 확인** — `DATAGOKR_API_KEY`, `KMA_API_KEY` 설정 여부 → 날씨 카드 실제 동작 확인
-2. **data.go.kr TAGO 서비스 활용신청 상태 확인** — 승인되면 실시간 시간표 자동 전환
-3. **KOMSA API 엔드포인트 확인** — data.go.kr에서 연안여객선 운항현황 서비스 찾기
-4. **M2 시작**: 커스텀 도메인 → PWA → 애드센스 신청
+1. **Vercel 환경변수 확인** — `DATAGOKR_API_KEY`, `KMA_API_KEY` 설정 여부 → 날씨·항로 실제 동작 확인
+2. **KOMSA API 결항 정보 연동** — data.go.kr 승인된 KOMSA 서비스 엔드포인트 확인 → 결항 배지 🔴 활성화
+3. **M2 시작**: 커스텀 도메인 → PWA → 애드센스 신청
 
 ---
 
