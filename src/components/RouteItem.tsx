@@ -8,7 +8,7 @@ interface Props {
 export default function RouteItem({ route, onClick }: Props) {
   const isCancelled = route.status === "cancelled"
   const routeLabel = route.from ? `${route.from} → ${route.to}` : `완도 → ${route.to}`
-  const timeLabel = route.from ? "도착 예정" : "출발"
+  const timeLabel = route.from ? `${route.from} 출발` : "출발"
 
   return (
     <button
