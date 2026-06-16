@@ -1,4 +1,4 @@
-import { getWandoWeather, windDirLabel, ptyLabel } from "@/lib/weather"
+import { getWandoWeather, windDirLabel, ptyLabel, waveLabel } from "@/lib/weather"
 import RefreshButton from "./RefreshButton"
 
 export default async function WeatherCard() {
@@ -31,10 +31,22 @@ export default async function WeatherCard() {
         <span className="mb-1 text-base font-medium text-blue-700">{ptyText}</span>
       </div>
 
-      <div className="mt-3 flex gap-6 text-sm text-blue-700">
+      <div className="mt-3 flex flex-wrap gap-x-6 gap-y-1.5 text-sm text-blue-700">
         <span>💨 {w.windSpeed} m/s · {windDirLabel(w.windDir)}</span>
         <span>💧 습도 {w.humidity}%</span>
         {w.rain1h > 0 && <span>🌧 {w.rain1h} mm/h</span>}
+      </div>
+      <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1.5 text-sm">
+        {w.waveHeight !== undefined ? (
+          <>
+            <span className="text-blue-700">🌊 파고 {w.waveHeight.toFixed(1)}m</span>
+            <span className={waveLabel(w.waveHeight).color}>
+              {waveLabel(w.waveHeight).text}
+            </span>
+          </>
+        ) : (
+          <span className="text-blue-400 text-xs">파고 정보 없음</span>
+        )}
       </div>
     </div>
   )
