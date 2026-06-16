@@ -151,7 +151,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
         if (!filtered.length) return null
 
         const times = filtered
-          .map((it) => parseTime(it.arrPlandTime))
+          .map((it) => parseTime(it.depPlandTime))
           .filter(Boolean) as string[]
         const ships = new Set(filtered.map((it) => it.vihicleNm).filter(Boolean))
         const ferryNames = ferryKeys.flatMap((k) => ROUTE_FERRIES[k] ?? [])
@@ -194,8 +194,8 @@ const STATIC_DEP: WandoRoute[] = [
 ]
 
 const STATIC_ARR: WandoRoute[] = [
-  { id: "arr-jeju",   to: "완도", from: "제주",       operator: "청해진해운", times: ["10:49", "21:36"],             status: "unknown", isLive: false },
-  { id: "arr-chsnd",  to: "완도", from: "청산도",     operator: "남해고속",   times: ["07:39", "10:01", "13:10"],     status: "unknown", isLive: false },
-  { id: "arr-soando", to: "완도", from: "소안도",     operator: "청해진해운", times: ["07:30", "09:51", "15:51"],     status: "unknown", isLive: false },
-  { id: "arr-bogil",  to: "완도", from: "보길도·노화", operator: "청해진해운", times: ["08:12", "10:05", "15:32"],     status: "unknown", isLive: false },
+  { id: "arr-jeju",   to: "완도", from: "제주",       operator: "청해진해운", times: ["08:00", "08:40", "16:00", "19:30"], status: "unknown", isLive: false },
+  { id: "arr-chsnd",  to: "완도", from: "청산도",     operator: "남해고속",   times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"], status: "unknown", isLive: false },
+  { id: "arr-soando", to: "완도", from: "소안도",     operator: "청해진해운", times: ["07:24", "07:30", "08:45", "09:12", "10:12", "11:12", "12:12", "13:12", "14:12", "15:12", "16:12", "17:12", "18:12", "19:04"], status: "unknown", isLive: false },
+  { id: "arr-bogil",  to: "완도", from: "보길도·노화", operator: "청해진해운", times: ["07:45", "09:47", "16:14"], status: "unknown", isLive: false },
 ]
