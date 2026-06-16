@@ -1,4 +1,5 @@
 import { getWandoWeather, windDirLabel, ptyLabel } from "@/lib/weather"
+import RefreshButton from "./RefreshButton"
 
 export default async function WeatherCard() {
   const w = await getWandoWeather()
@@ -18,7 +19,10 @@ export default async function WeatherCard() {
     <div className="rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-sky-50 p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-blue-900">완도 현재 날씨</h2>
-        <span className="text-xs text-blue-400">기준 {timeStr}</span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-blue-400">기준 {timeStr}</span>
+          <RefreshButton />
+        </div>
       </div>
 
       <div className="flex items-end gap-3">
