@@ -82,7 +82,7 @@ const { baseDate, baseTime } = getBaseDateTime()
 console.log(`\n📅 기준시각: ${baseDate} ${baseTime}`)
 
 const base = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
-const common = `serviceKey=${encodeURIComponent(KEY)}&dataType=JSON&numOfRows=100&pageNo=1`
+const common = `serviceKey=${KEY}&dataType=JSON&numOfRows=100&pageNo=1`
 const wando = `nx=57&ny=74`
 
 // 단기예보
