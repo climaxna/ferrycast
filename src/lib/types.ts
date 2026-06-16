@@ -1,16 +1,10 @@
-export type FerryStatus = "on-time" | "delayed" | "boarding" | "departed" | "cancelled"
+export type RouteStatus = "operating" | "cancelled" | "unknown"
 
-export type Ferry = {
+export interface WandoRoute {
   id: string
-  name: string
-  route: {
-    from: string
-    to: string
-  }
-  departure: string
-  arrival: string
-  status: FerryStatus
-  capacity: number
-  boarded: number
-  platform: string
+  to: string
+  operator: string
+  times: string[]
+  status: RouteStatus
+  isLive: boolean
 }
