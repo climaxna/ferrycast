@@ -11,7 +11,7 @@ interface Props {
 export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const isCancelled = route.status === "cancelled"
   const routeLabel = route.from ? `${route.from} → ${route.to}` : `완도 → ${route.to}`
-  const timeHeading = isDeparture ? "오늘 출발 시간표" : "오늘 완도 도착 예정"
+  const timeHeading = isDeparture ? "오늘 출발 시간표" : `오늘 ${route.from} 출발 시간표`
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
