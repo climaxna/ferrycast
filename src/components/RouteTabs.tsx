@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import RouteItem from "./RouteItem"
 import RouteDetail from "./RouteDetail"
 import type { WandoRoute } from "@/lib/types"
@@ -13,6 +13,18 @@ interface Props {
 export default function RouteTabs({ departures, arrivals }: Props) {
   const [tab, setTab] = useState<"dep" | "arr">("dep")
   const [selected, setSelected] = useState<WandoRoute | null>(null)
+  const [nowMinutes, setNowMinutes] = useState(() => {
+    const d = new Date()
+    return d.getHours() * 60 + d.getMinutes()
+  })
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const d = new Date()
+      setNowMinutes(d.getHours() * 60 + d.getMinutes())
+    }, 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   const isDeparture = tab === "dep"
   const { routes, isLive } = isDeparture ? departures : arrivals
@@ -39,6 +51,7 @@ export default function RouteTabs({ departures, arrivals }: Props) {
             <RouteItem
               key={route.id}
               route={route}
+              nowMinutes={nowMinutes}
               onClick={() => setSelected(route)}
             />
           ))}
