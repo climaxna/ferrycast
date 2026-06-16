@@ -62,12 +62,15 @@ async function call(label, url) {
       }
       const arr = Array.isArray(items) ? items : [items]
       console.log("총 item 수:", arr.length)
-      // 카테고리별 첫 값 출력
+      // 카테고리별 첫 값 출력 (예보: fcstValue/fcstDate/fcstTime, 실황: obsrValue/baseDate/baseTime)
       const seen = new Set()
       for (const it of arr) {
         if (!seen.has(it.category)) {
           seen.add(it.category)
-          console.log(`  ${it.category}: ${it.fcstValue}  (${it.fcstDate} ${it.fcstTime})`)
+          const val = it.fcstValue ?? it.obsrValue
+          const dt = it.fcstDate ?? it.baseDate
+          const tm = it.fcstTime ?? it.baseTime
+          console.log(`  ${it.category}: ${val}  (${dt} ${tm})`)
         }
       }
     } catch {
@@ -81,18 +84,17 @@ async function call(label, url) {
 const { baseDate, baseTime } = getBaseDateTime()
 console.log(`\n📅 기준시각: ${baseDate} ${baseTime}`)
 
-const base = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
-const common = `serviceKey=${KEY}&dataType=JSON&numOfRows=100&pageNo=1`
 const wando = `nx=57&ny=74`
+const dt = `base_date=${baseDate}&base_time=${baseTime}`
 
-// 단기예보
-await call(
-  "단기예보 (getVilageFcst)",
-  `${base}/getVilageFcst?${common}&base_date=${baseDate}&base_time=${baseTime}&${wando}`
-)
+// ── data.go.kr (serviceKey)
+const dataGo = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0"
+const q1 = `serviceKey=${KEY}&dataType=JSON&numOfRows=100&pageNo=1`
+await call("data.go.kr 단기예보", `${dataGo}/getVilageFcst?${q1}&${dt}&${wando}`)
+await call("data.go.kr 초단기실황", `${dataGo}/getUltraSrtNcst?${q1}&${dt}&${wando}`)
 
-// 초단기실황
-await call(
-  "초단기실황 (getUltraSrtNcst)",
-  `${base}/getUltraSrtNcst?${common}&base_date=${baseDate}&base_time=${baseTime}&${wando}`
-)
+// ── apihub.kma.go.kr (authKey)
+const hub = "https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0"
+const q2 = `authKey=${KEY}&dataType=JSON&numOfRows=100&pageNo=1`
+await call("apihub 단기예보", `${hub}/getVilageFcst?${q2}&${dt}&${wando}`)
+await call("apihub 초단기실황", `${hub}/getUltraSrtNcst?${q2}&${dt}&${wando}`)

@@ -1,10 +1,11 @@
 import { Suspense } from "react"
 import { ferries } from "@/lib/ferry-data"
 import DepartureBoard from "@/components/DepartureBoard"
+import WeatherCard from "@/components/WeatherCard"
 
 export const metadata = {
-  title: "Ferrycast — 여수 출발 현황",
-  description: "여수항 페리 실시간 출발 현황판",
+  title: "FerryCast — 완도 날씨·항로 현황",
+  description: "완도 현재 날씨와 여객선 항로 운항 현황",
 }
 
 function BoardSkeleton() {
@@ -17,22 +18,30 @@ function BoardSkeleton() {
   )
 }
 
+function WeatherSkeleton() {
+  return <div className="h-28 animate-pulse rounded-xl bg-blue-50" />
+}
+
 export default function Page() {
   return (
     <main className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
+        <div className="mx-auto max-w-3xl px-4 py-5 sm:px-6">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">⛴</span>
+            <span className="text-3xl">⛴️</span>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900">Ferrycast</h1>
-              <p className="text-sm text-gray-500">여수항 출발 현황판</p>
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900">FerryCast</h1>
+              <p className="text-sm text-gray-500">완도 날씨 · 항로 현황</p>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 space-y-6">
+        <Suspense fallback={<WeatherSkeleton />}>
+          <WeatherCard />
+        </Suspense>
+
         <Suspense fallback={<BoardSkeleton />}>
           <DepartureBoard initial={ferries} />
         </Suspense>
