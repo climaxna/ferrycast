@@ -88,7 +88,12 @@ export default function DepartureBoard({
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {currentFerries.map((ferry) => (
-            <FerryCard key={ferry.id} ferry={ferry} onClick={() => setSelectedFerry(ferry)} />
+            <FerryCard
+              key={ferry.id}
+              ferry={ferry}
+              mode={tab === "wando" ? "arrive" : "depart"}
+              onClick={() => setSelectedFerry(ferry)}
+            />
           ))}
         </div>
       </div>
