@@ -72,25 +72,32 @@ function getVilageFcstBase(): { baseDate: string; baseTime: string } {
 
 async function fetchWaveHeight(key: string): Promise<number | null> {
   const { baseDate, baseTime } = getVilageFcstBase()
-  const url =
-    `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst` +
-    `?authKey=${key}&dataType=JSON&numOfRows=300&pageNo=1` +
-    `&base_date=${baseDate}&base_time=${baseTime}&nx=57&ny=74`
-  try {
-    const res = await fetch(url, { next: { revalidate: 1800 } })
-    if (!res.ok) return null
-    const json = await res.json()
-    if (json?.response?.header?.resultCode !== "00") return null
-    const items: Array<{ category: string; fcstValue: string; fcstDate: string; fcstTime: string }> =
-      json?.response?.body?.items?.item ?? []
-    const wavItems = items
-      .filter((i) => i.category === "WAV")
-      .sort((a, b) => parseInt(a.fcstDate + a.fcstTime) - parseInt(b.fcstDate + b.fcstTime))
-    if (!wavItems.length) return null
-    return parseFloat(wavItems[0].fcstValue)
-  } catch {
-    return null
+  // 완도(X=57,Y=74)는 육지 격자 — WAV 없음. 남쪽 해상 격자를 순서대로 시도
+  const seaGrids = [
+    { nx: 57, ny: 72 },
+    { nx: 57, ny: 71 },
+    { nx: 58, ny: 72 },
+    { nx: 56, ny: 72 },
+  ]
+  for (const { nx, ny } of seaGrids) {
+    try {
+      const url =
+        `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst` +
+        `?authKey=${key}&dataType=JSON&numOfRows=300&pageNo=1` +
+        `&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`
+      const res = await fetch(url, { next: { revalidate: 1800 } })
+      if (!res.ok) continue
+      const json = await res.json()
+      if (json?.response?.header?.resultCode !== "00") continue
+      const items: Array<{ category: string; fcstValue: string; fcstDate: string; fcstTime: string }> =
+        json?.response?.body?.items?.item ?? []
+      const wavItems = items
+        .filter((i) => i.category === "WAV")
+        .sort((a, b) => parseInt(a.fcstDate + a.fcstTime) - parseInt(b.fcstDate + b.fcstTime))
+      if (wavItems.length) return parseFloat(wavItems[0].fcstValue)
+    } catch { continue }
   }
+  return null
 }
 
 export async function getWandoWeather(): Promise<WeatherData | null> {
