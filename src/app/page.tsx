@@ -3,8 +3,8 @@ import { ferries, wandoFerries } from "@/lib/ferry-data"
 import DepartureBoard from "@/components/DepartureBoard"
 
 export const metadata = {
-  title: "Ferrycast — 여수 출발 현황",
-  description: "여수항 페리 실시간 출발 현황판",
+  title: "Ferrycast — 완도 여객선 현황",
+  description: "완도항 여객선 출발·도착 실시간 현황판",
 }
 
 function BoardSkeleton() {
@@ -26,7 +26,7 @@ export default function Page() {
             <span className="text-3xl">⛴</span>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-gray-900">Ferrycast</h1>
-              <p className="text-sm text-gray-500">여수항 출발 현황판</p>
+              <p className="text-sm text-gray-500">완도항 여객선 출발·도착 현황판</p>
             </div>
           </div>
         </div>

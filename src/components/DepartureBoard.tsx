@@ -63,7 +63,7 @@ export default function DepartureBoard({
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            여수 출발
+            완도 출발
           </button>
           <button
             onClick={() => switchTab("wando")}
