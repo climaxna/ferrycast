@@ -1,10 +1,10 @@
 import { Suspense } from "react"
 import WeatherCard from "@/components/WeatherCard"
-import RouteList from "@/components/RouteList"
+import RouteSection from "@/components/RouteSection"
 
 export const metadata = {
   title: "FerryCast — 완도 날씨·항로 현황",
-  description: "완도 현재 날씨와 여객선 출발 시간표·운항 현황을 한눈에",
+  description: "완도 현재 날씨와 여객선 출발·도착 시간표·운항 현황을 한눈에",
 }
 
 function WeatherSkeleton() {
@@ -14,6 +14,7 @@ function WeatherSkeleton() {
 function RouteSkeleton() {
   return (
     <div className="space-y-2">
+      <div className="h-8 w-48 animate-pulse rounded bg-gray-100" />
       {[1, 2, 3, 4].map((i) => (
         <div key={i} className="h-16 animate-pulse rounded-xl bg-gray-100" />
       ))}
@@ -40,7 +41,7 @@ export default function Page() {
         </Suspense>
 
         <Suspense fallback={<RouteSkeleton />}>
-          <RouteList />
+          <RouteSection />
         </Suspense>
 
         {/* 광고 슬롯 자리 — AdSense 승인 후 활성화 */}
