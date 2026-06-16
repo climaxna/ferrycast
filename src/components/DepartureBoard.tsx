@@ -1,8 +1,9 @@
 "use client"
 
-import { use, useEffect, useState, useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import type { Ferry } from "@/lib/types"
 import FerryCard from "./FerryCard"
+import FerryDetail from "./FerryDetail"
 
 async function fetchFerries(): Promise<Ferry[]> {
   const res = await fetch("/api/ferries", { cache: "no-store" })
@@ -14,6 +15,7 @@ export default function DepartureBoard({ initial }: { initial: Ferry[] }) {
   const [ferries, setFerries] = useState<Ferry[]>(initial)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [isPending, startTransition] = useTransition()
+  const [selectedFerry, setSelectedFerry] = useState<Ferry | null>(null)
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -31,20 +33,26 @@ export default function DepartureBoard({ initial }: { initial: Ferry[] }) {
   }, [])
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-gray-400">
-          마지막 업데이트: {lastUpdated.toLocaleTimeString("ko-KR")}
-        </p>
-        {isPending && (
-          <span className="text-xs text-blue-500 animate-pulse">업데이트 중…</span>
-        )}
+    <>
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-sm text-gray-400">
+            마지막 업데이트: {lastUpdated.toLocaleTimeString("ko-KR")}
+          </p>
+          {isPending && (
+            <span className="text-xs text-blue-500 animate-pulse">업데이트 중…</span>
+          )}
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {ferries.map((ferry) => (
+            <FerryCard key={ferry.id} ferry={ferry} onClick={() => setSelectedFerry(ferry)} />
+          ))}
+        </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ferries.map((ferry) => (
-          <FerryCard key={ferry.id} ferry={ferry} />
-        ))}
-      </div>
-    </div>
+
+      {selectedFerry && (
+        <FerryDetail ferry={selectedFerry} onClose={() => setSelectedFerry(null)} />
+      )}
+    </>
   )
 }

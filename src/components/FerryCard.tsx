@@ -2,13 +2,17 @@ import type { Ferry } from "@/lib/types"
 import StatusBadge from "./StatusBadge"
 import CapacityBar from "./CapacityBar"
 
-export default function FerryCard({ ferry }: { ferry: Ferry }) {
+export default function FerryCard({ ferry, onClick }: { ferry: Ferry; onClick?: () => void }) {
   const isCancelled = ferry.status === "cancelled"
   const isDeparted = ferry.status === "departed"
 
   return (
     <div
-      className={`rounded-xl border p-5 shadow-sm transition-shadow hover:shadow-md ${
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => e.key === "Enter" && onClick?.()}
+      className={`rounded-xl border p-5 shadow-sm transition-shadow hover:shadow-md cursor-pointer ${
         isCancelled ? "border-red-200 bg-red-50/50 opacity-70" :
         isDeparted  ? "border-gray-200 bg-gray-50/50 opacity-60" :
                       "border-gray-200 bg-white"
