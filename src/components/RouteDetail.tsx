@@ -57,8 +57,6 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const nextTime = nextIdx >= 0 ? route.times[nextIdx] : null
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
-  const { fare } = route
-
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: "100dvh" }}>
       {/* 상단 헤더 */}
@@ -176,47 +174,26 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
             )}
           </div>
 
-          {/* 운임 요금 */}
-          {fare && (
-            <div>
-              <p className="mb-3 text-sm font-bold uppercase tracking-wider text-slate-400">운임 요금</p>
-              <div className="divide-y divide-slate-100 rounded-2xl bg-slate-50 px-4 py-1">
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-base text-slate-600">성인 (편도)</span>
-                  <span className="text-lg font-bold text-slate-900">{fare.adult.toLocaleString()}원</span>
+          {/* 운임 요금 — 공식 링크 */}
+          {route.fareUrl && (
+            <a
+              href={route.fareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-4 transition-opacity active:opacity-70"
+            >
+              <div className="flex items-center gap-3">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-slate-400" aria-hidden="true">
+                  <rect x="2" y="5" width="20" height="14" rx="2" />
+                  <path d="M2 10h20" />
+                </svg>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">운임 요금</p>
+                  <p className="text-base font-bold text-slate-800">공식 요금표 확인하기</p>
                 </div>
-                {fare.teen !== undefined && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-base text-slate-600">청소년 (중·고교생)</span>
-                    <span className="text-lg font-bold text-slate-900">{fare.teen.toLocaleString()}원</span>
-                  </div>
-                )}
-                {fare.child !== undefined && (
-                  <div className="flex items-center justify-between py-3">
-                    <span className="text-base text-slate-600">어린이</span>
-                    <span className="text-lg font-bold text-slate-900">{fare.child.toLocaleString()}원</span>
-                  </div>
-                )}
-                {(fare.carSmall !== undefined || fare.carRegular !== undefined) && (
-                  <div className="pt-3 pb-2">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">차량 선적</p>
-                    {fare.carSmall !== undefined && (
-                      <div className="flex items-center justify-between pb-2">
-                        <span className="text-base text-slate-600">소형차</span>
-                        <span className="text-lg font-bold text-slate-900">{fare.carSmall.toLocaleString()}원</span>
-                      </div>
-                    )}
-                    {fare.carRegular !== undefined && (
-                      <div className="flex items-center justify-between pb-1">
-                        <span className="text-base text-slate-600">일반 승용차</span>
-                        <span className="text-lg font-bold text-slate-900">{fare.carRegular.toLocaleString()}원</span>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
-              <p className="mt-2 text-xs text-slate-400">* 2024년 기준 참고 요금 · 실제 요금은 운항사 또는 예매 사이트에서 확인하세요</p>
-            </div>
+              <span className="text-slate-400">→</span>
+            </a>
           )}
 
           {/* 안내 문구 */}

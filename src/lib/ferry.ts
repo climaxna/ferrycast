@@ -7,6 +7,13 @@ const FARE_MAP: Record<string, FareInfo> = {
   "보길도·노화": { adult: 6500, teen: 5900, child: 3300, carSmall: 14000, carRegular: 18000 },
 }
 
+// 공식 운임 확인 링크 (label 기준)
+const FARE_URL_MAP: Record<string, string> = {
+  "청산도":     "https://cheongsannh.nonghyup.com/user/indexSub.do?codyMenuSeq=1048386239&siteId=cheongsannh",
+  "소안도":     "https://island.theksa.co.kr",
+  "보길도·노화": "https://island.theksa.co.kr",
+}
+
 // TAGO nodeId
 const WANDO_NODE = "SEA31020"
 const WANDO_HWAHEUNGPO = "SEA31022"
@@ -143,6 +150,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           isLive: true,
           terminal: HWAHEUNGPO_DESTS.has(destKey) ? TERMINAL_HWAHEUNGPO : TERMINAL_MAIN,
           fare: FARE_MAP[label],
+          fareUrl: FARE_URL_MAP[label],
         }
       })
 
@@ -186,6 +194,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           isLive: true,
           terminal: arrFilter === "완도_화흥포" ? TERMINAL_HWAHEUNGPO : TERMINAL_MAIN,
           fare: FARE_MAP[label],
+          fareUrl: FARE_URL_MAP[label],
           _priority: priority,
         }
       })
@@ -209,14 +218,14 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 // ────────────────────────────────────────────────
 const STATIC_DEP: WandoRoute[] = [
   { id: "dep-jeju",    to: "제주",       operator: "청해진해운", times: ["02:30", "09:20", "15:00"],                   status: "unknown", isLive: false, terminal: TERMINAL_MAIN },
-  { id: "dep-chsnd",   to: "청산도",     operator: "남해고속",   times: ["07:00", "08:30", "11:00", "13:00", "15:00"], status: "unknown", isLive: false, terminal: TERMINAL_MAIN,        fare: FARE_MAP["청산도"] },
-  { id: "dep-soando",  to: "소안도",     operator: "청해진해운", times: ["08:30", "13:00", "15:30"],                   status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["소안도"] },
-  { id: "dep-bogil",   to: "보길도·노화", operator: "청해진해운", times: ["07:20", "09:00", "13:00", "15:00"],          status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["보길도·노화"] },
+  { id: "dep-chsnd",   to: "청산도",     operator: "남해고속",   times: ["07:00", "08:30", "11:00", "13:00", "15:00"], status: "unknown", isLive: false, terminal: TERMINAL_MAIN,        fare: FARE_MAP["청산도"],     fareUrl: FARE_URL_MAP["청산도"] },
+  { id: "dep-soando",  to: "소안도",     operator: "청해진해운", times: ["08:30", "13:00", "15:30"],                   status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["소안도"],     fareUrl: FARE_URL_MAP["소안도"] },
+  { id: "dep-bogil",   to: "보길도·노화", operator: "청해진해운", times: ["07:20", "09:00", "13:00", "15:00"],          status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["보길도·노화"], fareUrl: FARE_URL_MAP["보길도·노화"] },
 ]
 
 const STATIC_ARR: WandoRoute[] = [
   { id: "arr-jeju",   to: "완도", from: "제주",       operator: "청해진해운", times: ["08:00", "08:40", "16:00", "19:30"], status: "unknown", isLive: false, terminal: TERMINAL_MAIN },
-  { id: "arr-chsnd",  to: "완도", from: "청산도",     operator: "남해고속",   times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"], status: "unknown", isLive: false, terminal: TERMINAL_MAIN,        fare: FARE_MAP["청산도"] },
-  { id: "arr-soando", to: "완도", from: "소안도",     operator: "청해진해운", times: ["07:24", "07:30", "08:45", "09:12", "10:12", "11:12", "12:12", "13:12", "14:12", "15:12", "16:12", "17:12", "18:12", "19:04"], status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["소안도"] },
-  { id: "arr-bogil",  to: "완도", from: "보길도·노화", operator: "청해진해운", times: ["07:45", "09:47", "16:14"], status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["보길도·노화"] },
+  { id: "arr-chsnd",  to: "완도", from: "청산도",     operator: "남해고속",   times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"], status: "unknown", isLive: false, terminal: TERMINAL_MAIN,        fare: FARE_MAP["청산도"],     fareUrl: FARE_URL_MAP["청산도"] },
+  { id: "arr-soando", to: "완도", from: "소안도",     operator: "청해진해운", times: ["07:24", "07:30", "08:45", "09:12", "10:12", "11:12", "12:12", "13:12", "14:12", "15:12", "16:12", "17:12", "18:12", "19:04"], status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["소안도"],     fareUrl: FARE_URL_MAP["소안도"] },
+  { id: "arr-bogil",  to: "완도", from: "보길도·노화", operator: "청해진해운", times: ["07:45", "09:47", "16:14"], status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["보길도·노화"], fareUrl: FARE_URL_MAP["보길도·노화"] },
 ]

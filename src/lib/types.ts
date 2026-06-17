@@ -18,4 +18,5 @@ export interface WandoRoute {
   isLive: boolean
   terminal: string  // 완도측 터미널 (예: "완도여객선터미널", "화흥포항")
   fare?: FareInfo   // 제주는 미포함 (요금 구조 복잡)
+  fareUrl?: string  // 공식 운임 확인 링크
 }
