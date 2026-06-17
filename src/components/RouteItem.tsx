@@ -83,9 +83,9 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
               </div>
             )}
 
-            {/* 지난 편 + 이후 편 칩 */}
-            {(pastTimes.length > 0 || futureTimes.length > 0) && (
-              <div className="mt-2 flex flex-wrap gap-1">
+            {/* 전체 시간표 칩 — 지난편·다음편·이후편 한눈에 */}
+            {(pastTimes.length > 0 || nextTime || futureTimes.length > 0) && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
                 {pastTimes.map((t) => (
                   <span
                     key={t}
@@ -94,10 +94,15 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
                     {t}
                   </span>
                 ))}
+                {nextTime && (
+                  <span className="rounded-md bg-blue-500 px-2 py-0.5 text-xs font-bold tabular-nums text-white">
+                    {nextTime}
+                  </span>
+                )}
                 {futureTimes.map((t) => (
                   <span
                     key={t}
-                    className="rounded-md bg-slate-100 px-1.5 py-0.5 text-xs tabular-nums text-slate-500"
+                    className="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-semibold tabular-nums text-blue-700"
                   >
                     {t}
                   </span>

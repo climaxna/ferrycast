@@ -73,17 +73,22 @@ export async function get5DayForecast(): Promise<DailyForecast[]> {
       `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst` +
       `?authKey=${key}&dataType=JSON&numOfRows=1000&pageNo=1` +
       `&base_date=${baseDate}&base_time=${baseTime}&nx=57&ny=74`
-    const res = await fetch(url, { next: { revalidate: 1800 } })
+    const res = await fetch(url, { next: { revalidate: 600 } })
     if (!res.ok) return []
     const json = await res.json()
-    if (json?.response?.header?.resultCode !== "00") return []
+    // resultCode 위치가 API 버전마다 다를 수 있으므로 두 경로 모두 확인
+    const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
+    if (resultCode !== "00") return []
 
+    const rawItems = json?.response?.body?.items?.item
+    if (!rawItems) return []
+    // 단일 객체 반환 시 배열로 감싸기
     const items: Array<{
       category: string
       fcstDate: string
       fcstTime: string
       fcstValue: string
-    }> = json?.response?.body?.items?.item ?? []
+    }> = Array.isArray(rawItems) ? rawItems : [rawItems]
 
     // Group by date
     const byDate = new Map<string, typeof items>()
