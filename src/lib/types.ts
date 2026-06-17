@@ -1,5 +1,13 @@
 export type RouteStatus = "operating" | "cancelled" | "unknown"
 
+export interface FareInfo {
+  adult: number        // 성인 편도 (원)
+  teen?: number        // 청소년 (중·고교생)
+  child?: number       // 어린이
+  carSmall?: number    // 소형차 (차량선적)
+  carRegular?: number  // 일반 승용차
+}
+
 export interface WandoRoute {
   id: string
   to: string
@@ -9,4 +17,5 @@ export interface WandoRoute {
   status: RouteStatus
   isLive: boolean
   terminal: string  // 완도측 터미널 (예: "완도여객선터미널", "화흥포항")
+  fare?: FareInfo   // 제주는 미포함 (요금 구조 복잡)
 }

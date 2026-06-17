@@ -1,12 +1,26 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import type { WandoRoute } from "@/lib/types"
 
 interface Props {
   route: WandoRoute
   isDeparture: boolean
   onClose: () => void
+}
+
+function toMin(t: string): number {
+  const [h, m] = t.split(":").map(Number)
+  return h * 60 + m
+}
+
+function relativeTime(t: string, nowMin: number): string {
+  const diff = toMin(t) - nowMin
+  if (diff <= 0) return ""
+  if (diff < 60) return `${diff}분 후`
+  const h = Math.floor(diff / 60)
+  const m = diff % 60
+  return m > 0 ? `${h}시간 ${m}분 후` : `${h}시간 후`
 }
 
 export default function RouteDetail({ route, isDeparture, onClose }: Props) {
@@ -16,6 +30,17 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const timeHeading = isDeparture ? "오늘 출발 시간표" : `오늘 ${route.from} 출발 시간표`
   const isAltTerminal = route.terminal !== "완도여객선터미널"
   const terminalRole = isDeparture ? "출발" : "도착"
+
+  const [nowMinutes, setNowMinutes] = useState(0)
+  useEffect(() => {
+    const update = () => {
+      const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+      setNowMinutes(kst.getUTCHours() * 60 + kst.getUTCMinutes())
+    }
+    update()
+    const id = setInterval(update, 60000)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     document.body.style.overflow = "hidden"
@@ -27,8 +52,15 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
     }
   }, [onClose])
 
+  const nextIdx = route.times.findIndex((t) => toMin(t) > nowMinutes)
+  const pastTimes = route.times.slice(0, nextIdx === -1 ? route.times.length : nextIdx)
+  const nextTime = nextIdx >= 0 ? route.times[nextIdx] : null
+  const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
+
+  const { fare } = route
+
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: '100dvh' }}>
+    <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: "100dvh" }}>
       {/* 상단 헤더 */}
       <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-4">
         <button
@@ -103,10 +135,28 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
               </div>
             ) : route.times.length > 0 ? (
               <div className="flex flex-wrap gap-2.5">
-                {route.times.map((t) => (
+                {pastTimes.map((t) => (
                   <span
                     key={t}
-                    className="rounded-2xl bg-slate-50 px-5 py-3 text-xl font-bold tabular-nums text-slate-800 shadow-sm"
+                    className="rounded-2xl bg-slate-50 px-5 py-3 text-xl font-bold tabular-nums text-slate-300 line-through shadow-sm"
+                  >
+                    {t}
+                  </span>
+                ))}
+                {nextTime && (
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span className="rounded-2xl bg-blue-500 px-5 py-3 text-xl font-bold tabular-nums text-white shadow-md">
+                      {nextTime}
+                    </span>
+                    <span className="text-xs font-semibold text-blue-500">
+                      {relativeTime(nextTime, nowMinutes)}
+                    </span>
+                  </div>
+                )}
+                {futureTimes.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-2xl bg-blue-50 px-5 py-3 text-xl font-bold tabular-nums text-blue-700 shadow-sm"
                   >
                     {t}
                   </span>
@@ -115,7 +165,53 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
             ) : (
               <p className="text-base text-slate-400">시간표 정보 없음</p>
             )}
+            {!isCancelled && nextTime === null && route.times.length > 0 && (
+              <p className="mt-3 text-sm text-slate-400">오늘 모든 편 출발 완료</p>
+            )}
           </div>
+
+          {/* 운임 요금 */}
+          {fare && (
+            <div>
+              <p className="mb-3 text-sm font-bold uppercase tracking-wider text-slate-400">운임 요금</p>
+              <div className="divide-y divide-slate-100 rounded-2xl bg-slate-50 px-4 py-1">
+                <div className="flex items-center justify-between py-3">
+                  <span className="text-base text-slate-600">성인 (편도)</span>
+                  <span className="text-lg font-bold text-slate-900">{fare.adult.toLocaleString()}원</span>
+                </div>
+                {fare.teen !== undefined && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-base text-slate-600">청소년 (중·고교생)</span>
+                    <span className="text-lg font-bold text-slate-900">{fare.teen.toLocaleString()}원</span>
+                  </div>
+                )}
+                {fare.child !== undefined && (
+                  <div className="flex items-center justify-between py-3">
+                    <span className="text-base text-slate-600">어린이</span>
+                    <span className="text-lg font-bold text-slate-900">{fare.child.toLocaleString()}원</span>
+                  </div>
+                )}
+                {(fare.carSmall !== undefined || fare.carRegular !== undefined) && (
+                  <div className="pt-3 pb-2">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">차량 선적</p>
+                    {fare.carSmall !== undefined && (
+                      <div className="flex items-center justify-between pb-2">
+                        <span className="text-base text-slate-600">소형차</span>
+                        <span className="text-lg font-bold text-slate-900">{fare.carSmall.toLocaleString()}원</span>
+                      </div>
+                    )}
+                    {fare.carRegular !== undefined && (
+                      <div className="flex items-center justify-between pb-1">
+                        <span className="text-base text-slate-600">일반 승용차</span>
+                        <span className="text-lg font-bold text-slate-900">{fare.carRegular.toLocaleString()}원</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <p className="mt-2 text-xs text-slate-400">* 2024년 기준 참고 요금 · 실제 요금은 운항사 또는 예매 사이트에서 확인하세요</p>
+            </div>
+          )}
 
           {/* 안내 문구 */}
           <p className="text-sm text-slate-400">
