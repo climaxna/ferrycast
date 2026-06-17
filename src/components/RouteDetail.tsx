@@ -58,7 +58,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                     ? "bg-rose-50 text-rose-600"
                     : isUnknown
                       ? "bg-slate-100 text-slate-500"
-                      : "bg-teal-50 text-teal-700"
+                      : "bg-blue-50 text-blue-700"
                 }`}
               >
                 {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
@@ -139,7 +139,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
             href="https://island.theksa.co.kr"
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full rounded-xl bg-gradient-to-r from-teal-600 to-cyan-700 py-3.5 text-center text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
+            className="block w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 py-3.5 text-center text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
           >
             해운조합 승선 예약하기
           </a>

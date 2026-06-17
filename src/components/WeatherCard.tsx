@@ -17,7 +17,7 @@ export default async function WeatherCard() {
   const wave = w.waveHeight !== undefined ? waveLabel(w.waveHeight) : null
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-700 via-cyan-800 to-slate-900 p-5 text-white shadow-lg shadow-cyan-900/10">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 p-5 text-white shadow-lg shadow-blue-900/10">
       {/* 장식용 물결 */}
       <svg
         className="pointer-events-none absolute -right-6 -top-6 h-32 w-32 text-white/5"
@@ -60,7 +60,7 @@ export default async function WeatherCard() {
           {wave ? (
             <>
               <span className="font-semibold">{w.waveHeight!.toFixed(1)}m</span>
-              <span className="text-[11px] font-medium text-cyan-200">{wave.text}</span>
+              <span className="text-[11px] font-medium text-sky-200">{wave.text}</span>
             </>
           ) : (
             <span className="text-xs text-white/40">정보 없음</span>

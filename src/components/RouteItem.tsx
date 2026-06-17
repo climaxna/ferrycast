@@ -31,7 +31,7 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
   const pastTimes = route.times.slice(0, nextIdx === -1 ? route.times.length : nextIdx)
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
-  const accent = isCancelled ? "bg-rose-400" : isUnknown ? "bg-slate-300" : "bg-teal-500"
+  const accent = isCancelled ? "bg-rose-400" : isUnknown ? "bg-slate-300" : "bg-blue-500"
   const isAltTerminal = route.terminal !== "완도여객선터미널"
 
   return (
@@ -53,7 +53,7 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
                 ? "bg-rose-50 text-rose-600"
                 : isUnknown
                   ? "bg-slate-100 text-slate-500"
-                  : "bg-teal-50 text-teal-700"
+                  : "bg-blue-50 text-blue-700"
             }`}
           >
             {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
@@ -68,12 +68,12 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
           <>
             {/* 다음 출발 강조 */}
             {nextTime ? (
-              <div className="mt-2.5 flex items-center justify-between rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-2">
+              <div className="mt-2.5 flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-50 to-sky-50 px-3 py-2">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[11px] font-medium text-teal-500">{timeLabel}</span>
-                  <span className="text-2xl font-bold tabular-nums text-teal-800">{nextTime}</span>
+                  <span className="text-[11px] font-medium text-blue-500">{timeLabel}</span>
+                  <span className="text-2xl font-bold tabular-nums text-blue-800">{nextTime}</span>
                 </div>
-                <span className="text-xs font-semibold text-teal-600">
+                <span className="text-xs font-semibold text-blue-600">
                   {relativeTime(nextTime, nowMinutes)}
                 </span>
               </div>

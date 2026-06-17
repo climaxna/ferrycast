@@ -90,7 +90,7 @@ function TabButton({
       onClick={onClick}
       className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
         active
-          ? "bg-white text-teal-700 shadow-sm"
+          ? "bg-white text-blue-700 shadow-sm"
           : "text-slate-500 hover:text-slate-700"
       }`}
     >

@@ -1,7 +1,7 @@
 export default function Logo({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-cyan-800 shadow-sm ${className}`}
+      className={`inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 shadow-sm ${className}`}
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         {/* 선체 */}

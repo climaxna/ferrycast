@@ -31,7 +31,7 @@ export default function Page() {
           <Logo />
           <div>
             <h1 className="text-lg font-bold leading-none tracking-tight text-slate-900">
-              Ferry<span className="text-teal-600">Cast</span>
+              Ferry<span className="text-blue-600">Cast</span>
             </h1>
             <p className="mt-1 text-[11px] font-medium tracking-wide text-slate-400">
               완도 날씨 · 여객선 현황
@@ -67,7 +67,7 @@ export default function Page() {
               href="https://www.wando.go.kr"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-teal-200 hover:text-teal-700"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
             >
               완도군청 여객선
             </a>
@@ -75,7 +75,7 @@ export default function Page() {
               href="https://island.theksa.co.kr"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-teal-200 hover:text-teal-700"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
             >
               해운조합 승선예약
             </a>
