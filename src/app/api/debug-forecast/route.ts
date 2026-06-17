@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
 
 export async function GET() {
-  const key = process.env.KMA_API_KEY
-  if (!key) return NextResponse.json({ error: "KMA_API_KEY 없음" })
+  const key = process.env.DATAGOKR_API_KEY
+  if (!key) return NextResponse.json({ error: "DATAGOKR_API_KEY 없음" })
 
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
   const pad = (n: number) => String(n).padStart(2, "0")
@@ -25,32 +25,25 @@ export async function GET() {
     }
   }
 
-  const grids = [{ nx: 57, ny: 74 }, { nx: 57, ny: 72 }]
   const results = []
-
-  for (const { baseDate, baseTime } of candidates) {
-    for (const { nx, ny } of grids) {
-      const url =
-        `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst` +
-        `?authKey=${key}&dataType=JSON&numOfRows=10&pageNo=1` +
-        `&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`
+  for (const { baseDate, baseTime } of candidates.slice(0, 1)) {
+    for (const { nx, ny } of [{ nx: 57, ny: 74 }, { nx: 57, ny: 72 }]) {
+      const params = new URLSearchParams({
+        serviceKey: key, dataType: "JSON", numOfRows: "10", pageNo: "1",
+        base_date: baseDate, base_time: baseTime, nx: String(nx), ny: String(ny),
+      })
+      const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
       try {
         const res = await fetch(url, { cache: "no-store" })
         const json = await res.json()
         const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
         const resultMsg = json?.response?.header?.resultMsg ?? json?.header?.resultMsg
-        results.push({
-          baseDate, baseTime, nx, ny,
-          httpStatus: res.status,
-          resultCode,
-          resultMsg,
-          itemCount: json?.response?.body?.items?.item?.length ?? 0,
-        })
+        results.push({ baseDate, baseTime, nx, ny, httpStatus: res.status, resultCode, resultMsg })
       } catch (e) {
         results.push({ baseDate, baseTime, nx, ny, error: String(e) })
       }
     }
   }
 
-  return NextResponse.json({ kstNow: kst.toISOString(), candidates, results })
+  return NextResponse.json({ kstNow: kst.toISOString(), results })
 }

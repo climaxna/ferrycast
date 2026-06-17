@@ -73,21 +73,28 @@ function makeDateLabel(date: string, today: string): string {
 }
 
 export async function get5DayForecast(): Promise<DailyForecast[]> {
-  const key = process.env.KMA_API_KEY
+  // apihub.kma.go.kr는 서비스별 별도 등록 필요. data.go.kr 공통키 사용.
+  const key = process.env.DATAGOKR_API_KEY
   if (!key) return []
 
   const today = kstDateStr(0)
   const candidates = getVilageFcstBaseCandidates()
-  // 육지 격자(57,74) 실패 시 인근 해상 격자 시도
-  const grids = [{ nx: 57, ny: 74 }, { nx: 57, ny: 72 }, { nx: 57, ny: 71 }]
+  const grids = [{ nx: 57, ny: 74 }, { nx: 57, ny: 72 }]
 
   for (const { baseDate, baseTime } of candidates) {
     for (const { nx, ny } of grids) {
       try {
-        const url =
-          `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst` +
-          `?authKey=${key}&dataType=JSON&numOfRows=1000&pageNo=1` +
-          `&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`
+        const params = new URLSearchParams({
+          serviceKey: key,
+          dataType: "JSON",
+          numOfRows: "1000",
+          pageNo: "1",
+          base_date: baseDate,
+          base_time: baseTime,
+          nx: String(nx),
+          ny: String(ny),
+        })
+        const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
         const res = await fetch(url, { next: { revalidate: 600 } })
         if (!res.ok) continue
         const json = await res.json()
