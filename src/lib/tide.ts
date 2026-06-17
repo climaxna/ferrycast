@@ -77,3 +77,72 @@ export function nextTidalEvent(events: TidalEvent[], nowMinutes: number): TidalE
   })
   return upcoming ?? events[0] ?? null
 }
+
+function kstDateStrOffset(offsetDays: number): string {
+  const d = new Date(Date.now() + (9 * 60 * 60 + offsetDays * 86400) * 1000)
+  return `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`
+}
+
+function dayLabel(date: string, today: string): string {
+  const toMs = (s: string) => new Date(`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}`).getTime()
+  const diff = Math.round((toMs(date) - toMs(today)) / 86400000)
+  if (diff === 0) return "오늘"
+  if (diff === 1) return "내일"
+  if (diff === 2) return "모레"
+  return `${date.slice(4, 6)}/${date.slice(6)}`
+}
+
+export interface TidalDayForecast {
+  date: string
+  dateLabel: string
+  events: TidalEvent[]
+  obsName: string
+}
+
+export async function get5DayTidalForecast(): Promise<TidalDayForecast[]> {
+  const key = process.env.DATAGOKR_API_KEY
+  if (!key) return []
+
+  const today = kstDateStrOffset(0)
+  const dates = Array.from({ length: 5 }, (_, i) => kstDateStrOffset(i))
+
+  const results = await Promise.all(
+    dates.map(async (reqDate) => {
+      try {
+        const params = new URLSearchParams({
+          serviceKey: key,
+          type: "json",
+          numOfRows: "20",
+          pageNo: "1",
+          obsCode: OBS_CODE,
+          reqDate,
+        })
+        const url = `https://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService?${params}`
+        const res = await fetch(url, { next: { revalidate: 3600 } })
+        if (!res.ok) return null
+        const json = await res.json()
+        const resultCode = json?.header?.resultCode ?? json?.response?.header?.resultCode
+        if (resultCode !== "00") return null
+        const raw = json?.body?.items?.item
+        if (!raw) return null
+        const items = Array.isArray(raw) ? raw : [raw]
+        const events: TidalEvent[] = items.map((d: Record<string, unknown>) => ({
+          time: String(d.predcDt).slice(11, 16),
+          height: Number(d.predcTdlvVl),
+          type: Number(d.extrSe) % 2 === 1 ? "high" : "low",
+        }))
+        events.sort((a, b) => a.time.localeCompare(b.time))
+        return { reqDate, obsName: String(items[0]?.obsvtrNm ?? "완도"), events }
+      } catch {
+        return null
+      }
+    })
+  )
+
+  return dates.map((date, i) => ({
+    date,
+    dateLabel: dayLabel(date, today),
+    events: results[i]?.events ?? [],
+    obsName: results[i]?.obsName ?? "완도",
+  }))
+}
