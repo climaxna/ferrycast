@@ -28,7 +28,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+    <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: '100dvh' }}>
       {/* 상단 헤더 */}
       <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-4">
         <button

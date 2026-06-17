@@ -26,7 +26,7 @@ export default function WeatherDetail({ weather: w, tidal, onClose }: Props) {
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+    <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: '100dvh' }}>
       {/* 상단 헤더 */}
       <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-4">
         <button
@@ -89,7 +89,7 @@ export default function WeatherDetail({ weather: w, tidal, onClose }: Props) {
                 <p className="text-3xl">🌊</p>
                 <p className="mt-3 text-base font-semibold text-slate-500">조석 정보를 불러올 수 없습니다</p>
                 <p className="mt-1.5 text-sm text-slate-400">
-                  KHOA_API_KEY 환경변수가 설정되면<br />만조·간조 예보를 확인할 수 있습니다
+                  잠시 후 다시 시도해 주세요
                 </p>
               </div>
             )}

@@ -37,11 +37,12 @@ export async function getTidalForecast(): Promise<TidalForecast | null> {
       reqDate,
     })
     const url = `https://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService?${params}`
-    const res = await fetch(url, { next: { revalidate: 3600 } })
+    const res = await fetch(url, { next: { revalidate: 300 } })
     if (!res.ok) return null
 
     const json = await res.json()
-    if (json?.header?.resultCode !== "00") return null
+    const resultCode = json?.header?.resultCode ?? json?.response?.header?.resultCode
+    if (resultCode !== "00") return null
 
     const raw = json?.body?.items?.item
     if (!raw) return null
