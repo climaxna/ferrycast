@@ -112,7 +112,7 @@ export default function WeatherCardClient({ weather: w, tidal }: Props) {
           </svg>
           자세히 보기
         </div>
-      </button>
+      </div>
 
       {isDetailOpen && (
         <WeatherDetail
