@@ -26,9 +26,15 @@ const HWAHEUNGPO_GROUPS = new Set(["hwaheungpo-route"])
 
 // KOMSA 결항 조회용 선박명 (그룹 키 기준)
 const ROUTE_FERRIES: Record<string, string[]> = {
-  "jeju":             ["실버클라우드", "골드스텔라"],
-  "cheongsando":      ["슬로시티청산도호", "청산아일랜드"],
-  "hwaheungpo-route": ["대한호"],
+  "jeju":             ["실버클라우드", "골드스텔라", "송림블루오션"],
+  "cheongsando":      ["슬로시티청산도호", "청산아일랜드", "섬사랑7호"],
+  "hwaheungpo-route": ["대한호", "대한호(700톤)", "민국호(811톤)", "만세호"],
+}
+
+// TAGO 데이터가 불완전한 노선: 편수가 이 값 미만이면 정적 시간표 사용
+// (청산도 = 청산농협 선박이 TAGO 미등록)
+const ROUTE_MIN_TRIPS: Record<string, number> = {
+  "cheongsando": 3,
 }
 
 // 운임 요금표 (그룹 키 기준, 제주 제외)
@@ -149,11 +155,18 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       .sort((a, b) => (grouped[a].priority ?? 99) - (grouped[b].priority ?? 99))
       .map((groupKey) => {
         const { label, times, ships } = grouped[groupKey]
+        const uniqueTimes = [...new Set(times)].sort()
+        const minTrips = ROUTE_MIN_TRIPS[groupKey]
+        // TAGO 편수 부족 → 정적 시간표 + 실시간 운항상태
+        if (minTrips && uniqueTimes.length < minTrips) {
+          const base = STATIC_DEP.find((r) => r.id === `dep-${groupKey}`)
+          if (base) return { ...base, status: statusMap[groupKey], isLive: false }
+        }
         return {
           id: `dep-${groupKey}`,
           to: label,
           operator: [...ships].join(" · "),
-          times: [...new Set(times)].sort(),
+          times: uniqueTimes,
           status: statusMap[groupKey],
           isLive: true,
           terminal: HWAHEUNGPO_GROUPS.has(groupKey) ? TERMINAL_HWAHEUNGPO : TERMINAL_MAIN,
@@ -185,18 +198,25 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
         const filtered = items.filter((it) => it.arrPlaceNm === arrFilter)
         if (!filtered.length) return null
 
-        const times = filtered
-          .map((it) => parseTime(it.depPlandTime))
-          .filter(Boolean) as string[]
+        const times = [...new Set(
+          filtered.map((it) => parseTime(it.depPlandTime)).filter(Boolean) as string[]
+        )].sort()
         const ships = new Set(filtered.map((it) => it.vihicleNm).filter(Boolean))
         const status = await fetchKomsaStatus(key, date, ROUTE_FERRIES[groupKey] ?? [])
+
+        // TAGO 편수 부족 → 정적 시간표 + 실시간 운항상태
+        const minTrips = ROUTE_MIN_TRIPS[groupKey]
+        if (minTrips && times.length < minTrips) {
+          const base = STATIC_ARR.find((r) => r.id === `arr-${groupKey}`)
+          if (base) return { ...base, status, isLive: false, _priority: priority }
+        }
 
         return {
           id: `arr-${groupKey}`,
           to: "완도",
           from: label,
           operator: [...ships].join(" · "),
-          times: [...new Set(times)].sort(),
+          times,
           status,
           isLive: true,
           terminal: arrFilter === "완도_화흥포" ? TERMINAL_HWAHEUNGPO : TERMINAL_MAIN,
