@@ -94,39 +94,70 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
         <div className="mx-auto max-w-lg space-y-5 px-4 py-5">
 
           {/* 터미널 안내 — 클릭 시 카카오지도 */}
-          <a
-            href={`https://map.kakao.com/?q=${encodeURIComponent(isAltTerminal ? "완도 화흥포항" : "완도여객선터미널")}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-start gap-3 rounded-2xl px-4 py-4 transition-opacity active:opacity-70 ${
-              isAltTerminal ? "bg-amber-50" : "bg-slate-50"
-            }`}
-          >
-            <svg
-              className={`mt-0.5 shrink-0 ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}
-              width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-              aria-hidden="true"
+          {isDeparture ? (
+            /* 출발 탭: 완도측 터미널 */
+            <a
+              href={`https://map.kakao.com/?q=${encodeURIComponent(isAltTerminal ? "완도 화흥포항" : "완도여객선터미널")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-start gap-3 rounded-2xl px-4 py-4 transition-opacity active:opacity-70 ${
+                isAltTerminal ? "bg-amber-50" : "bg-slate-50"
+              }`}
             >
-              <path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11Z" strokeLinejoin="round" />
-              <circle cx="12" cy="10" r="2.2" />
-            </svg>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <p className={`text-base font-bold ${isAltTerminal ? "text-amber-800" : "text-slate-700"}`}>
-                  완도 {terminalRole} · {route.terminal}
-                </p>
-                <span className={`shrink-0 text-xs font-medium ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}>
-                  지도 보기 →
-                </span>
+              <svg
+                className={`mt-0.5 shrink-0 ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}
+                width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                aria-hidden="true"
+              >
+                <path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11Z" strokeLinejoin="round" />
+                <circle cx="12" cy="10" r="2.2" />
+              </svg>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <p className={`text-base font-bold ${isAltTerminal ? "text-amber-800" : "text-slate-700"}`}>
+                    완도 출발 · {route.terminal}
+                  </p>
+                  <span className={`shrink-0 text-xs font-medium ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}>
+                    지도 보기 →
+                  </span>
+                </div>
+                {isAltTerminal && (
+                  <p className="mt-1.5 text-sm leading-relaxed text-amber-700">
+                    완도여객선터미널이 아닌 <strong className="font-bold">화흥포항</strong>에서 출발합니다.
+                    터미널 위치가 다르니 방문 전 꼭 확인하세요.
+                  </p>
+                )}
               </div>
-              {isAltTerminal && (
-                <p className="mt-1.5 text-sm leading-relaxed text-amber-700">
-                  완도여객선터미널이 아닌 <strong className="font-bold">화흥포항</strong>에서{" "}
-                  {terminalRole}합니다. 터미널 위치가 다르니 방문 전 꼭 확인하세요.
-                </p>
-              )}
-            </div>
-          </a>
+            </a>
+          ) : (
+            /* 도착 탭: 섬에서 타는 터미널 */
+            <a
+              href={`https://map.kakao.com/?q=${encodeURIComponent(route.islandTerminal ?? `${route.from} 여객터미널`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-start gap-3 rounded-2xl bg-blue-50 px-4 py-4 transition-opacity active:opacity-70"
+            >
+              <svg
+                className="mt-0.5 shrink-0 text-blue-500"
+                width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                aria-hidden="true"
+              >
+                <path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11Z" strokeLinejoin="round" />
+                <circle cx="12" cy="10" r="2.2" />
+              </svg>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-[11px] font-semibold text-blue-400">타는 곳</p>
+                    <p className="text-base font-bold text-blue-800">
+                      {route.islandTerminal ?? `${route.from} 여객터미널`}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-xs font-medium text-blue-400">지도 보기 →</span>
+                </div>
+              </div>
+            </a>
+          )}
 
           {/* 시간표 */}
           <div>

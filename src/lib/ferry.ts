@@ -45,9 +45,9 @@ const FARE_URL_MAP: Record<string, string> = {
 // 도착 탭: 완도로 돌아오는 항로
 // 소안도(SEA33830)가 화흥포 직전 마지막 경유지 → 해당 출발 시간을 기준으로 사용
 const ARR_QUERIES = [
-  { nodeId: "SEA10090", label: "제주",             arrFilter: "완도",        groupKey: "jeju",             priority: 1 },
-  { nodeId: "SEA35560", label: "청산도",            arrFilter: "완도",        groupKey: "cheongsando",      priority: 2 },
-  { nodeId: "SEA33830", label: "소안도·보길도·노화", arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", priority: 3 },
+  { nodeId: "SEA10090", label: "제주",             arrFilter: "완도",        groupKey: "jeju",             islandTerminal: "제주항 연안여객터미널",          priority: 1 },
+  { nodeId: "SEA35560", label: "청산도",            arrFilter: "완도",        groupKey: "cheongsando",      islandTerminal: "도청항 (청산도 여객선터미널)",    priority: 2 },
+  { nodeId: "SEA33830", label: "소안도·보길도·노화", arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", islandTerminal: "소안도 부황항 · 노화 산양항",    priority: 3 },
   // SEA31891(보길도·노화 출발)은 동일 노선 — 소안도 경유 후 화흥포 도착이므로 소안도 시간 기준 사용
 ] as const
 
@@ -180,7 +180,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
 
     const results = await Promise.all(
-      ARR_QUERIES.map(async ({ nodeId, label, arrFilter, groupKey, priority }) => {
+      ARR_QUERIES.map(async ({ nodeId, label, arrFilter, groupKey, islandTerminal, priority }) => {
         const items = await fetchNodeRoutes(key, nodeId, date)
         const filtered = items.filter((it) => it.arrPlaceNm === arrFilter)
         if (!filtered.length) return null
@@ -200,6 +200,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           status,
           isLive: true,
           terminal: arrFilter === "완도_화흥포" ? TERMINAL_HWAHEUNGPO : TERMINAL_MAIN,
+          islandTerminal,
           fare: FARE_MAP[groupKey],
           fareUrl: FARE_URL_MAP[groupKey],
           _priority: priority,
@@ -252,12 +253,14 @@ const STATIC_ARR: WandoRoute[] = [
     to: "완도", from: "제주", operator: "청해진해운",
     times: ["08:00", "08:40", "16:00", "19:30"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+    islandTerminal: "제주항 연안여객터미널",
   },
   {
     id: "arr-cheongsando",
     to: "완도", from: "청산도", operator: "남해고속",
     times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+    islandTerminal: "도청항 (청산도 여객선터미널)",
     fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
   },
   {
@@ -265,6 +268,7 @@ const STATIC_ARR: WandoRoute[] = [
     to: "완도", from: "소안도·보길도·노화", operator: "청해진해운",
     times: ["07:30", "09:47", "13:12", "16:14", "19:04"],
     status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
+    islandTerminal: "소안도 부황항 · 노화 산양항",
     fareUrl: FARE_URL_MAP["hwaheungpo-route"],
   },
 ]
