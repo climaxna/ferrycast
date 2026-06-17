@@ -7,7 +7,7 @@
 
 ## 🟢 지금 여기
 
-**조석예보 UI 완성 (클릭 → 상세 바텀시트) → KHOA_API_KEY 발급 필요, 이후 M2 진행**
+**조석예보 완전 연동 완료 (DATAGOKR_API_KEY 공용, DT_0027) → M2 진행**
 
 > **Claude Code 지시**: 태스크 하나 완료할 때마다 이 섹션을 자동으로 업데이트할 것.
 > 완료된 항목은 마일스톤 현황에서 [x] 체크할 것.
@@ -135,9 +135,8 @@ ferrycast/
 ## 환경변수 (.env.local)
 
 ```
-DATAGOKR_API_KEY=발급받은_키   # TAGO + KOMSA 공통 (data.go.kr 동일 키)
+DATAGOKR_API_KEY=발급받은_키   # TAGO + KOMSA + KHOA 조석예보 공통 (data.go.kr 동일 키)
 KMA_API_KEY=발급받은_키        # 기상청 별도 키
-KHOA_API_KEY=발급받은_키       # 국립해양조사원 조석예보 (https://www.khoa.go.kr/api/oceangrid/intro.do)
 ```
 
 > ⚠️ `.env.local`은 반드시 `.gitignore`에 포함되어 있어야 합니다. GitHub에 키가 올라가면 즉시 폐기하고 재발급하세요.
@@ -177,11 +176,8 @@ KHOA_API_KEY=발급받은_키       # 국립해양조사원 조석예보 (https:
 
 ## 지금 당장 다음 할 일
 
-1. **KHOA API 키 발급** — https://www.khoa.go.kr/api/oceangrid/intro.do 에서 회원가입 후 키 발급
-2. **.env.local에 `KHOA_API_KEY` 추가** 후 `node --env-file=.env.local scripts/test-khoa.mjs` 실행해 관측소 코드 확인
-3. (필요시) 완도 관측소 코드가 `DW0011`이 아닌 경우 `src/lib/tide.ts` 의 `OBS_CODE` 수정
-4. **Vercel 환경변수 추가** — `KHOA_API_KEY` Vercel 대시보드에도 추가
-5. **M2 시작**: 커스텀 도메인 → PWA manifest → 애드센스 신청
+1. **Vercel 재배포 확인** — Vercel에 `DATAGOKR_API_KEY`가 이미 설정되어 있으면 조석예보 즉시 동작
+2. **M2 시작**: 커스텀 도메인 → PWA manifest → 애드센스 신청
 
 ### KOMSA API 연동 메모 (다음 세션 참고)
 
@@ -193,13 +189,17 @@ KHOA_API_KEY=발급받은_키       # 국립해양조사원 조석예보 (https:
 
 ---
 
-## KHOA 조석예보 연동 메모
+## KHOA 조석예보 연동 메모 ✅ 완료
 
-- **Endpoint**: `https://www.khoa.go.kr/api/oceangrid/tideObsPredicAPI.do/json`
-- **파라미터**: `ServiceKey`, `ObsCode=DW0011` (완도 추정), `Date=YYYYMMDD`
-- **응답 형식**: `result.data[]` — 각 항목에 `tph_time/tph_level`(만조), `tpl_time/tpl_level`(간조)
+- **Base URL**: `https://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService`
+- **사용 키**: `DATAGOKR_API_KEY` (별도 KHOA 키 불필요!)
+- **완도 예보지점 코드**: `DT_0027`
+- **파라미터**: `serviceKey`, `type=json`, `obsCode=DT_0027`, `reqDate=YYYYMMDD`
+- **응답 형식**: `header.resultCode === "00"`, `body.items.item[]`
+  - `predcDt`: "YYYY-MM-DD HH:MM" (예측 시각)
+  - `predcTdlvVl`: 조위 높이 (cm)
+  - `extrSe`: 홀수(1,3)=고조, 짝수(2,4)=저조
 - **테스트**: `node --env-file=.env.local scripts/test-khoa.mjs`
-- **관측소 코드 오류 시**: `scripts/test-khoa.mjs` 실행해 올바른 코드 확인 후 `src/lib/tide.ts` OBS_CODE 수정
 
 ---
 
