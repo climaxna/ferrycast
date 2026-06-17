@@ -1,17 +1,24 @@
 import { Suspense } from "react"
-import { ferries, wandoFerries } from "@/lib/ferry-data"
-import DepartureBoard from "@/components/DepartureBoard"
+import Link from "next/link"
+import WeatherCard from "@/components/WeatherCard"
+import RouteSection from "@/components/RouteSection"
+import Logo from "@/components/Logo"
 
 export const metadata = {
-  title: "Ferrycast — 완도 여객선 현황",
-  description: "완도항 여객선 출발·도착 실시간 현황판",
+  title: "FerryCast — 완도 날씨·항로 현황",
+  description: "완도 현재 날씨와 여객선 출발·도착 시간표·운항 현황을 한눈에",
 }
 
-function BoardSkeleton() {
+function WeatherSkeleton() {
+  return <div className="h-36 animate-pulse rounded-2xl bg-slate-100" />
+}
+
+function RouteSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="h-44 animate-pulse rounded-xl bg-gray-100" />
+    <div className="space-y-2.5">
+      <div className="h-9 w-48 animate-pulse rounded-lg bg-slate-100" />
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-100" />
       ))}
     </div>
   )
@@ -19,23 +26,80 @@ function BoardSkeleton() {
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">⛴</span>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900">Ferrycast</h1>
-              <p className="text-sm text-gray-500">완도항 여객선 출발·도착 현황판</p>
-            </div>
+    <main className="min-h-screen bg-slate-50">
+      <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-lg items-center gap-2.5 px-4 py-3">
+          <Logo />
+          <div className="flex-1">
+            <h1 className="text-lg font-bold leading-none tracking-tight text-slate-900">
+              Ferry<span className="text-blue-600">Cast</span>
+            </h1>
+            <p className="mt-1 text-[11px] font-medium tracking-wide text-slate-400">
+              완도 날씨 · 여객선 현황
+            </p>
           </div>
+          <Link
+            href="/qr"
+            aria-label="QR 코드"
+            className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-blue-600"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="18" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="14" y="18" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="18" y="18" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="5" y="5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="16" y="5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="5" y="16" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+            </svg>
+          </Link>
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <Suspense fallback={<BoardSkeleton />}>
-          <DepartureBoard initial={ferries} wandoInitial={wandoFerries} />
+      <div className="mx-auto max-w-lg space-y-5 px-4 py-5">
+        <Suspense fallback={<WeatherSkeleton />}>
+          <WeatherCard />
         </Suspense>
+
+        <Suspense fallback={<RouteSkeleton />}>
+          <RouteSection />
+        </Suspense>
+
+        {/* 광고 슬롯 자리 — AdSense 승인 후 활성화 */}
+        <div className="flex h-20 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/50">
+          <span className="text-xs text-slate-300">광고 영역</span>
+        </div>
+
+        <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+          <p className="text-xs leading-relaxed text-slate-500">
+            이 정보는 참고용입니다.{" "}
+            <strong className="font-semibold text-slate-700">
+              실제 운항 여부는 출발 전 공식 채널에서 반드시 최종 확인하세요.
+            </strong>{" "}
+            기상 악화·조류 등으로 예고 없이 결항될 수 있습니다.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a
+              href="https://www.wando.go.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
+            >
+              완도군청 여객선
+            </a>
+            <a
+              href="https://island.theksa.co.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
+            >
+              해운조합 승선예약
+            </a>
+          </div>
+        </footer>
       </div>
     </main>
   )
