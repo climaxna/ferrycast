@@ -99,16 +99,17 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
 
             <div className="flex-1" />
 
-            {/* 기준시간 + 새로고침 */}
-            <div className="flex shrink-0 items-center gap-1">
-              <span className="text-[10px] text-white/30">{timeStr}</span>
-              <span onClick={(e) => e.stopPropagation()}>
-                <RefreshButton />
-              </span>
-            </div>
+            {/* 새로고침 */}
+            <span onClick={(e) => e.stopPropagation()}>
+              <RefreshButton />
+            </span>
           </div>
 
-          <p className="mt-1.5 text-right text-[10px] text-white/25">5일 날씨 예보 →</p>
+          {/* 날짜·기준시간 ← → 5일 날씨 예보 */}
+          <div className="mt-1.5 flex items-center justify-between">
+            <span className="text-[11px] font-medium text-white/50">{timeStr} 기준</span>
+            <span className="text-[11px] font-medium text-white/50">5일 날씨 예보 →</span>
+          </div>
         </button>
 
         {/* 조석 존 — 클릭 시 5일 조석 예보 */}
