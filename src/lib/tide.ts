@@ -126,11 +126,17 @@ export async function get5DayTidalForecast(): Promise<TidalDayForecast[]> {
         const raw = json?.body?.items?.item
         if (!raw) return null
         const items = Array.isArray(raw) ? raw : [raw]
-        const events: TidalEvent[] = items.map((d: Record<string, unknown>) => ({
-          time: String(d.predcDt).slice(11, 16),
-          height: Number(d.predcTdlvVl),
-          type: Number(d.extrSe) % 2 === 1 ? "high" : "low",
-        }))
+        const events: TidalEvent[] = items
+          .filter((d: Record<string, unknown>) => {
+            // predcDt: "YYYY-MM-DD HH:MM" → "YYYYMMDD" 와 reqDate 비교
+            const dt = String(d.predcDt).slice(0, 10).replace(/-/g, "")
+            return dt === reqDate
+          })
+          .map((d: Record<string, unknown>) => ({
+            time: String(d.predcDt).slice(11, 16),
+            height: Number(d.predcTdlvVl),
+            type: Number(d.extrSe) % 2 === 1 ? "high" : "low",
+          }))
         events.sort((a, b) => a.time.localeCompare(b.time))
         return { reqDate, obsName: String(items[0]?.obsvtrNm ?? "완도"), events }
       } catch {
