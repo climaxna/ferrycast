@@ -1,6 +1,4 @@
-// 해양수산부 국립해양조사원 조석예보(고·저조) API
-// Base URL: apis.data.go.kr/1192136/tideFcstHghLw
-// DATAGOKR_API_KEY 공통 사용 (별도 키 불필요)
+import { kstDateStr, dayLabel } from "@/lib/utils"
 
 export interface TidalEvent {
   time: string   // "HH:MM"
@@ -78,19 +76,6 @@ export function nextTidalEvent(events: TidalEvent[], nowMinutes: number): TidalE
   return upcoming ?? events[0] ?? null
 }
 
-function kstDateStrOffset(offsetDays: number): string {
-  const d = new Date(Date.now() + (9 * 60 * 60 + offsetDays * 86400) * 1000)
-  return `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`
-}
-
-function dayLabel(date: string, today: string): string {
-  const toMs = (s: string) => new Date(`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}`).getTime()
-  const diff = Math.round((toMs(date) - toMs(today)) / 86400000)
-  if (diff === 0) return "오늘"
-  if (diff === 1) return "내일"
-  if (diff === 2) return "모레"
-  return `${date.slice(4, 6)}/${date.slice(6)}`
-}
 
 export interface TidalDayForecast {
   date: string
@@ -103,8 +88,8 @@ export async function get5DayTidalForecast(): Promise<TidalDayForecast[]> {
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return []
 
-  const today = kstDateStrOffset(0)
-  const dates = Array.from({ length: 5 }, (_, i) => kstDateStrOffset(i))
+  const today = kstDateStr(0)
+  const dates = Array.from({ length: 5 }, (_, i) => kstDateStr(i))
 
   const results = await Promise.all(
     dates.map(async (reqDate) => {

@@ -1,4 +1,4 @@
-// 기상청 단기예보 API로 5일치 날씨 데이터
+import { kstDateStr, dayLabel } from "@/lib/utils"
 
 export interface DailyForecast {
   date: string       // "YYYYMMDD"
@@ -58,19 +58,6 @@ function getVilageFcstBaseCandidates(): Array<{ baseDate: string; baseTime: stri
   return candidates
 }
 
-function kstDateStr(offsetDays = 0): string {
-  const d = new Date(Date.now() + (9 * 60 * 60 + offsetDays * 86400) * 1000)
-  return `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(d.getUTCDate()).padStart(2, "0")}`
-}
-
-function makeDateLabel(date: string, today: string): string {
-  const toMs = (s: string) => new Date(`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6)}`).getTime()
-  const dayDiff = Math.round((toMs(date) - toMs(today)) / 86400000)
-  if (dayDiff === 0) return "오늘"
-  if (dayDiff === 1) return "내일"
-  if (dayDiff === 2) return "모레"
-  return `${date.slice(4, 6)}/${date.slice(6)}`
-}
 
 export async function get5DayForecast(): Promise<DailyForecast[]> {
   // apihub.kma.go.kr는 서비스별 별도 등록 필요. data.go.kr 공통키 사용.
@@ -144,7 +131,7 @@ export async function get5DayForecast(): Promise<DailyForecast[]> {
 
           return {
             date,
-            dateLabel: makeDateLabel(date, today),
+            dateLabel: dayLabel(date, today),
             tempMin,
             tempMax,
             sky,

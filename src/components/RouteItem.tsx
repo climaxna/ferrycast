@@ -1,18 +1,5 @@
 import type { WandoRoute } from "@/lib/types"
-
-function toMinutes(t: string): number {
-  const [h, m] = t.split(":").map(Number)
-  return h * 60 + m
-}
-
-function relativeTime(t: string, nowMin: number): string {
-  const diff = toMinutes(t) - nowMin
-  if (diff <= 0) return ""
-  if (diff < 60) return `${diff}분 후`
-  const h = Math.floor(diff / 60)
-  const m = diff % 60
-  return m > 0 ? `${h}시간 ${m}분 후` : `${h}시간 후`
-}
+import { toMinutes, relativeTime } from "@/lib/utils"
 
 interface Props {
   route: WandoRoute

@@ -2,25 +2,13 @@
 
 import { useEffect, useState } from "react"
 import type { WandoRoute } from "@/lib/types"
+import { useModalClose } from "@/hooks/useModalClose"
+import { toMinutes as toMin, relativeTime } from "@/lib/utils"
 
 interface Props {
   route: WandoRoute
   isDeparture: boolean
   onClose: () => void
-}
-
-function toMin(t: string): number {
-  const [h, m] = t.split(":").map(Number)
-  return h * 60 + m
-}
-
-function relativeTime(t: string, nowMin: number): string {
-  const diff = toMin(t) - nowMin
-  if (diff <= 0) return ""
-  if (diff < 60) return `${diff}분 후`
-  const h = Math.floor(diff / 60)
-  const m = diff % 60
-  return m > 0 ? `${h}시간 ${m}분 후` : `${h}시간 후`
 }
 
 export default function RouteDetail({ route, isDeparture, onClose }: Props) {
@@ -42,15 +30,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
     return () => clearInterval(id)
   }, [])
 
-  useEffect(() => {
-    document.body.style.overflow = "hidden"
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.body.style.overflow = ""
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [onClose])
+  useModalClose(onClose)
 
   const nextIdx = route.times.findIndex((t) => toMin(t) > nowMinutes)
   const pastTimes = route.times.slice(0, nextIdx === -1 ? route.times.length : nextIdx)

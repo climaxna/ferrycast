@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
 import type { TidalDayForecast, TidalEvent } from "@/lib/tide"
+import { useModalClose } from "@/hooks/useModalClose"
 
 interface Props {
   days: TidalDayForecast[]
@@ -9,15 +9,7 @@ interface Props {
 }
 
 export default function TidalForecastDetail({ days, onClose }: Props) {
-  useEffect(() => {
-    document.body.style.overflow = "hidden"
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.body.style.overflow = ""
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [onClose])
+  useModalClose(onClose)
 
   const now = new Date()
   const todayStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`

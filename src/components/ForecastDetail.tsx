@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect } from "react"
 import { skyIcon, skyLabel } from "@/lib/forecast"
 import type { DailyForecast } from "@/lib/forecast"
+import { useModalClose } from "@/hooks/useModalClose"
 
 interface Props {
   forecast: DailyForecast[]
@@ -10,15 +10,7 @@ interface Props {
 }
 
 export default function ForecastDetail({ forecast, onClose }: Props) {
-  useEffect(() => {
-    document.body.style.overflow = "hidden"
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.body.style.overflow = ""
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [onClose])
+  useModalClose(onClose)
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: "100dvh" }}>

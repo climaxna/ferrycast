@@ -1,9 +1,9 @@
 "use client"
 
-import { useEffect } from "react"
 import { windDirLabel, ptyLabel } from "@/lib/weather"
 import type { WeatherData } from "@/lib/weather"
 import type { TidalForecast, TidalEvent } from "@/lib/tide"
+import { useModalClose } from "@/hooks/useModalClose"
 
 interface Props {
   weather: WeatherData
@@ -12,18 +12,9 @@ interface Props {
 }
 
 export default function WeatherDetail({ weather: w, tidal, onClose }: Props) {
+  useModalClose(onClose)
   const { text: ptyText, icon: ptyIcon } = ptyLabel(w.pty)
   const baseStr = `${w.baseDate.slice(0, 4)}.${w.baseDate.slice(4, 6)}.${w.baseDate.slice(6)} ${w.baseTime.slice(0, 2)}:${w.baseTime.slice(2)} 기준`
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden"
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
-    document.addEventListener("keydown", onKey)
-    return () => {
-      document.body.style.overflow = ""
-      document.removeEventListener("keydown", onKey)
-    }
-  }, [onClose])
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: '100dvh' }}>
