@@ -105,10 +105,9 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
             </span>
           </div>
 
-          {/* 날짜·기준시간 ← → 5일 날씨 예보 */}
           <div className="mt-1.5 flex items-center justify-between">
             <span className="text-[11px] font-medium text-white/50">{timeStr} 기준</span>
-            <span className="text-[11px] font-medium text-white/50">5일 날씨 예보 →</span>
+            <span className="text-[11px] font-medium text-white/50">단기 날씨 예보 →</span>
           </div>
         </button>
 

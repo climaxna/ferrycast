@@ -34,8 +34,8 @@ export default function ForecastDetail({ forecast, onClose }: Props) {
           </svg>
         </button>
         <div>
-          <h2 className="text-lg font-bold tracking-tight text-slate-900">완도 5일 날씨 예보</h2>
-          <p className="text-xs text-slate-400">기상청 단기예보 기준</p>
+          <h2 className="text-lg font-bold tracking-tight text-slate-900">완도 단기 날씨 예보</h2>
+          <p className="text-xs text-slate-400">기상청 단기예보 기준 (최대 3일)</p>
         </div>
       </div>
 

@@ -78,72 +78,76 @@ export async function get5DayForecast(): Promise<DailyForecast[]> {
 
   const today = kstDateStr(0)
   const candidates = getVilageFcstBaseCandidates()
+  // 육지 격자(57,74) 실패 시 인근 해상 격자 시도
+  const grids = [{ nx: 57, ny: 74 }, { nx: 57, ny: 72 }, { nx: 57, ny: 71 }]
 
   for (const { baseDate, baseTime } of candidates) {
-    try {
-      const url =
-        `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst` +
-        `?authKey=${key}&dataType=JSON&numOfRows=1500&pageNo=1` +
-        `&base_date=${baseDate}&base_time=${baseTime}&nx=57&ny=74`
-      const res = await fetch(url, { next: { revalidate: 600 } })
-      if (!res.ok) continue
-      const json = await res.json()
-      const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
-      if (resultCode !== "00") continue
+    for (const { nx, ny } of grids) {
+      try {
+        const url =
+          `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst` +
+          `?authKey=${key}&dataType=JSON&numOfRows=1000&pageNo=1` +
+          `&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`
+        const res = await fetch(url, { next: { revalidate: 600 } })
+        if (!res.ok) continue
+        const json = await res.json()
+        const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
+        if (resultCode !== "00") continue
 
-      const rawItems = json?.response?.body?.items?.item
-      if (!rawItems) continue
-      const items: Array<{
-        category: string
-        fcstDate: string
-        fcstTime: string
-        fcstValue: string
-      }> = Array.isArray(rawItems) ? rawItems : [rawItems]
+        const rawItems = json?.response?.body?.items?.item
+        if (!rawItems) continue
+        const items: Array<{
+          category: string
+          fcstDate: string
+          fcstTime: string
+          fcstValue: string
+        }> = Array.isArray(rawItems) ? rawItems : [rawItems]
 
-      const byDate = new Map<string, typeof items>()
-      for (const item of items) {
-        if (!byDate.has(item.fcstDate)) byDate.set(item.fcstDate, [])
-        byDate.get(item.fcstDate)!.push(item)
-      }
-
-      const sortedDates = [...byDate.keys()].sort().slice(0, 5)
-      if (sortedDates.length === 0) continue
-
-      return sortedDates.map((date) => {
-        const dayItems = byDate.get(date)!
-
-        const valAt = (cat: string, time: string) =>
-          dayItems.find((i) => i.category === cat && i.fcstTime === time)?.fcstValue
-        const allVals = (cat: string) =>
-          dayItems.filter((i) => i.category === cat).map((i) => parseFloat(i.fcstValue))
-
-        const tmnRaw = valAt("TMN", "0600") ?? dayItems.find((i) => i.category === "TMN")?.fcstValue
-        const tmxRaw = valAt("TMX", "1500") ?? dayItems.find((i) => i.category === "TMX")?.fcstValue
-        const tempMin = tmnRaw !== undefined ? parseFloat(tmnRaw) : undefined
-        const tempMax = tmxRaw !== undefined ? parseFloat(tmxRaw) : undefined
-
-        const skyStr = valAt("SKY", "1200") ?? valAt("SKY", "1500") ?? valAt("SKY", "0900") ?? "1"
-        const sky = parseInt(skyStr)
-
-        const ptyVals = allVals("PTY")
-        const ptyNonZero = ptyVals.filter((v) => v > 0)
-        const pty = ptyNonZero.length > 0 ? Math.max(...ptyNonZero) : 0
-
-        const popVals = allVals("POP")
-        const popMax = popVals.length > 0 ? Math.max(...popVals) : 0
-
-        return {
-          date,
-          dateLabel: makeDateLabel(date, today),
-          tempMin,
-          tempMax,
-          sky,
-          pty,
-          popMax,
+        const byDate = new Map<string, typeof items>()
+        for (const item of items) {
+          if (!byDate.has(item.fcstDate)) byDate.set(item.fcstDate, [])
+          byDate.get(item.fcstDate)!.push(item)
         }
-      })
-    } catch {
-      continue
+
+        const sortedDates = [...byDate.keys()].sort().slice(0, 5)
+        if (sortedDates.length === 0) continue
+
+        return sortedDates.map((date) => {
+          const dayItems = byDate.get(date)!
+
+          const valAt = (cat: string, time: string) =>
+            dayItems.find((i) => i.category === cat && i.fcstTime === time)?.fcstValue
+          const allVals = (cat: string) =>
+            dayItems.filter((i) => i.category === cat).map((i) => parseFloat(i.fcstValue))
+
+          const tmnRaw = valAt("TMN", "0600") ?? dayItems.find((i) => i.category === "TMN")?.fcstValue
+          const tmxRaw = valAt("TMX", "1500") ?? dayItems.find((i) => i.category === "TMX")?.fcstValue
+          const tempMin = tmnRaw !== undefined ? parseFloat(tmnRaw) : undefined
+          const tempMax = tmxRaw !== undefined ? parseFloat(tmxRaw) : undefined
+
+          const skyStr = valAt("SKY", "1200") ?? valAt("SKY", "1500") ?? valAt("SKY", "0900") ?? "1"
+          const sky = parseInt(skyStr)
+
+          const ptyVals = allVals("PTY")
+          const ptyNonZero = ptyVals.filter((v) => v > 0)
+          const pty = ptyNonZero.length > 0 ? Math.max(...ptyNonZero) : 0
+
+          const popVals = allVals("POP")
+          const popMax = popVals.length > 0 ? Math.max(...popVals) : 0
+
+          return {
+            date,
+            dateLabel: makeDateLabel(date, today),
+            tempMin,
+            tempMax,
+            sky,
+            pty,
+            popMax,
+          }
+        })
+      } catch {
+        continue
+      }
     }
   }
   return []
