@@ -28,107 +28,97 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
-      {/* 배경 오버레이 */}
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
-
-      {/* 바텀 시트 */}
-      <div
-        className="relative w-full max-w-lg rounded-t-3xl bg-white"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* 핸들 */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="h-1 w-10 rounded-full bg-slate-200" />
+    <div className="fixed inset-0 z-50 flex flex-col bg-white">
+      {/* 상단 헤더 */}
+      <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-4">
+        <button
+          onClick={onClose}
+          className="flex items-center gap-1.5 rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-100"
+          aria-label="닫기"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 5l-7 7 7 7" />
+          </svg>
+        </button>
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-lg font-bold tracking-tight text-slate-900">{routeLabel}</h2>
+          {route.operator && (
+            <p className="truncate text-xs text-slate-400">{route.operator}</p>
+          )}
         </div>
+        <span
+          className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-bold ${
+            isCancelled
+              ? "bg-rose-50 text-rose-600"
+              : isUnknown
+                ? "bg-slate-100 text-slate-500"
+                : "bg-blue-50 text-blue-700"
+          }`}
+        >
+          {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
+        </span>
+      </div>
 
-        <div className="px-5 pt-2 pb-8">
-          {/* 헤더 */}
-          <div className="mb-5 flex items-start justify-between">
-            <div className="min-w-0">
-              <h2 className="text-xl font-bold tracking-tight text-slate-900">{routeLabel}</h2>
-              {route.operator && (
-                <p className="mt-1 truncate text-sm text-slate-400">{route.operator}</p>
-              )}
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <span
-                className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                  isCancelled
-                    ? "bg-rose-50 text-rose-600"
-                    : isUnknown
-                      ? "bg-slate-100 text-slate-500"
-                      : "bg-blue-50 text-blue-700"
-                }`}
-              >
-                {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
-              </span>
-              <button
-                onClick={onClose}
-                className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-                aria-label="닫기"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-          </div>
+      {/* 스크롤 컨텐츠 */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-lg space-y-5 px-4 py-5">
 
-          {/* 완도측 터미널 */}
+          {/* 터미널 안내 */}
           <div
-            className={`mb-4 flex items-start gap-2 rounded-xl px-3 py-2.5 ${
+            className={`flex items-start gap-3 rounded-2xl px-4 py-4 ${
               isAltTerminal ? "bg-amber-50" : "bg-slate-50"
             }`}
           >
             <svg
               className={`mt-0.5 shrink-0 ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}
-              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+              width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
               aria-hidden="true"
             >
               <path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11Z" strokeLinejoin="round" />
               <circle cx="12" cy="10" r="2.2" />
             </svg>
             <div className="min-w-0">
-              <p className={`text-sm font-semibold ${isAltTerminal ? "text-amber-800" : "text-slate-700"}`}>
+              <p className={`text-base font-bold ${isAltTerminal ? "text-amber-800" : "text-slate-700"}`}>
                 완도 {terminalRole} · {route.terminal}
               </p>
               {isAltTerminal && (
-                <p className="mt-0.5 text-xs leading-relaxed text-amber-600">
-                  완도여객선터미널이 아닌 <strong>화흥포항</strong>에서 {terminalRole}합니다.
-                  터미널 위치가 다르니 방문 전 확인하세요.
+                <p className="mt-1.5 text-sm leading-relaxed text-amber-700">
+                  완도여객선터미널이 아닌 <strong className="font-bold">화흥포항</strong>에서{" "}
+                  {terminalRole}합니다. 터미널 위치가 다르니 방문 전 꼭 확인하세요.
                 </p>
               )}
             </div>
           </div>
 
           {/* 시간표 */}
-          <div className="mb-5">
-            <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <div>
+            <p className="mb-3 text-sm font-bold uppercase tracking-wider text-slate-400">
               {timeHeading}
             </p>
             {isCancelled ? (
-              <p className="rounded-xl bg-rose-50 px-3 py-2.5 text-sm text-rose-600">
-                오늘 이 항로는 결항입니다. 공식 채널에서 최종 확인하세요.
-              </p>
+              <div className="rounded-2xl bg-rose-50 px-4 py-6 text-center">
+                <p className="text-3xl">🚢</p>
+                <p className="mt-2 text-lg font-bold text-rose-600">오늘 결항</p>
+                <p className="mt-1 text-sm text-rose-500">공식 채널에서 최종 확인하세요.</p>
+              </div>
             ) : route.times.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {route.times.map((t) => (
                   <span
                     key={t}
-                    className="rounded-xl bg-slate-50 px-3 py-1.5 text-sm font-semibold tabular-nums text-slate-700"
+                    className="rounded-2xl bg-slate-50 px-5 py-3 text-xl font-bold tabular-nums text-slate-800 shadow-sm"
                   >
                     {t}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-400">시간표 정보 없음</p>
+              <p className="text-base text-slate-400">시간표 정보 없음</p>
             )}
           </div>
 
           {/* 안내 문구 */}
-          <p className="mb-4 text-xs text-slate-400">
+          <p className="text-sm text-slate-400">
             {route.isLive
               ? "실시간 데이터 기준 · 기상 상황에 따라 변동될 수 있습니다"
               : "참고용 시간표 · 실제 운항 여부는 공식 채널에서 확인하세요"}
@@ -139,7 +129,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
             href="https://island.theksa.co.kr"
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 py-3.5 text-center text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
+            className="block w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 py-4 text-center text-base font-bold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
           >
             해운조합 승선 예약하기
           </a>
