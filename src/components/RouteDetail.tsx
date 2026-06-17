@@ -14,6 +14,8 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const isUnknown = route.status === "unknown"
   const routeLabel = route.from ? `${route.from} → ${route.to}` : `완도 → ${route.to}`
   const timeHeading = isDeparture ? "오늘 출발 시간표" : `오늘 ${route.from} 출발 시간표`
+  const isAltTerminal = route.terminal !== "완도여객선터미널"
+  const terminalRole = isDeparture ? "출발" : "도착"
 
   useEffect(() => {
     document.body.style.overflow = "hidden"
@@ -70,6 +72,33 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                   <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
                 </svg>
               </button>
+            </div>
+          </div>
+
+          {/* 완도측 터미널 */}
+          <div
+            className={`mb-4 flex items-start gap-2 rounded-xl px-3 py-2.5 ${
+              isAltTerminal ? "bg-amber-50" : "bg-slate-50"
+            }`}
+          >
+            <svg
+              className={`mt-0.5 shrink-0 ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}
+              width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+              aria-hidden="true"
+            >
+              <path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11Z" strokeLinejoin="round" />
+              <circle cx="12" cy="10" r="2.2" />
+            </svg>
+            <div className="min-w-0">
+              <p className={`text-sm font-semibold ${isAltTerminal ? "text-amber-800" : "text-slate-700"}`}>
+                완도 {terminalRole} · {route.terminal}
+              </p>
+              {isAltTerminal && (
+                <p className="mt-0.5 text-xs leading-relaxed text-amber-600">
+                  완도여객선터미널이 아닌 <strong>화흥포항</strong>에서 {terminalRole}합니다.
+                  터미널 위치가 다르니 방문 전 확인하세요.
+                </p>
+              )}
             </div>
           </div>
 

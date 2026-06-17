@@ -8,4 +8,5 @@ export interface WandoRoute {
   times: string[]
   status: RouteStatus
   isLive: boolean
+  terminal: string  // 완도측 터미널 (예: "완도여객선터미널", "화흥포항")
 }

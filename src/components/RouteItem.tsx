@@ -32,6 +32,7 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
   const accent = isCancelled ? "bg-rose-400" : isUnknown ? "bg-slate-300" : "bg-teal-500"
+  const isAltTerminal = route.terminal !== "완도여객선터미널"
 
   return (
     <button
@@ -106,9 +107,24 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
           </>
         ) : null}
 
-        {route.operator && (
-          <p className="mt-2 truncate text-[11px] text-slate-400">{route.operator}</p>
-        )}
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span
+            className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium ${
+              isAltTerminal
+                ? "bg-amber-50 text-amber-700"
+                : "bg-slate-50 text-slate-400"
+            }`}
+          >
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+              <path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11Z" strokeLinejoin="round" />
+              <circle cx="12" cy="10" r="2.2" />
+            </svg>
+            {route.terminal}
+          </span>
+          {route.operator && (
+            <span className="truncate text-[11px] text-slate-400">{route.operator}</span>
+          )}
+        </div>
       </div>
 
       <span className="mt-0.5 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5">
