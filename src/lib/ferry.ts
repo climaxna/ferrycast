@@ -1,19 +1,5 @@
 import type { WandoRoute, RouteStatus, FareInfo } from "./types"
 
-// 운임 요금표 (label 기준, 제주 제외)
-const FARE_MAP: Record<string, FareInfo> = {
-  "청산도":     { adult: 8700, teen: 7900, child: 4200, carSmall: 21000, carRegular: 25000 },
-  "소안도":     { adult: 7700 },
-  "보길도·노화": { adult: 6500, teen: 5900, child: 3300, carSmall: 14000, carRegular: 18000 },
-}
-
-// 공식 운임 확인 링크 (label 기준)
-const FARE_URL_MAP: Record<string, string> = {
-  "청산도":     "https://cheongsannh.nonghyup.com/user/indexSub.do?codyMenuSeq=1048386239&siteId=cheongsannh",
-  "소안도":     "https://island.theksa.co.kr",
-  "보길도·노화": "https://island.theksa.co.kr",
-}
-
 // TAGO nodeId
 const WANDO_NODE = "SEA31020"
 const WANDO_HWAHEUNGPO = "SEA31022"
@@ -22,32 +8,48 @@ const WANDO_HWAHEUNGPO = "SEA31022"
 const TERMINAL_MAIN = "완도여객선터미널"
 const TERMINAL_HWAHEUNGPO = "화흥포항"
 
-// 화흥포항을 이용하는 목적지(출발 탭 destKey 기준)
-const HWAHEUNGPO_DESTS = new Set(["소안도", "노화_동천 보길"])
+// ────────────────────────────────────────────────
+// 노선 그룹 정의
+// 소안도와 노화_동천 보길은 동일 경유 노선(화흥포 → 소안도 → 보길도·노화)
+// ────────────────────────────────────────────────
+interface DestInfo { label: string; priority: number; groupKey: string }
 
-// 출발 탭: 완도에서 떠나는 항로 (TAGO arrPlaceNm 기준)
-const DEP_DEST: Record<string, { label: string; priority: number }> = {
-  "제주도":           { label: "제주",       priority: 1 },
-  "청산도":           { label: "청산도",     priority: 2 },
-  "소안도":           { label: "소안도",     priority: 3 },
-  "노화_동천 보길":   { label: "보길도·노화", priority: 4 },
+const DEP_DEST: Record<string, DestInfo> = {
+  "제주도":         { label: "제주",              priority: 1, groupKey: "jeju" },
+  "청산도":         { label: "청산도",             priority: 2, groupKey: "cheongsando" },
+  "소안도":         { label: "소안도·보길도·노화",   priority: 3, groupKey: "hwaheungpo-route" },
+  "노화_동천 보길": { label: "소안도·보길도·노화",   priority: 3, groupKey: "hwaheungpo-route" },
 }
 
-// 도착 탭: 완도로 돌아오는 항로 (역방향 depNodeId → arrFilter)
-const ARR_QUERIES = [
-  { nodeId: "SEA10090", label: "제주",       arrFilter: "완도",        ferryKeys: ["제주도"],        priority: 1 },
-  { nodeId: "SEA35560", label: "청산도",     arrFilter: "완도",        ferryKeys: ["청산도"],        priority: 2 },
-  { nodeId: "SEA33830", label: "소안도",     arrFilter: "완도_화흥포", ferryKeys: ["소안도"],        priority: 3 },
-  { nodeId: "SEA31891", label: "보길도·노화", arrFilter: "완도_화흥포", ferryKeys: ["노화_동천 보길"], priority: 4 },
-] as const
+// 화흥포항 사용 그룹 키
+const HWAHEUNGPO_GROUPS = new Set(["hwaheungpo-route"])
 
-// KOMSA 조회용 선박명 (TAGO vihicleNm 기준 — 앞부분 일치로 필터됨)
+// KOMSA 결항 조회용 선박명 (그룹 키 기준)
 const ROUTE_FERRIES: Record<string, string[]> = {
-  "제주도":         ["실버클라우드", "골드스텔라"],
-  "청산도":         ["슬로시티청산도호", "청산아일랜드"],
-  "소안도":         ["대한호"],
-  "노화_동천 보길": ["대한호"],
+  "jeju":             ["실버클라우드", "골드스텔라"],
+  "cheongsando":      ["슬로시티청산도호", "청산아일랜드"],
+  "hwaheungpo-route": ["대한호"],
 }
+
+// 운임 요금표 (그룹 키 기준, 제주 제외)
+const FARE_MAP: Record<string, FareInfo> = {
+  "cheongsando": { adult: 8700, teen: 7900, child: 4200, carSmall: 21000, carRegular: 25000 },
+}
+
+// 공식 운임 확인 링크 (그룹 키 기준)
+const FARE_URL_MAP: Record<string, string> = {
+  "cheongsando":      "https://cheongsannh.nonghyup.com/user/indexSub.do?codyMenuSeq=1048386239&siteId=cheongsannh",
+  "hwaheungpo-route": "https://island.theksa.co.kr",
+}
+
+// 도착 탭: 완도로 돌아오는 항로
+// 소안도(SEA33830)가 화흥포 직전 마지막 경유지 → 해당 출발 시간을 기준으로 사용
+const ARR_QUERIES = [
+  { nodeId: "SEA10090", label: "제주",             arrFilter: "완도",        groupKey: "jeju",             priority: 1 },
+  { nodeId: "SEA35560", label: "청산도",            arrFilter: "완도",        groupKey: "cheongsando",      priority: 2 },
+  { nodeId: "SEA33830", label: "소안도·보길도·노화", arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", priority: 3 },
+  // SEA31891(보길도·노화 출발)은 동일 노선 — 소안도 경유 후 화흥포 도착이므로 소안도 시간 기준 사용
+] as const
 
 // ────────────────────────────────────────────────
 // TAGO 운항정보 조회 (공통)
@@ -122,35 +124,41 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
     const allItems = [...mainItems, ...hwaItems]
     if (!allItems.length) return { routes: STATIC_DEP, isLive: false }
 
-    const grouped: Record<string, { times: string[]; ships: Set<string> }> = {}
+    // 소안도·보길도를 동일 groupKey로 묶어서 그룹화
+    const grouped: Record<string, { times: string[]; ships: Set<string>; label: string; priority: number }> = {}
     for (const it of allItems) {
-      if (!DEP_DEST[it.arrPlaceNm]) continue
-      if (!grouped[it.arrPlaceNm]) grouped[it.arrPlaceNm] = { times: [], ships: new Set() }
+      const dest = DEP_DEST[it.arrPlaceNm]
+      if (!dest) continue
+      const { groupKey, label, priority } = dest
+      if (!grouped[groupKey]) grouped[groupKey] = { times: [], ships: new Set(), label, priority }
       const t = parseTime(it.depPlandTime)
-      if (t) grouped[it.arrPlaceNm].times.push(t)
-      if (it.vihicleNm) grouped[it.arrPlaceNm].ships.add(it.vihicleNm)
+      if (t) grouped[groupKey].times.push(t)
+      if (it.vihicleNm) grouped[groupKey].ships.add(it.vihicleNm)
     }
     if (!Object.keys(grouped).length) return { routes: STATIC_DEP, isLive: false }
 
-    const destKeys = Object.keys(grouped)
-    const statuses = await Promise.all(
-      destKeys.map((k) => fetchKomsaStatus(key, date, ROUTE_FERRIES[k] ?? []))
+    const groupKeys = Object.keys(grouped)
+    const statusMap: Record<string, RouteStatus> = {}
+    await Promise.all(
+      groupKeys.map(async (k) => {
+        statusMap[k] = await fetchKomsaStatus(key, date, ROUTE_FERRIES[k] ?? [])
+      })
     )
 
-    const routes: WandoRoute[] = destKeys
-      .sort((a, b) => (DEP_DEST[a]?.priority ?? 99) - (DEP_DEST[b]?.priority ?? 99))
-      .map((destKey) => {
-        const label = DEP_DEST[destKey].label
+    const routes: WandoRoute[] = groupKeys
+      .sort((a, b) => (grouped[a].priority ?? 99) - (grouped[b].priority ?? 99))
+      .map((groupKey) => {
+        const { label, times, ships } = grouped[groupKey]
         return {
-          id: `dep-${destKey}`,
+          id: `dep-${groupKey}`,
           to: label,
-          operator: [...grouped[destKey].ships].join(" · "),
-          times: [...new Set(grouped[destKey].times)].sort(),
-          status: statuses[destKeys.indexOf(destKey)],
+          operator: [...ships].join(" · "),
+          times: [...new Set(times)].sort(),
+          status: statusMap[groupKey],
           isLive: true,
-          terminal: HWAHEUNGPO_DESTS.has(destKey) ? TERMINAL_HWAHEUNGPO : TERMINAL_MAIN,
-          fare: FARE_MAP[label],
-          fareUrl: FARE_URL_MAP[label],
+          terminal: HWAHEUNGPO_GROUPS.has(groupKey) ? TERMINAL_HWAHEUNGPO : TERMINAL_MAIN,
+          fare: FARE_MAP[groupKey],
+          fareUrl: FARE_URL_MAP[groupKey],
         }
       })
 
@@ -172,7 +180,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
 
     const results = await Promise.all(
-      ARR_QUERIES.map(async ({ nodeId, label, arrFilter, ferryKeys, priority }) => {
+      ARR_QUERIES.map(async ({ nodeId, label, arrFilter, groupKey, priority }) => {
         const items = await fetchNodeRoutes(key, nodeId, date)
         const filtered = items.filter((it) => it.arrPlaceNm === arrFilter)
         if (!filtered.length) return null
@@ -181,11 +189,10 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           .map((it) => parseTime(it.depPlandTime))
           .filter(Boolean) as string[]
         const ships = new Set(filtered.map((it) => it.vihicleNm).filter(Boolean))
-        const ferryNames = ferryKeys.flatMap((k) => ROUTE_FERRIES[k] ?? [])
-        const status = await fetchKomsaStatus(key, date, ferryNames)
+        const status = await fetchKomsaStatus(key, date, ROUTE_FERRIES[groupKey] ?? [])
 
         return {
-          id: `arr-${nodeId}`,
+          id: `arr-${groupKey}`,
           to: "완도",
           from: label,
           operator: [...ships].join(" · "),
@@ -193,8 +200,8 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           status,
           isLive: true,
           terminal: arrFilter === "완도_화흥포" ? TERMINAL_HWAHEUNGPO : TERMINAL_MAIN,
-          fare: FARE_MAP[label],
-          fareUrl: FARE_URL_MAP[label],
+          fare: FARE_MAP[groupKey],
+          fareUrl: FARE_URL_MAP[groupKey],
           _priority: priority,
         }
       })
@@ -217,15 +224,47 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 // 정적 fallback
 // ────────────────────────────────────────────────
 const STATIC_DEP: WandoRoute[] = [
-  { id: "dep-jeju",    to: "제주",       operator: "청해진해운", times: ["02:30", "09:20", "15:00"],                   status: "unknown", isLive: false, terminal: TERMINAL_MAIN },
-  { id: "dep-chsnd",   to: "청산도",     operator: "남해고속",   times: ["07:00", "08:30", "11:00", "13:00", "15:00"], status: "unknown", isLive: false, terminal: TERMINAL_MAIN,        fare: FARE_MAP["청산도"],     fareUrl: FARE_URL_MAP["청산도"] },
-  { id: "dep-soando",  to: "소안도",     operator: "청해진해운", times: ["08:30", "13:00", "15:30"],                   status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["소안도"],     fareUrl: FARE_URL_MAP["소안도"] },
-  { id: "dep-bogil",   to: "보길도·노화", operator: "청해진해운", times: ["07:20", "09:00", "13:00", "15:00"],          status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["보길도·노화"], fareUrl: FARE_URL_MAP["보길도·노화"] },
+  {
+    id: "dep-jeju",
+    to: "제주", operator: "청해진해운",
+    times: ["02:30", "09:20", "15:00"],
+    status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+  },
+  {
+    id: "dep-cheongsando",
+    to: "청산도", operator: "남해고속",
+    times: ["07:00", "08:30", "11:00", "13:00", "15:00"],
+    status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+    fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
+  },
+  {
+    id: "dep-hwaheungpo-route",
+    to: "소안도·보길도·노화", operator: "청해진해운",
+    times: ["07:20", "08:30", "09:00", "13:00", "15:00", "15:30"],
+    status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
+    fareUrl: FARE_URL_MAP["hwaheungpo-route"],
+  },
 ]
 
 const STATIC_ARR: WandoRoute[] = [
-  { id: "arr-jeju",   to: "완도", from: "제주",       operator: "청해진해운", times: ["08:00", "08:40", "16:00", "19:30"], status: "unknown", isLive: false, terminal: TERMINAL_MAIN },
-  { id: "arr-chsnd",  to: "완도", from: "청산도",     operator: "남해고속",   times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"], status: "unknown", isLive: false, terminal: TERMINAL_MAIN,        fare: FARE_MAP["청산도"],     fareUrl: FARE_URL_MAP["청산도"] },
-  { id: "arr-soando", to: "완도", from: "소안도",     operator: "청해진해운", times: ["07:24", "07:30", "08:45", "09:12", "10:12", "11:12", "12:12", "13:12", "14:12", "15:12", "16:12", "17:12", "18:12", "19:04"], status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["소안도"],     fareUrl: FARE_URL_MAP["소안도"] },
-  { id: "arr-bogil",  to: "완도", from: "보길도·노화", operator: "청해진해운", times: ["07:45", "09:47", "16:14"], status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO, fare: FARE_MAP["보길도·노화"], fareUrl: FARE_URL_MAP["보길도·노화"] },
+  {
+    id: "arr-jeju",
+    to: "완도", from: "제주", operator: "청해진해운",
+    times: ["08:00", "08:40", "16:00", "19:30"],
+    status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+  },
+  {
+    id: "arr-cheongsando",
+    to: "완도", from: "청산도", operator: "남해고속",
+    times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"],
+    status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+    fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
+  },
+  {
+    id: "arr-hwaheungpo-route",
+    to: "완도", from: "소안도·보길도·노화", operator: "청해진해운",
+    times: ["07:30", "09:47", "13:12", "16:14", "19:04"],
+    status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
+    fareUrl: FARE_URL_MAP["hwaheungpo-route"],
+  },
 ]
