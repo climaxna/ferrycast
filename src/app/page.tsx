@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import Link from "next/link"
 import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
 import Logo from "@/components/Logo"
@@ -29,7 +30,7 @@ export default function Page() {
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center gap-2.5 px-4 py-3">
           <Logo />
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-bold leading-none tracking-tight text-slate-900">
               Ferry<span className="text-blue-600">Cast</span>
             </h1>
@@ -37,6 +38,24 @@ export default function Page() {
               완도 날씨 · 여객선 현황
             </p>
           </div>
+          <Link
+            href="/qr"
+            aria-label="QR 코드"
+            className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-blue-600"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="18" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="14" y="18" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="18" y="18" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="5" y="5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="16" y="5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="5" y="16" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+            </svg>
+          </Link>
         </div>
       </header>
 
