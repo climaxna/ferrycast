@@ -17,7 +17,7 @@ export default function RefreshButton() {
     <button
       onClick={handleRefresh}
       aria-label="날씨 새로고침"
-      className="rounded-full p-1 text-blue-400 hover:bg-blue-100 hover:text-blue-600 transition-colors"
+      className="rounded-full p-1 text-white/60 transition-colors hover:bg-white/10 hover:text-white"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import type { WandoRoute } from "@/lib/types"
 
 interface Props {
@@ -10,52 +11,63 @@ interface Props {
 
 export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const isCancelled = route.status === "cancelled"
+  const isUnknown = route.status === "unknown"
   const routeLabel = route.from ? `${route.from} → ${route.to}` : `완도 → ${route.to}`
   const timeHeading = isDeparture ? "오늘 출발 시간표" : `오늘 ${route.from} 출발 시간표`
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden"
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose()
+    document.addEventListener("keydown", onKey)
+    return () => {
+      document.body.style.overflow = ""
+      document.removeEventListener("keydown", onKey)
+    }
+  }, [onClose])
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
       {/* 배경 오버레이 */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
 
       {/* 바텀 시트 */}
       <div
-        className="relative w-full max-w-lg rounded-t-2xl bg-white pb-safe"
+        className="relative w-full max-w-lg rounded-t-3xl bg-white"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 핸들 */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="h-1 w-10 rounded-full bg-gray-300" />
+          <div className="h-1 w-10 rounded-full bg-slate-200" />
         </div>
 
         <div className="px-5 pt-2 pb-8">
           {/* 헤더 */}
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">{routeLabel}</h2>
+          <div className="mb-5 flex items-start justify-between">
+            <div className="min-w-0">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900">{routeLabel}</h2>
               {route.operator && (
-                <p className="text-sm text-gray-500 mt-0.5">🚢 {route.operator}</p>
+                <p className="mt-1 truncate text-sm text-slate-400">{route.operator}</p>
               )}
             </div>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="flex shrink-0 items-center gap-2">
               <span
-                className={`rounded-full px-3 py-1 text-sm font-medium ${
+                className={`rounded-full px-3 py-1 text-sm font-semibold ${
                   isCancelled
-                    ? "bg-red-100 text-red-700"
-                    : route.status === "unknown"
-                      ? "bg-gray-100 text-gray-600"
-                      : "bg-green-100 text-green-700"
+                    ? "bg-rose-50 text-rose-600"
+                    : isUnknown
+                      ? "bg-slate-100 text-slate-500"
+                      : "bg-teal-50 text-teal-700"
                 }`}
               >
-                {isCancelled ? "🔴 결항" : route.status === "unknown" ? "운항예정" : "🟢 운항"}
+                {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
               </span>
               <button
                 onClick={onClose}
-                className="rounded-full p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                className="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                 aria-label="닫기"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6 6 18M6 6l12 12" />
+                  <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
                 </svg>
               </button>
             </div>
@@ -63,11 +75,11 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
 
           {/* 시간표 */}
           <div className="mb-5">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+            <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
               {timeHeading}
             </p>
             {isCancelled ? (
-              <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">
+              <p className="rounded-xl bg-rose-50 px-3 py-2.5 text-sm text-rose-600">
                 오늘 이 항로는 결항입니다. 공식 채널에서 최종 확인하세요.
               </p>
             ) : route.times.length > 0 ? (
@@ -75,19 +87,19 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                 {route.times.map((t) => (
                   <span
                     key={t}
-                    className="rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-semibold text-blue-800"
+                    className="rounded-xl bg-slate-50 px-3 py-1.5 text-sm font-semibold tabular-nums text-slate-700"
                   >
                     {t}
                   </span>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-400">시간표 정보 없음</p>
+              <p className="text-sm text-slate-400">시간표 정보 없음</p>
             )}
           </div>
 
           {/* 안내 문구 */}
-          <p className="text-xs text-gray-400 mb-5">
+          <p className="mb-4 text-xs text-slate-400">
             {route.isLive
               ? "실시간 데이터 기준 · 기상 상황에 따라 변동될 수 있습니다"
               : "참고용 시간표 · 실제 운항 여부는 공식 채널에서 확인하세요"}
@@ -98,9 +110,9 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
             href="https://island.theksa.co.kr"
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full rounded-xl bg-blue-600 py-3.5 text-center text-sm font-semibold text-white hover:bg-blue-700 active:bg-blue-800 transition-colors"
+            className="block w-full rounded-xl bg-gradient-to-r from-teal-600 to-cyan-700 py-3.5 text-center text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
           >
-            🎫 해운조합 승선 예약하기
+            해운조합 승선 예약하기
           </a>
         </div>
       </div>

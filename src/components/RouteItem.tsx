@@ -22,6 +22,7 @@ interface Props {
 
 export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
   const isCancelled = route.status === "cancelled"
+  const isUnknown = route.status === "unknown"
   const routeLabel = route.from ? `${route.from} → ${route.to}` : `완도 → ${route.to}`
   const timeLabel = route.from ? `${route.from} 출발` : "출발"
 
@@ -30,62 +31,73 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
   const pastTimes = route.times.slice(0, nextIdx === -1 ? route.times.length : nextIdx)
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
+  const accent = isCancelled ? "bg-rose-400" : isUnknown ? "bg-slate-300" : "bg-teal-500"
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className="w-full text-left flex items-start gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3.5 shadow-sm hover:shadow-md hover:border-gray-200 active:scale-[0.99] transition-all cursor-pointer"
+      className="group relative flex w-full items-start gap-3 overflow-hidden rounded-2xl border border-slate-100 bg-white px-4 py-3.5 text-left shadow-sm transition-all hover:border-slate-200 hover:shadow-md active:scale-[0.99]"
     >
-      <span className="mt-0.5 text-base leading-none shrink-0">
-        {isCancelled ? "🔴" : "🟢"}
-      </span>
+      {/* 좌측 상태 액센트 바 */}
+      <span className={`absolute left-0 top-0 h-full w-1 ${accent}`} />
 
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 pl-1">
         {/* 항로명 + 상태 배지 */}
         <div className="flex items-center justify-between gap-2">
-          <span className="font-semibold text-gray-900">{routeLabel}</span>
-          <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
-            isCancelled
-              ? "bg-red-100 text-red-700"
-              : route.status === "unknown"
-                ? "bg-gray-100 text-gray-500"
-                : "bg-green-100 text-green-700"
-          }`}>
-            {isCancelled ? "결항" : route.status === "unknown" ? "운항예정" : "운항"}
+          <span className="font-bold text-slate-900">{routeLabel}</span>
+          <span
+            className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+              isCancelled
+                ? "bg-rose-50 text-rose-600"
+                : isUnknown
+                  ? "bg-slate-100 text-slate-500"
+                  : "bg-teal-50 text-teal-700"
+            }`}
+          >
+            {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
           </span>
         </div>
 
         {isCancelled ? (
-          <p className="mt-1.5 text-xs text-red-400">오늘 이 항로는 결항입니다</p>
+          <p className="mt-2 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-500">
+            오늘 이 항로는 결항입니다
+          </p>
         ) : route.times.length > 0 ? (
           <>
-            {/* 다음 출발 강조 박스 */}
+            {/* 다음 출발 강조 */}
             {nextTime ? (
-              <div className="mt-2 flex items-center justify-between rounded-lg bg-blue-50 px-3 py-2">
+              <div className="mt-2.5 flex items-center justify-between rounded-xl bg-gradient-to-r from-teal-50 to-cyan-50 px-3 py-2">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xs font-medium text-blue-400">{timeLabel} 다음</span>
-                  <span className="text-xl font-bold tabular-nums text-blue-900">{nextTime}</span>
+                  <span className="text-[11px] font-medium text-teal-500">{timeLabel}</span>
+                  <span className="text-2xl font-bold tabular-nums text-teal-800">{nextTime}</span>
                 </div>
-                <span className="text-xs font-semibold text-blue-500">
+                <span className="text-xs font-semibold text-teal-600">
                   {relativeTime(nextTime, nowMinutes)}
                 </span>
               </div>
             ) : (
-              <div className="mt-2 rounded-lg bg-gray-50 px-3 py-2">
-                <span className="text-xs text-gray-400">오늘 {timeLabel} 종료</span>
+              <div className="mt-2.5 rounded-xl bg-slate-50 px-3 py-2">
+                <span className="text-xs text-slate-400">오늘 {timeLabel} 종료</span>
               </div>
             )}
 
             {/* 지난 편 + 이후 편 칩 */}
             {(pastTimes.length > 0 || futureTimes.length > 0) && (
-              <div className="mt-1.5 flex flex-wrap gap-1">
+              <div className="mt-2 flex flex-wrap gap-1">
                 {pastTimes.map((t) => (
-                  <span key={t} className="rounded-md bg-gray-50 px-2 py-0.5 text-xs tabular-nums text-gray-300 line-through">
+                  <span
+                    key={t}
+                    className="rounded-md px-1.5 py-0.5 text-xs tabular-nums text-slate-300 line-through"
+                  >
                     {t}
                   </span>
                 ))}
                 {futureTimes.map((t) => (
-                  <span key={t} className="rounded-md bg-gray-100 px-2 py-0.5 text-xs tabular-nums text-gray-500">
+                  <span
+                    key={t}
+                    className="rounded-md bg-slate-100 px-1.5 py-0.5 text-xs tabular-nums text-slate-500"
+                  >
                     {t}
                   </span>
                 ))}
@@ -95,11 +107,13 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
         ) : null}
 
         {route.operator && (
-          <p className="mt-1.5 text-xs text-gray-400">{route.operator}</p>
+          <p className="mt-2 truncate text-[11px] text-slate-400">{route.operator}</p>
         )}
       </div>
 
-      <span className="mt-1 shrink-0 text-sm text-gray-300">›</span>
+      <span className="mt-0.5 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5">
+        ›
+      </span>
     </button>
   )
 }

@@ -32,21 +32,23 @@ export default function RouteTabs({ departures, arrivals }: Props) {
   return (
     <section>
       {/* 탭 헤더 */}
-      <div className="flex border-b border-gray-200 mb-3">
+      <div className="mb-3 flex items-center gap-1 rounded-xl bg-slate-100 p-1">
         <TabButton active={tab === "dep"} onClick={() => setTab("dep")}>
-          ⛴️ 완도 출발
+          완도 출발
         </TabButton>
         <TabButton active={tab === "arr"} onClick={() => setTab("arr")}>
-          🚢 완도 도착
+          완도 도착
         </TabButton>
         {!isLive && (
-          <span className="ml-auto self-end mb-1.5 text-xs text-amber-500">참고 시간표</span>
+          <span className="mr-1.5 shrink-0 text-[11px] font-medium text-amber-500">
+            참고 시간표
+          </span>
         )}
       </div>
 
       {/* 항로 목록 */}
       {routes.length > 0 ? (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {routes.map((route) => (
             <RouteItem
               key={route.id}
@@ -57,7 +59,7 @@ export default function RouteTabs({ departures, arrivals }: Props) {
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+        <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
           항로 정보를 불러올 수 없습니다.
         </div>
       )}
@@ -86,10 +88,10 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`px-4 pb-2.5 pt-1 text-sm font-medium transition-colors border-b-2 -mb-px ${
+      className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
         active
-          ? "border-blue-600 text-blue-600"
-          : "border-transparent text-gray-500 hover:text-gray-700"
+          ? "bg-white text-teal-700 shadow-sm"
+          : "text-slate-500 hover:text-slate-700"
       }`}
     >
       {children}
