@@ -33,9 +33,12 @@ export default function WeatherCardClient({ weather: w, tidal }: Props) {
 
   return (
     <>
-      <button
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setIsDetailOpen(true)}
-        className="relative w-full overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 p-5 text-left text-white shadow-lg shadow-blue-900/10 transition-opacity active:opacity-90"
+        onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setIsDetailOpen(true)}
+        className="relative w-full cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 p-5 text-white shadow-lg shadow-blue-900/10 transition-opacity active:opacity-90"
         aria-label="날씨 상세 보기"
       >
         {/* 장식 원 */}
