@@ -134,32 +134,30 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                 <p className="mt-1 text-sm text-rose-500">공식 채널에서 최종 확인하세요.</p>
               </div>
             ) : route.times.length > 0 ? (
-              <div className="flex flex-wrap gap-2.5">
+              <div className="grid grid-cols-4 gap-2">
                 {pastTimes.map((t) => (
-                  <span
+                  <div
                     key={t}
-                    className="rounded-2xl bg-slate-50 px-5 py-3 text-xl font-bold tabular-nums text-slate-300 line-through shadow-sm"
+                    className="flex items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-300 line-through shadow-sm"
                   >
                     {t}
-                  </span>
+                  </div>
                 ))}
                 {nextTime && (
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="rounded-2xl bg-blue-500 px-5 py-3 text-xl font-bold tabular-nums text-white shadow-md">
-                      {nextTime}
-                    </span>
-                    <span className="text-xs font-semibold text-blue-500">
+                  <div className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-2 shadow-md">
+                    <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
+                    <span className="text-[10px] font-semibold leading-tight text-blue-200">
                       {relativeTime(nextTime, nowMinutes)}
                     </span>
                   </div>
                 )}
                 {futureTimes.map((t) => (
-                  <span
+                  <div
                     key={t}
-                    className="rounded-2xl bg-blue-50 px-5 py-3 text-xl font-bold tabular-nums text-blue-700 shadow-sm"
+                    className="flex items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm"
                   >
                     {t}
-                  </span>
+                  </div>
                 ))}
               </div>
             ) : (

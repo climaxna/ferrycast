@@ -2,7 +2,7 @@ import type { WandoRoute, RouteStatus, FareInfo } from "./types"
 
 // 운임 요금표 (label 기준, 제주 제외)
 const FARE_MAP: Record<string, FareInfo> = {
-  "청산도":     { adult: 8700, teen: 7900, child: 4200 },
+  "청산도":     { adult: 8700, teen: 7900, child: 4200, carSmall: 21000, carRegular: 25000 },
   "소안도":     { adult: 7700 },
   "보길도·노화": { adult: 6500, teen: 5900, child: 3300, carSmall: 14000, carRegular: 18000 },
 }
