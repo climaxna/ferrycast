@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import type { WandoRoute } from "@/lib/types"
 import { useModalClose } from "@/hooks/useModalClose"
 import { toMinutes as toMin, relativeTime } from "@/lib/utils"
+import AlarmSheet from "@/components/AlarmSheet"
 
 interface Props {
   route: WandoRoute
@@ -20,6 +21,8 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const terminalRole = isDeparture ? "출발" : "도착"
 
   const [nowMinutes, setNowMinutes] = useState(0)
+  const [alarmTime, setAlarmTime] = useState<string | null>(null)
+
   useEffect(() => {
     const update = () => {
       const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
@@ -161,20 +164,27 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                   </div>
                 ))}
                 {nextTime && (
-                  <div className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-2 shadow-md">
+                  <button
+                    key={nextTime}
+                    onClick={() => setAlarmTime(nextTime)}
+                    className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-2 shadow-md active:opacity-80"
+                  >
                     <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
                     <span className="text-[10px] font-semibold leading-tight text-blue-200">
                       {relativeTime(nextTime, nowMinutes)}
                     </span>
-                  </div>
+                    <span className="mt-0.5 text-[9px] text-blue-200">🔔 알림</span>
+                  </button>
                 )}
                 {futureTimes.map((t) => (
-                  <div
+                  <button
                     key={t}
-                    className="flex items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm"
+                    onClick={() => setAlarmTime(t)}
+                    className="flex flex-col items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm active:opacity-70"
                   >
                     {t}
-                  </div>
+                    <span className="mt-0.5 text-[9px] text-blue-400">🔔 알림</span>
+                  </button>
                 ))}
               </div>
             ) : (
@@ -225,6 +235,14 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
           </a>
         </div>
       </div>
+
+      {alarmTime && (
+        <AlarmSheet
+          routeLabel={routeLabel}
+          departureTime={alarmTime}
+          onClose={() => setAlarmTime(null)}
+        />
+      )}
     </div>
   )
 }
