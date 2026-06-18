@@ -28,7 +28,7 @@ function getDelayMs(departureTime: string, offsetMinutes: number): number {
 }
 
 export default function AlarmSheet({ routeLabel, departureTime, onClose, onAlarmSet }: Props) {
-  const [status, setStatus] = useState<"idle" | "done" | "denied" | "unsupported">("idle")
+  const [status, setStatus] = useState<"idle" | "done" | "denied" | "unsupported" | "installed">("idle")
   const standalone = isStandalone()
   const availableOffsets = OFFSETS.filter((off) => getDelayMs(departureTime, off) > 0)
 
@@ -69,8 +69,22 @@ export default function AlarmSheet({ routeLabel, departureTime, onClose, onAlarm
         <p className="text-lg font-bold text-slate-900">{routeLabel}</p>
         <p className="mt-0.5 text-2xl font-bold tabular-nums text-blue-600">{departureTime} 출발</p>
 
-        {/* 홈화면 미설치 시 안내 */}
-        {!standalone ? (
+        {/* 설치 완료 안내 */}
+        {status === "installed" ? (
+          <div className="mt-5 rounded-2xl bg-blue-50 px-4 py-5 text-center">
+            <p className="text-3xl">🎉</p>
+            <p className="mt-2 font-bold text-blue-700">홈화면에 추가되었습니다!</p>
+            <p className="mt-1 text-sm text-blue-500">
+              홈화면의 FerryCast 아이콘을 탭해서 앱을 실행하세요.
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-4 w-full rounded-2xl bg-blue-500 py-3 text-sm font-bold text-white"
+            >
+              확인
+            </button>
+          </div>
+        ) : !standalone ? (
           <div className="mt-5 rounded-2xl bg-amber-50 px-4 py-4">
             <p className="font-bold text-amber-700">홈화면 설치 후 사용 가능합니다</p>
             <p className="mt-1.5 text-sm leading-relaxed text-amber-600">
@@ -84,9 +98,13 @@ export default function AlarmSheet({ routeLabel, departureTime, onClose, onAlarm
             <div className="mt-4 flex gap-2">
               {window.__deferredPrompt && (
                 <button
-                  onClick={() => {
-                    window.__deferredPrompt?.prompt()
-                    onClose()
+                  onClick={async () => {
+                    const p = window.__deferredPrompt
+                    if (!p) return
+                    await p.prompt()
+                    const { outcome } = await p.userChoice
+                    if (outcome === "accepted") setStatus("installed")
+                    else onClose()
                   }}
                   className="flex-1 rounded-2xl bg-amber-500 py-3 text-sm font-bold text-white"
                 >

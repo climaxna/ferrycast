@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react"
 
-type DeferredPrompt = Event & { prompt: () => Promise<void> }
+type DeferredPrompt = Event & {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
+}
 
 declare global {
   interface Window { __deferredPrompt?: DeferredPrompt }
