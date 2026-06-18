@@ -253,8 +253,8 @@ const STATIC_DEP: WandoRoute[] = [
   },
   {
     id: "dep-cheongsando",
-    to: "청산도", operator: "남해고속",
-    times: ["07:00", "08:30", "11:00", "13:00", "15:00"],
+    to: "청산도", operator: "청산농협·남해고속",
+    times: ["07:00", "08:30", "11:00", "13:00", "14:30", "15:00", "18:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
     fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
   },
