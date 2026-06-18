@@ -122,7 +122,7 @@ async function fetchTomorrowCounts(
 // ────────────────────────────────────────────────
 export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
-  const fallback = () => ({ routes: applySeasonalCheongsando(STATIC_DEP, kst, "dep"), isLive: false })
+  const fallback = () => ({ routes: STATIC_DEP, isLive: false })
 
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return fallback()
@@ -176,7 +176,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
 // ────────────────────────────────────────────────
 export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
-  const fallback = () => ({ routes: applySeasonalCheongsando(STATIC_ARR, kst, "arr"), isLive: false })
+  const fallback = () => ({ routes: STATIC_ARR, isLive: false })
 
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return fallback()
@@ -227,40 +227,8 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 }
 
 // ────────────────────────────────────────────────
-// 계절별 청산도 시간표 (정적 fallback 전용)
-// 막배 시각만 계절별 변동 (겨울 17:00 / 여름 18:00 / 가을 17:30)
-// ────────────────────────────────────────────────
-type CheongsandoSeason = "winter" | "summer" | "autumn"
-
-function cheongsandoSeason(kst: Date): CheongsandoSeason {
-  const mmdd = (kst.getUTCMonth() + 1) * 100 + kst.getUTCDate()
-  if (mmdd >= 317 && mmdd <= 915) return "summer"
-  if (mmdd >= 916 && mmdd <= 1015) return "autumn"
-  return "winter"
-}
-
-const CHEONGSANDO_TIMES: Record<CheongsandoSeason, { dep: string[]; arr: string[] }> = {
-  winter: {
-    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "17:00"],
-    arr: ["06:50", "09:00", "11:30", "13:00", "15:00", "17:00"],
-  },
-  summer: {
-    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "18:00"],
-    arr: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"],
-  },
-  autumn: {
-    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "17:30"],
-    arr: ["06:50", "09:00", "11:30", "13:00", "15:00", "17:30"],
-  },
-}
-
-function applySeasonalCheongsando(routes: WandoRoute[], kst: Date, dir: "dep" | "arr"): WandoRoute[] {
-  const times = CHEONGSANDO_TIMES[cheongsandoSeason(kst)][dir]
-  return routes.map((r) => (r.id === `${dir}-cheongsando` ? { ...r, times } : r))
-}
-
-// ────────────────────────────────────────────────
-// 정적 fallback (API 장애 시)
+// 정적 fallback (API 완전 장애 시에만 노출 — "참고 시간표")
+// 청산도는 여름 기준값 (평상시엔 MTIS 실시간 데이터 사용)
 // ────────────────────────────────────────────────
 const STATIC_DEP: WandoRoute[] = [
   {
