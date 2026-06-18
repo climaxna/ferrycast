@@ -76,7 +76,7 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
                 {pastTimes.map((t) => (
                   <span
                     key={t}
-                    className="rounded-md px-1.5 py-0.5 text-xs tabular-nums text-slate-300 line-through"
+                    className="rounded-md px-1.5 py-0.5 text-xs tabular-nums text-slate-300"
                   >
                     {t}
                   </span>

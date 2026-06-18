@@ -185,7 +185,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                 {pastTimes.map((t) => (
                   <div
                     key={t}
-                    className="flex items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-300 line-through shadow-sm"
+                    className="flex items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-300 shadow-sm"
                   >
                     {t}
                   </div>
