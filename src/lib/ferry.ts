@@ -29,6 +29,7 @@ const ROUTE_FERRIES: Record<string, string[]> = {
   "jeju":             ["실버클라우드", "골드스텔라", "송림블루오션"],
   "cheongsando":      ["슬로시티청산도호", "청산아일랜드", "섬사랑7호"],
   "hwaheungpo-route": ["대한호", "대한호(700톤)", "민국호(811톤)", "만세호"],
+  "bogil-nohua-arr":  ["대한호", "대한호(700톤)", "민국호(811톤)", "만세호"],
 }
 
 // TAGO 데이터가 불완전한 노선: 편수가 이 값 미만이면 정적 시간표 사용
@@ -51,10 +52,10 @@ const FARE_URL_MAP: Record<string, string> = {
 // 도착 탭: 완도로 돌아오는 항로
 // 소안도(SEA33830)가 화흥포 직전 마지막 경유지 → 해당 출발 시간을 기준으로 사용
 const ARR_QUERIES = [
-  { nodeId: "SEA10090", label: "제주",             arrFilter: "완도",        groupKey: "jeju",             islandTerminal: "제주항 연안여객터미널",          priority: 1 },
-  { nodeId: "SEA35560", label: "청산도",            arrFilter: "완도",        groupKey: "cheongsando",      islandTerminal: "도청항 (청산도 여객선터미널)",    priority: 2 },
-  { nodeId: "SEA33830", label: "소안도·보길도·노화", arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", islandTerminal: "소안도 부황항 · 노화 산양항",    priority: 3 },
-  // SEA31891(보길도·노화 출발)은 동일 노선 — 소안도 경유 후 화흥포 도착이므로 소안도 시간 기준 사용
+  { nodeId: "SEA10090", label: "제주",       arrFilter: "완도",        groupKey: "jeju",             islandTerminal: "제주항 연안여객터미널",       priority: 1 },
+  { nodeId: "SEA35560", label: "청산도",      arrFilter: "완도",        groupKey: "cheongsando",      islandTerminal: "도청항 (청산도 여객선터미널)", priority: 2 },
+  { nodeId: "SEA33830", label: "소안도",      arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", islandTerminal: "소안도 부황항",               priority: 3 },
+  { nodeId: "SEA31891", label: "보길도·노화", arrFilter: "완도_화흥포", groupKey: "bogil-nohua-arr",  islandTerminal: "보길도 청별항 · 노화 산양항", priority: 4 },
 ] as const
 
 // ────────────────────────────────────────────────
@@ -338,10 +339,10 @@ const STATIC_ARR: WandoRoute[] = [
   },
   {
     id: "arr-hwaheungpo-route",
-    to: "완도", from: "소안도·보길도·노화", operator: "청해진해운",
+    to: "완도", from: "소안도", operator: "청해진해운",
     times: ["07:30", "09:47", "13:12", "16:14", "19:04"],
     status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
-    islandTerminal: "소안도 부황항 · 노화 산양항",
+    islandTerminal: "소안도 부황항",
     fareUrl: FARE_URL_MAP["hwaheungpo-route"],
   },
 ]
