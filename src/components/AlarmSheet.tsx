@@ -76,18 +76,30 @@ export default function AlarmSheet({ routeLabel, departureTime, onClose, onAlarm
             <p className="mt-1.5 text-sm leading-relaxed text-amber-600">
               알림 기능은 홈화면에 앱을 설치한 경우에만 안정적으로 작동합니다.
             </p>
-            <p className="mt-1 text-sm text-amber-600">
-              iOS: 공유 버튼 → 홈 화면에 추가
-            </p>
-            <p className="text-sm text-amber-600">
-              Android: 브라우저 메뉴 → 앱 설치
-            </p>
-            <button
-              onClick={onClose}
-              className="mt-4 w-full rounded-2xl bg-amber-100 py-3 text-sm font-bold text-amber-700"
-            >
-              닫기
-            </button>
+            {!window.__deferredPrompt && (
+              <p className="mt-1 text-sm text-amber-600">
+                iOS: 하단 공유 버튼 ⎙ → 홈 화면에 추가
+              </p>
+            )}
+            <div className="mt-4 flex gap-2">
+              {window.__deferredPrompt && (
+                <button
+                  onClick={() => {
+                    window.__deferredPrompt?.prompt()
+                    onClose()
+                  }}
+                  className="flex-1 rounded-2xl bg-amber-500 py-3 text-sm font-bold text-white"
+                >
+                  홈화면에 추가
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="flex-1 rounded-2xl bg-amber-100 py-3 text-sm font-bold text-amber-700"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         ) : status === "done" ? (
           <div className="mt-6 rounded-2xl bg-blue-50 py-5 text-center">
