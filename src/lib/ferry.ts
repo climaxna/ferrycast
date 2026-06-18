@@ -52,10 +52,10 @@ const FARE_URL_MAP: Record<string, string> = {
 // 도착 탭: 완도로 돌아오는 항로
 // 소안도(SEA33830)가 화흥포 직전 마지막 경유지 → 해당 출발 시간을 기준으로 사용
 const ARR_QUERIES = [
-  { nodeId: "SEA10090", label: "제주",       arrFilter: "완도",        groupKey: "jeju",             islandTerminal: "제주항 연안여객터미널",       priority: 1 },
-  { nodeId: "SEA35560", label: "청산도",      arrFilter: "완도",        groupKey: "cheongsando",      islandTerminal: "도청항 (청산도 여객선터미널)", priority: 2 },
-  { nodeId: "SEA33830", label: "소안도",      arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", islandTerminal: "소안도 부황항",               priority: 3 },
-  { nodeId: "SEA31891", label: "보길도·노화", arrFilter: "완도_화흥포", groupKey: "bogil-nohua-arr",  islandTerminal: "보길도 청별항 · 노화 산양항", priority: 4 },
+  { nodeId: "SEA10090", label: "제주",       arrFilter: "완도",        groupKey: "jeju",             islandTerminal: "제주항 연안여객터미널", priority: 1 },
+  { nodeId: "SEA35560", label: "청산도",      arrFilter: "완도",        groupKey: "cheongsando",      islandTerminal: "도청항",                priority: 2 },
+  { nodeId: "SEA33830", label: "소안도",      arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", islandTerminal: "소안도 부황항",          priority: 3 },
+  { nodeId: "SEA31891", label: "보길도·노화", arrFilter: "완도_화흥포", groupKey: "bogil-nohua-arr",  islandTerminal: "노화 산양항",            priority: 4 },
 ] as const
 
 // ────────────────────────────────────────────────
@@ -334,7 +334,7 @@ const STATIC_ARR: WandoRoute[] = [
     to: "완도", from: "청산도", operator: "청산농협 · 섬사랑7호",
     times: ["06:50", "09:00", "11:00", "11:30", "13:00", "15:00", "18:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
-    islandTerminal: "도청항 (청산도 여객선터미널)",
+    islandTerminal: "도청항",
     fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
   },
   {
