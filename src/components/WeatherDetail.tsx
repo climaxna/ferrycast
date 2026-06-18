@@ -42,7 +42,7 @@ export default function WeatherDetail({ weather: w, tidal, onClose }: Props) {
           {/* 현재 날씨 카드 */}
           <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 p-5 text-white">
             <div className="flex items-center gap-3">
-              <span className="text-5xl font-bold tracking-tight">{w.temp}°</span>
+              <span className="text-5xl font-bold tracking-tight">{Math.round(w.temp)}°</span>
               <span className="text-4xl">{ptyIcon}</span>
               <span className="text-xl font-medium text-white/90">{ptyText}</span>
             </div>

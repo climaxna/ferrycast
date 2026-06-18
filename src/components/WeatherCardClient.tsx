@@ -59,7 +59,7 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
         >
           <div className="flex items-center gap-2.5">
             {/* 기온 + 아이콘 */}
-            <span className="shrink-0 text-3xl font-bold tabular-nums leading-none">{w.temp}°</span>
+            <span className="shrink-0 text-3xl font-bold tabular-nums leading-none">{Math.round(w.temp)}°</span>
             <span className="shrink-0 text-2xl leading-none">{ptyIcon}</span>
             <span className="shrink-0 text-sm font-medium text-white/80">{ptyText}</span>
 
