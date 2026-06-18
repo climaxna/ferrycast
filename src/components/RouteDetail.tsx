@@ -23,6 +23,10 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const [nowMinutes, setNowMinutes] = useState(0)
   const [alarmTime, setAlarmTime] = useState<string | null>(null)
   const [activeAlarms, setActiveAlarms] = useState<Set<string>>(new Set())
+  const standalone =
+    typeof window !== "undefined" &&
+    (window.matchMedia("(display-mode: standalone)").matches ||
+      !!(window.navigator as { standalone?: boolean }).standalone)
 
   useEffect(() => {
     const update = () => {
@@ -163,8 +167,10 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                   >
                     🔔 알림 {activeAlarms.size}개 설정됨 · 취소
                   </button>
-                ) : (
+                ) : standalone ? (
                   <p className="text-[11px] text-slate-400">🔔 시간 탭 시 알림 설정</p>
+                ) : (
+                  <p className="text-[11px] text-slate-400">🔔 알림 — 앱 설치 후 가능</p>
                 )
               )}
             </div>

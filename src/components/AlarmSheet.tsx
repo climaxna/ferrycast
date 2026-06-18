@@ -11,6 +11,14 @@ interface Props {
 
 const OFFSETS = [30, 10, 5] // 분 전
 
+function isStandalone(): boolean {
+  if (typeof window === "undefined") return false
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    !!(window.navigator as { standalone?: boolean }).standalone
+  )
+}
+
 function getDelayMs(departureTime: string, offsetMinutes: number): number {
   const now = new Date()
   const [h, m] = departureTime.split(":").map(Number)
@@ -21,7 +29,7 @@ function getDelayMs(departureTime: string, offsetMinutes: number): number {
 
 export default function AlarmSheet({ routeLabel, departureTime, onClose, onAlarmSet }: Props) {
   const [status, setStatus] = useState<"idle" | "done" | "denied" | "unsupported">("idle")
-
+  const standalone = isStandalone()
   const availableOffsets = OFFSETS.filter((off) => getDelayMs(departureTime, off) > 0)
 
   async function handleSet() {
@@ -29,22 +37,19 @@ export default function AlarmSheet({ routeLabel, departureTime, onClose, onAlarm
       setStatus("unsupported")
       return
     }
-
     const perm = await Notification.requestPermission()
     if (perm !== "granted") {
       setStatus("denied")
       return
     }
-
     const sw = await navigator.serviceWorker.ready
     for (const off of availableOffsets) {
-      const delayMs = getDelayMs(departureTime, off)
       sw.active?.postMessage({
         type: "SCHEDULE_ALARM",
         routeLabel,
         departureTime,
         offsetMinutes: off,
-        delayMs,
+        delayMs: getDelayMs(departureTime, off),
       })
     }
     setStatus("done")
@@ -59,13 +64,32 @@ export default function AlarmSheet({ routeLabel, departureTime, onClose, onAlarm
         className="relative w-full max-w-lg rounded-t-3xl bg-white px-5 pb-8 pt-5"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* 핸들 */}
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-slate-200" />
 
         <p className="text-lg font-bold text-slate-900">{routeLabel}</p>
         <p className="mt-0.5 text-2xl font-bold tabular-nums text-blue-600">{departureTime} 출발</p>
 
-        {status === "done" ? (
+        {/* 홈화면 미설치 시 안내 */}
+        {!standalone ? (
+          <div className="mt-5 rounded-2xl bg-amber-50 px-4 py-4">
+            <p className="font-bold text-amber-700">홈화면 설치 후 사용 가능합니다</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-amber-600">
+              알림 기능은 홈화면에 앱을 설치한 경우에만 안정적으로 작동합니다.
+            </p>
+            <p className="mt-1 text-sm text-amber-600">
+              iOS: 공유 버튼 → 홈 화면에 추가
+            </p>
+            <p className="text-sm text-amber-600">
+              Android: 브라우저 메뉴 → 앱 설치
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-4 w-full rounded-2xl bg-amber-100 py-3 text-sm font-bold text-amber-700"
+            >
+              닫기
+            </button>
+          </div>
+        ) : status === "done" ? (
           <div className="mt-6 rounded-2xl bg-blue-50 py-5 text-center">
             <p className="text-3xl">✅</p>
             <p className="mt-2 font-bold text-blue-700">
