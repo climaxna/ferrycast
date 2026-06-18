@@ -6,6 +6,7 @@ interface Props {
   routeLabel: string
   departureTime: string // "HH:MM"
   onClose: () => void
+  onAlarmSet?: (time: string) => void
 }
 
 const OFFSETS = [30, 10, 5] // 분 전
@@ -18,7 +19,7 @@ function getDelayMs(departureTime: string, offsetMinutes: number): number {
   return dep.getTime() - now.getTime() - offsetMinutes * 60 * 1000
 }
 
-export default function AlarmSheet({ routeLabel, departureTime, onClose }: Props) {
+export default function AlarmSheet({ routeLabel, departureTime, onClose, onAlarmSet }: Props) {
   const [status, setStatus] = useState<"idle" | "done" | "denied" | "unsupported">("idle")
 
   const availableOffsets = OFFSETS.filter((off) => getDelayMs(departureTime, off) > 0)
@@ -47,6 +48,7 @@ export default function AlarmSheet({ routeLabel, departureTime, onClose }: Props
       })
     }
     setStatus("done")
+    onAlarmSet?.(departureTime)
     setTimeout(onClose, 1200)
   }
 

@@ -22,6 +22,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
 
   const [nowMinutes, setNowMinutes] = useState(0)
   const [alarmTime, setAlarmTime] = useState<string | null>(null)
+  const [activeAlarms, setActiveAlarms] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     const update = () => {
@@ -149,7 +150,22 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                 {timeHeading}
               </p>
               {!isCancelled && (nextTime || futureTimes.length > 0) && (
-                <p className="text-[11px] text-slate-400">🔔 시간 탭 시 알림 설정</p>
+                activeAlarms.size > 0 ? (
+                  <button
+                    onClick={async () => {
+                      const sw = await navigator.serviceWorker?.ready
+                      activeAlarms.forEach((t) =>
+                        sw?.active?.postMessage({ type: "CANCEL_ALARMS", departureTime: t })
+                      )
+                      setActiveAlarms(new Set())
+                    }}
+                    className="text-[11px] font-semibold text-rose-400"
+                  >
+                    🔔 알림 {activeAlarms.size}개 설정됨 · 취소
+                  </button>
+                ) : (
+                  <p className="text-[11px] text-slate-400">🔔 시간 탭 시 알림 설정</p>
+                )
               )}
             </div>
             {isCancelled ? (
@@ -244,6 +260,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
           routeLabel={routeLabel}
           departureTime={alarmTime}
           onClose={() => setAlarmTime(null)}
+          onAlarmSet={(t) => setActiveAlarms((prev) => new Set(prev).add(t))}
         />
       )}
     </div>
