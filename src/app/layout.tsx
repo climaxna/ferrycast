@@ -9,9 +9,21 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ferrycast.kr"),
   title: "FerryCast — 완도 여객선 정보",
   description: "완도 날씨·조석·항로 시간표·운항 현황을 한 화면에",
   manifest: "/manifest.json",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "FerryCast",
+    title: "FerryCast — 완도 여객선 정보",
+    description: "완도 날씨·조석·항로 시간표·운항 현황을 한 화면에",
+    url: "https://ferrycast.kr",
+    locale: "ko_KR",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
