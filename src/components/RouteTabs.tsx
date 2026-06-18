@@ -13,16 +13,15 @@ interface Props {
 export default function RouteTabs({ departures, arrivals }: Props) {
   const [tab, setTab] = useState<"dep" | "arr">("dep")
   const [selected, setSelected] = useState<WandoRoute | null>(null)
-  const [nowMinutes, setNowMinutes] = useState(() => {
-    const d = new Date()
-    return d.getHours() * 60 + d.getMinutes()
-  })
+  const [nowMinutes, setNowMinutes] = useState(0)
 
   useEffect(() => {
-    const id = setInterval(() => {
+    const update = () => {
       const d = new Date()
       setNowMinutes(d.getHours() * 60 + d.getMinutes())
-    }, 60_000)
+    }
+    update()
+    const id = setInterval(update, 60_000)
     return () => clearInterval(id)
   }, [])
 
