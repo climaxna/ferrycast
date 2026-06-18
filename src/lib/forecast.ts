@@ -116,8 +116,9 @@ export async function get5DayForecast(): Promise<DailyForecast[]> {
 
           const tmnRaw = valAt("TMN", "0600") ?? dayItems.find((i) => i.category === "TMN")?.fcstValue
           const tmxRaw = valAt("TMX", "1500") ?? dayItems.find((i) => i.category === "TMX")?.fcstValue
-          const tempMin = tmnRaw !== undefined ? parseFloat(tmnRaw) : undefined
-          const tempMax = tmxRaw !== undefined ? parseFloat(tmxRaw) : undefined
+          const tmpVals = allVals("TMP")
+          const tempMin = tmnRaw !== undefined ? parseFloat(tmnRaw) : (tmpVals.length > 0 ? Math.min(...tmpVals) : undefined)
+          const tempMax = tmxRaw !== undefined ? parseFloat(tmxRaw) : (tmpVals.length > 0 ? Math.max(...tmpVals) : undefined)
 
           const skyStr = valAt("SKY", "1200") ?? valAt("SKY", "1500") ?? valAt("SKY", "0900") ?? "1"
           const sky = parseInt(skyStr)
