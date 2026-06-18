@@ -218,6 +218,17 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
             {!isCancelled && nextTime === null && route.times.length > 0 && (
               <p className="mt-3 text-sm text-slate-400">오늘 모든 편 출발 완료</p>
             )}
+            {route.tomorrow && route.tomorrow.tripCount > 0 && (
+              <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2.5">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-emerald-600" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <path d="M3 10h18M8 2v4M16 2v4" strokeLinecap="round" />
+                </svg>
+                <span className="text-sm font-medium text-emerald-700">
+                  내일 <strong className="font-bold">{route.tomorrow.tripCount}편</strong> 운항 예정
+                </span>
+              </div>
+            )}
           </div>
 
           {/* 운임 요금 — 공식 링크 */}
