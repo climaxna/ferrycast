@@ -81,14 +81,22 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
   ]
   for (const { nx, ny } of seaGrids) {
     try {
-      const url =
-        `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getVilageFcst` +
-        `?authKey=${key}&dataType=JSON&numOfRows=300&pageNo=1` +
-        `&base_date=${baseDate}&base_time=${baseTime}&nx=${nx}&ny=${ny}`
+      const params = new URLSearchParams({
+        serviceKey: key,
+        dataType: "JSON",
+        numOfRows: "300",
+        pageNo: "1",
+        base_date: baseDate,
+        base_time: baseTime,
+        nx: String(nx),
+        ny: String(ny),
+      })
+      const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
       const res = await fetch(url, { next: { revalidate: 1800 } })
       if (!res.ok) continue
       const json = await res.json()
-      if (json?.response?.header?.resultCode !== "00") continue
+      const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
+      if (resultCode !== "00") continue
       const items: Array<{ category: string; fcstValue: string; fcstDate: string; fcstTime: string }> =
         json?.response?.body?.items?.item ?? []
       const wavItems = items
@@ -101,11 +109,22 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
 }
 
 export async function getWandoWeather(): Promise<WeatherData | null> {
-  const key = process.env.KMA_API_KEY
+  // apihub.kma.go.kr는 서비스별 별도 등록 필요(403). data.go.kr 공통키 사용.
+  const key = process.env.DATAGOKR_API_KEY
   if (!key) return null
 
   const { baseDate, baseTime } = getBaseDateTime()
-  const url = `https://apihub.kma.go.kr/api/typ02/openApi/VilageFcstInfoService_2.0/getUltraSrtNcst?authKey=${key}&dataType=JSON&numOfRows=10&pageNo=1&base_date=${baseDate}&base_time=${baseTime}&nx=57&ny=74`
+  const params = new URLSearchParams({
+    serviceKey: key,
+    dataType: "JSON",
+    numOfRows: "10",
+    pageNo: "1",
+    base_date: baseDate,
+    base_time: baseTime,
+    nx: "57",
+    ny: "74",
+  })
+  const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?${params}`
 
   try {
     const [res, waveHeight] = await Promise.all([
@@ -115,7 +134,8 @@ export async function getWandoWeather(): Promise<WeatherData | null> {
     if (!res.ok) return null
 
     const json = await res.json()
-    if (json?.response?.header?.resultCode !== "00") return null
+    const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
+    if (resultCode !== "00") return null
 
     const items: Array<{ category: string; obsrValue: string; baseDate: string; baseTime: string }> =
       json?.response?.body?.items?.item ?? []
