@@ -41,11 +41,9 @@ export default function QrClient() {
         <div className="text-center">
           <p className="text-base font-semibold text-slate-700">QR 코드를 스캔하세요</p>
           <p className="mt-1 text-sm text-slate-400">완도 날씨와 여객선 시간표를 바로 확인</p>
-          {url && (
-            <p className="mt-2 rounded-lg bg-white px-3 py-1.5 text-xs font-mono text-blue-600 shadow-sm">
-              {url}
-            </p>
-          )}
+          <p className="mt-2 rounded-lg bg-white px-3 py-1.5 text-xs font-mono text-blue-600 shadow-sm">
+            {url}
+          </p>
         </div>
       </div>
 
