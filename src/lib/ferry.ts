@@ -58,6 +58,47 @@ const ARR_QUERIES = [
 ] as const
 
 // ────────────────────────────────────────────────
+// 청산도 계절별 시간표 (청산농협 공식 + 섬사랑7호 병합)
+// 청산농협 차도선(슬로시티청산도호·청산아일랜드호)은 TAGO 미등록 → 정적 적용
+// 3개 기간으로 운영, 막배 시각만 계절별로 변동 (겨울 17:00 / 여름 18:00 / 가을 17:30)
+// 15:00 출발 · 11:00 도착 = 섬사랑7호(다도해 행정선, TAGO 등록) 병합
+// 출처: cheongsannh.nonghyup.com
+// ────────────────────────────────────────────────
+type CheongsandoSeason = "winter" | "summer" | "autumn"
+
+function cheongsandoSeason(kst: Date): CheongsandoSeason {
+  const mmdd = (kst.getUTCMonth() + 1) * 100 + kst.getUTCDate()
+  if (mmdd >= 317 && mmdd <= 915) return "summer" // 3.17 ~ 9.15
+  if (mmdd >= 916 && mmdd <= 1015) return "autumn" // 9.16 ~ 10.15
+  return "winter" // 10.16 ~ 익년 3.16
+}
+
+const CHEONGSANDO_TIMES: Record<CheongsandoSeason, { dep: string[]; arr: string[] }> = {
+  winter: {
+    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "15:00", "17:00"],
+    arr: ["06:50", "09:00", "11:00", "11:30", "13:00", "15:00", "17:00"],
+  },
+  summer: {
+    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "15:00", "18:00"],
+    arr: ["06:50", "09:00", "11:00", "11:30", "13:00", "15:00", "18:00"],
+  },
+  autumn: {
+    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "15:00", "17:30"],
+    arr: ["06:50", "09:00", "11:00", "11:30", "13:00", "15:00", "17:30"],
+  },
+}
+
+function cheongsandoTimes(dir: "dep" | "arr", kst: Date): string[] {
+  return CHEONGSANDO_TIMES[cheongsandoSeason(kst)][dir]
+}
+
+// 정적 fallback 배열에 계절별 청산도 시간표 적용
+function applySeasonalCheongsando(routes: WandoRoute[], kst: Date, dir: "dep" | "arr"): WandoRoute[] {
+  const times = cheongsandoTimes(dir, kst)
+  return routes.map((r) => (r.id === `${dir}-cheongsando` ? { ...r, times } : r))
+}
+
+// ────────────────────────────────────────────────
 // TAGO 운항정보 조회 (공통)
 // ────────────────────────────────────────────────
 async function fetchNodeRoutes(key: string, nodeId: string, date: string) {
@@ -116,11 +157,13 @@ async function fetchKomsaStatus(key: string, date: string, ferryNames: string[])
 // 완도 출발 항로
 // ────────────────────────────────────────────────
 export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const fallback = () => ({ routes: applySeasonalCheongsando(STATIC_DEP, kst, "dep"), isLive: false })
+
   const key = process.env.DATAGOKR_API_KEY
-  if (!key) return { routes: STATIC_DEP, isLive: false }
+  if (!key) return fallback()
 
   try {
-    const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
 
     const [mainItems, hwaItems] = await Promise.all([
@@ -128,7 +171,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       fetchNodeRoutes(key, WANDO_HWAHEUNGPO, date),
     ])
     const allItems = [...mainItems, ...hwaItems]
-    if (!allItems.length) return { routes: STATIC_DEP, isLive: false }
+    if (!allItems.length) return fallback()
 
     // 소안도·보길도를 동일 groupKey로 묶어서 그룹화
     const grouped: Record<string, { times: string[]; ships: Set<string>; label: string; priority: number }> = {}
@@ -141,7 +184,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       if (t) grouped[groupKey].times.push(t)
       if (it.vihicleNm) grouped[groupKey].ships.add(it.vihicleNm)
     }
-    if (!Object.keys(grouped).length) return { routes: STATIC_DEP, isLive: false }
+    if (!Object.keys(grouped).length) return fallback()
 
     const groupKeys = Object.keys(grouped)
     const statusMap: Record<string, RouteStatus> = {}
@@ -160,7 +203,10 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
         // TAGO 편수 부족 → 정적 시간표 + 실시간 운항상태
         if (minTrips && uniqueTimes.length < minTrips) {
           const base = STATIC_DEP.find((r) => r.id === `dep-${groupKey}`)
-          if (base) return { ...base, status: statusMap[groupKey], isLive: false }
+          if (base) {
+            const seasonal = groupKey === "cheongsando" ? cheongsandoTimes("dep", kst) : base.times
+            return { ...base, times: seasonal, status: statusMap[groupKey], isLive: false }
+          }
         }
         return {
           id: `dep-${groupKey}`,
@@ -177,7 +223,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
 
     return { routes, isLive: true }
   } catch {
-    return { routes: STATIC_DEP, isLive: false }
+    return fallback()
   }
 }
 
@@ -185,11 +231,13 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
 // 완도 도착 항로 (역방향 조회)
 // ────────────────────────────────────────────────
 export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const fallback = () => ({ routes: applySeasonalCheongsando(STATIC_ARR, kst, "arr"), isLive: false })
+
   const key = process.env.DATAGOKR_API_KEY
-  if (!key) return { routes: STATIC_ARR, isLive: false }
+  if (!key) return fallback()
 
   try {
-    const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
 
     const results = await Promise.all(
@@ -208,7 +256,10 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
         const minTrips = ROUTE_MIN_TRIPS[groupKey]
         if (minTrips && times.length < minTrips) {
           const base = STATIC_ARR.find((r) => r.id === `arr-${groupKey}`)
-          if (base) return { ...base, status, isLive: false, _priority: priority }
+          if (base) {
+            const seasonal = groupKey === "cheongsando" ? cheongsandoTimes("arr", kst) : base.times
+            return { ...base, times: seasonal, status, isLive: false, _priority: priority }
+          }
         }
 
         return {
@@ -234,10 +285,10 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
     valid.sort((a, b) => (a._priority ?? 99) - (b._priority ?? 99))
     const routes: WandoRoute[] = valid.map(({ _priority: _, ...r }) => r)
 
-    if (!routes.length) return { routes: STATIC_ARR, isLive: false }
+    if (!routes.length) return fallback()
     return { routes, isLive: true }
   } catch {
-    return { routes: STATIC_ARR, isLive: false }
+    return fallback()
   }
 }
 
@@ -252,8 +303,9 @@ const STATIC_DEP: WandoRoute[] = [
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
   },
   {
+    // times는 applySeasonalCheongsando/cheongsandoTimes로 계절별 자동 적용됨 (아래는 여름 기본값)
     id: "dep-cheongsando",
-    to: "청산도", operator: "청산농협·남해고속",
+    to: "청산도", operator: "청산농협 · 섬사랑7호",
     times: ["07:00", "08:30", "11:00", "13:00", "14:30", "15:00", "18:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
     fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
@@ -276,9 +328,10 @@ const STATIC_ARR: WandoRoute[] = [
     islandTerminal: "제주항 연안여객터미널",
   },
   {
+    // times는 applySeasonalCheongsando/cheongsandoTimes로 계절별 자동 적용됨 (아래는 여름 기본값)
     id: "arr-cheongsando",
-    to: "완도", from: "청산도", operator: "남해고속",
-    times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"],
+    to: "완도", from: "청산도", operator: "청산농협 · 섬사랑7호",
+    times: ["06:50", "09:00", "11:00", "11:30", "13:00", "15:00", "18:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
     islandTerminal: "도청항 (청산도 여객선터미널)",
     fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
