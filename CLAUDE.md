@@ -44,8 +44,8 @@
 - [x] Vercel Analytics 설치
 - [x] 메인 화면 구현 (M1 완료)
 - [x] 기상청 API 연동 (날씨 카드 — 초단기실황 + 5일 단기예보)
-- [x] TAGO API 실시간 연동 완료 (제주·청산도·소안도·보길도 실시간 시간표)
-- [x] KOMSA API 연동 완료 (결항 정보 실시간 연동 — nvg_stts_nm=결항 감지)
+- [x] MTIS 운항 스케줄 API 실시간 연동 완료 (제주·청산도·소안도·보길도 시간표 + 결항 통합, nvg_stts_nm=결항 감지)
+- [x] TAGO + KOMSA → MTIS 단일 API 마이그레이션 완료 (청산도 정적 fallback 제거, 6편 실시간 수신)
 - [x] KHOA 조석예보 연동 완료 (DT_0027, 만조·간조 시각·높이, 5일 예보)
 - [x] RouteDetail 전체화면 상세 페이지 (시간표 과거/현재/미래 구분, 운임 링크, 터미널 지도)
 - [x] QR 코드 페이지 (/qr) — 앱 URL 즉시 공유
@@ -91,9 +91,7 @@
 
 | 데이터         | API                          | 비고                          |
 | -------------- | ---------------------------- | ----------------------------- |
-| 항로 시간표    | 국토교통부 TAGO (data.go.kr) | 국내선박운항정보              |
-| 운항/결항 상태 | 한국해양교통안전공단 KOMSA   | 실시간 운항현황               |
-| 운항 정보 보완 | 한국해운조합                 | KOMSA 보완용                  |
+| 항로 시간표 + 운항/결항 | 한국해양교통안전공단 MTIS (data.go.kr) | 운항 스케줄 통합 (시간표·결항 단일 API) |
 | 날씨           | 기상청 오픈API               | 초단기실황 (5분 캐시)         |
 | 5일 예보·파고  | 기상청 단기예보              | getVilageFcst (600초 캐시)    |
 | 조석예보       | 국립해양조사원 KHOA          | 만조·간조 시각·높이, 5일 예보 |
@@ -104,19 +102,27 @@
 - 경도(lon): 126.7544
 - 기상청 격자: X=57, Y=74
 
-### 주요 항로 (TAGO 실제 데이터 기준)
+### 주요 항로 (MTIS 실제 데이터 기준)
 
-- 완도 → 제주 (SEA31020, TAGO 실시간 ✅)
-- 완도 → 청산도 (SEA31020, TAGO 실시간 ✅)
-- 완도_화흥포 → **소안도·보길도·노화** (SEA31022, 경유 노선 통합 ✅)
-- _(목포·녹동·여수는 TAGO 데이터 없음 — 별도 확인 필요)_
+- 완도 → 제주 (실버클라우드, MTIS 실시간 ✅)
+- 완도 → 청산도 (슬로시티청산도호·청산아일랜드호, MTIS 실시간 ✅ — 청산농협 차도선 전편 수신)
+- 완도_화흥포 → **소안도·보길도·노화** (대한호·민국호, 경유 노선 통합 ✅)
 
-### TAGO API 연동 정보
+### MTIS 운항 스케줄 API 연동 정보 (현행)
 
-- **Base URL**: `https://apis.data.go.kr/1613000/DmstcShipNvgInfo`
-- **Operations**: PascalCase (`GetShipOpratInfoList`, `GetPortList`, `GetPsnshipTrminlList`)
-- **완도항 nodeId**: `SEA31020` / **화흥포 nodeId**: `SEA31022`
-- **날짜 파라미터**: `depPlandTime=YYYYMMDD`
+- **Base URL**: `https://apis.data.go.kr/B554035/oprt-schd-info-v2/get-oprt-schd-info-v2`
+- **사용 키**: `DATAGOKR_API_KEY` (기존 키 그대로, 별도 발급 불필요)
+- **파라미터**: `serviceKey`, `pageNo`, `numOfRows=200`, `dataType=JSON`, `rlvtYmd=YYYYMMDD`
+- **성공 코드**: `response.header.resultCode === "200"` (KOMSA 계열 동일, 표준 "00" 아님!)
+- **응답 필드** (`response.body.items.item[]`):
+  - `sail_tm`: 출항 시각 HHMM (앞자리 0 없음 — `"700"`=07:00, `"1430"`=14:30 → `parseSailTime`로 4자리 패딩 후 콜론 삽입)
+  - `oport_nm`: 출발항 이름 (완도/화흥포/청산/소안/제주 …)
+  - `dest_nm`: 도착항 이름
+  - `psnshp_nm`: 여객선명
+  - `nvg_stts_nm`: 운항 상태 — `"결항"` 감지로 결항 배지 표시
+- **노선 분류**: `depGroupKey()`/`arrGroupKey()`가 출발·도착항 이름으로 groupKey 매핑
+  - 단일 호출로 시간표 + 결항을 동시 수신 (TAGO 2회 + KOMSA N회 → MTIS 1회로 통합)
+- _TAGO·KOMSA(ferry-route-info-v4) 연동은 폐기됨 (2026.06 MTIS 전환)_
 
 ---
 
@@ -142,7 +148,7 @@ ferrycast/
 │   └── lib/
 │       ├── weather.ts           ← 기상청 초단기실황 API
 │       ├── forecast.ts          ← 기상청 단기예보 (5일)
-│       ├── ferry.ts             ← TAGO/KOMSA API
+│       ├── ferry.ts             ← MTIS 운항 스케줄 API (시간표·결항 통합)
 │       ├── tide.ts              ← KHOA 조석예보 API
 │       └── types.ts             ← 공통 타입 정의
 ├── public/
@@ -157,7 +163,7 @@ ferrycast/
 ## 환경변수 (.env.local)
 
 ```
-DATAGOKR_API_KEY=발급받은_키   # TAGO + KOMSA + KHOA 조석예보 공통 (data.go.kr 동일 키)
+DATAGOKR_API_KEY=발급받은_키   # MTIS 운항스케줄 + KHOA 조석예보 공통 (data.go.kr 동일 키)
 KMA_API_KEY=발급받은_키        # 기상청 별도 키
 ```
 
@@ -170,7 +176,7 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 ### M0 — 준비 ✅ 완료
 
 - [x] 프로젝트 생성 + GitHub + Vercel 연동
-- [x] DATAGOKR_API_KEY 발급 (TAGO + KOMSA + KHOA 통합)
+- [x] DATAGOKR_API_KEY 발급 (MTIS + KHOA 통합)
 - [x] KMA_API_KEY 발급 (기상청)
 - [x] API 실제 응답 테스트 완료
 - [x] Vercel Analytics 설치
@@ -180,8 +186,8 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 - [x] 메인 레이아웃 (모바일 375px, max-w-lg, sticky 헤더)
 - [x] WeatherCard — 기상청 초단기실황 연동 (기온·날씨·풍속·습도·파고)
 - [x] TidalCard — KHOA 조석예보 연동 (DT_0027, 만조·간조, 5일 예보)
-- [x] RouteList + RouteItem — TAGO 실시간 연동, fallback 자동 전환
-- [x] 운항/결항 배지 — TAGO 시간표 + KOMSA 결항 감지 실시간 연동
+- [x] RouteList + RouteItem — MTIS 실시간 연동, fallback 자동 전환
+- [x] 운항/결항 배지 — MTIS 시간표 + 결항(nvg_stts_nm) 단일 API 실시간 연동
 - [x] API 오류 fallback — 날씨·항로 각각 안내 박스
 - [x] 면책 문구 + 공식 링크 (완도군청, 해운조합)
 - [x] 광고 슬롯 placeholder
@@ -217,13 +223,10 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 
 ## API 연동 메모
 
-### KOMSA API
+### (폐기) KOMSA ferry-route-info-v4 API
 
-- **Endpoint**: `https://apis.data.go.kr/B554035/ferry-route-info-v4/get-ferry-route-info-v4`
-- **필수 파라미터**: `rlvtYmd=YYYYMMDD` (출항일자), `dataType=JSON`
-- **선택 파라미터**: `psnshpNm` (여객선명 필터), `numOfRows`, `pageNo`
-- **성공 코드**: `resultCode: "200"` (표준 "00" 아님!)
-- **결항 감지**: `nvg_stts_nm === "결항"`
+> ⚠️ 2026.06 MTIS 전환으로 더 이상 사용하지 않음. MTIS `nvg_stts_nm`이 결항을 함께 제공하므로 별도 결항 조회 불필요.
+> 과거 참고: `https://apis.data.go.kr/B554035/ferry-route-info-v4/get-ferry-route-info-v4`, `rlvtYmd`, `psnshpNm` 필터, `resultCode: "200"`, `nvg_stts_nm === "결항"`
 
 ### KHOA 조석예보 ✅ 완료
 
@@ -236,15 +239,12 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
   - `predcTdlvVl`: 조위 높이 (cm)
   - `extrSe`: 홀수(1,3)=고조, 짝수(2,4)=저조
 
-### 청산도 시간표 주의사항
+### 청산도 시간표 (MTIS 전환 후)
 
-- **청산농협**(슬로시티청산도호, 청산아일랜드호)은 TAGO API 미등록 → 정적 시간표 사용
-- TAGO에는 **섬사랑7호**(다도해 행정선, 완도발 15:00 / 청산발 11:00)만 등록되어 있음 → 정적 시간표에 병합
-- **계절별 시간표 적용 완료** (`CHEONGSANDO_TIMES` in ferry.ts): 막배 시각만 기간별 변동
-  - 겨울(10.16~3.16): 막배 17:00
-  - 여름(3.17~9.15): 막배 18:00
-  - 가을(9.16~10.15): 막배 17:30
-- 운항/결항은 KOMSA 실시간 유지, 시간표는 `cheongsandoSeason()`이 오늘 날짜로 자동 선택
+- **MTIS 실시간 직접 수신** ✅ — 슬로시티청산도호(3편) + 청산아일랜드호(3편) = 6편 모두 MTIS에 등록되어 실시간 조회됨
+- TAGO 시절 정적 fallback(`ROUTE_MIN_TRIPS`, 청산농협 미등록 보완)은 **제거됨** — 더 이상 정적 시간표를 데이터 소스로 쓰지 않음
+- 단, `CHEONGSANDO_TIMES` 계절별 시간표는 **API 완전 장애 시 최후 안전망(`STATIC_DEP`/`STATIC_ARR`)으로만** 잔존 (CLAUDE.md 원칙 #3: 흰 화면 금지). 정상 시 노출되지 않음
+  - 안전망 막배: 겨울 17:00 / 여름 18:00 / 가을 17:30
 - 실제 시간표 확인: 청산농협 061-552-9385 또는 cheongsannh.nonghyup.com
 
 ### 운임 요금 링크
@@ -257,7 +257,8 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 
 ## 참고 링크
 
-- 공공데이터포털 (TAGO 키 발급): https://www.data.go.kr
+- 공공데이터포털 (MTIS·KHOA 키 발급): https://www.data.go.kr
+- MTIS 운항 스케줄 정보 (data.go.kr ID 15142302): https://www.data.go.kr/data/15142302/openapi.do
 - 기상청 오픈API: https://www.data.go.kr/data/15084084/openapi.do
 - KOMSA: https://www.komsa.or.kr
 - KHOA 오픈API: https://www.khoa.go.kr/api/oceangrid/intro.do
