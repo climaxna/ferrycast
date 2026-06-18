@@ -54,7 +54,7 @@ const FARE_URL_MAP: Record<string, string> = {
 const ARR_QUERIES = [
   { nodeId: "SEA10090", label: "제주",       arrFilter: "완도",        groupKey: "jeju",             islandTerminal: "제주항 연안여객터미널", priority: 1 },
   { nodeId: "SEA35560", label: "청산도",      arrFilter: "완도",        groupKey: "cheongsando",      islandTerminal: "도청항",                priority: 2 },
-  { nodeId: "SEA33830", label: "소안도",      arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", islandTerminal: "소안도 부황항",          priority: 3 },
+  { nodeId: "SEA33830", label: "소안도",      arrFilter: "완도_화흥포", groupKey: "hwaheungpo-route", islandTerminal: "부황항",                priority: 3 },
   { nodeId: "SEA31891", label: "보길도·노화", arrFilter: "완도_화흥포", groupKey: "bogil-nohua-arr",  islandTerminal: "노화 산양항",            priority: 4 },
 ] as const
 
@@ -342,7 +342,7 @@ const STATIC_ARR: WandoRoute[] = [
     to: "완도", from: "소안도", operator: "청해진해운",
     times: ["07:30", "09:47", "13:12", "16:14", "19:04"],
     status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
-    islandTerminal: "소안도 부황항",
+    islandTerminal: "부황항",
     fareUrl: FARE_URL_MAP["hwaheungpo-route"],
   },
 ]
