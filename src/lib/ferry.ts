@@ -135,26 +135,28 @@ function nextDay(date: string): string {
   return dt.toISOString().slice(0, 10).replace(/-/g, "")
 }
 
-// 내일 스케줄을 groupKey별 편수로 집계 (결항 편 제외)
-// keyFn: depGroupKey(출발) 또는 arrGroupKey(도착)
+// 내일 스케줄을 groupKey별 편수로 집계 (결항 편 제외, 5분 이내 중복 병합 후 카운트)
 async function fetchTomorrowCounts(
   key: string,
   todayDate: string,
   keyFn: (item: MtisItem) => string | null,
 ): Promise<Record<string, number>> {
-  const counts: Record<string, number> = {}
+  const timesPerGroup: Record<string, string[]> = {}
   try {
     const items = await fetchMtisAll(key, nextDay(todayDate))
     for (const it of items) {
       if (it.nvg_stts_nm === "결항") continue
       const gk = keyFn(it)
       if (!gk) continue
-      counts[gk] = (counts[gk] ?? 0) + 1
+      if (!timesPerGroup[gk]) timesPerGroup[gk] = []
+      timesPerGroup[gk].push(parseSailTime(it.sail_tm))
     }
   } catch {
     // 내일 데이터는 부가 정보 — 실패해도 오늘 데이터에 영향 없음
   }
-  return counts
+  return Object.fromEntries(
+    Object.entries(timesPerGroup).map(([gk, times]) => [gk, deduplicateTimes(times).length]),
+  )
 }
 
 // ────────────────────────────────────────────────
