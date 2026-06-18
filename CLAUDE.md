@@ -200,7 +200,7 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 ### M2 — 배포·확산
 
 - [ ] 커스텀 도메인 연결
-- [ ] PWA manifest 설정
+- [x] PWA manifest 설정 (manifest.json, 아이콘 192/512px, theme-color, apple-touch-icon)
 - [ ] 구글 애드센스 신청
 - [ ] 광고 슬롯 레이아웃 준비
 - [ ] 3종 환경 테스트 (iOS / Android / PC)
