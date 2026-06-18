@@ -88,6 +88,35 @@ function groupStatus(items: MtisItem[]): RouteStatus {
   return "unknown"
 }
 
+// YYYYMMDD → 다음날 YYYYMMDD
+function nextDay(date: string): string {
+  const y = +date.slice(0, 4), m = +date.slice(4, 6), d = +date.slice(6, 8)
+  const dt = new Date(Date.UTC(y, m - 1, d + 1))
+  return dt.toISOString().slice(0, 10).replace(/-/g, "")
+}
+
+// 내일 스케줄을 groupKey별 편수로 집계 (결항 편 제외)
+// keyFn: depGroupKey(출발) 또는 arrGroupKey(도착)
+async function fetchTomorrowCounts(
+  key: string,
+  todayDate: string,
+  keyFn: (item: MtisItem) => string | null,
+): Promise<Record<string, number>> {
+  const counts: Record<string, number> = {}
+  try {
+    const items = await fetchMtisAll(key, nextDay(todayDate))
+    for (const it of items) {
+      if (it.nvg_stts_nm === "결항") continue
+      const gk = keyFn(it)
+      if (!gk) continue
+      counts[gk] = (counts[gk] ?? 0) + 1
+    }
+  } catch {
+    // 내일 데이터는 부가 정보 — 실패해도 오늘 데이터에 영향 없음
+  }
+  return counts
+}
+
 // ────────────────────────────────────────────────
 // 완도 출발 항로
 // ────────────────────────────────────────────────
@@ -100,7 +129,10 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const items = await fetchMtisAll(key, date)
+    const [items, tomorrowCounts] = await Promise.all([
+      fetchMtisAll(key, date),
+      fetchTomorrowCounts(key, date, depGroupKey),
+    ])
     if (!items.length) return fallback()
 
     const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[] }> = {}
@@ -118,6 +150,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       .sort(([a], [b]) => (DEP_CFG[a]?.priority ?? 99) - (DEP_CFG[b]?.priority ?? 99))
       .map(([gk, { times, ships, allItems }]) => {
         const cfg = DEP_CFG[gk]
+        const tmrwCount = tomorrowCounts[gk]
         return {
           id: `dep-${gk}`,
           to: cfg.label,
@@ -128,6 +161,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           terminal: cfg.terminal,
           fare: cfg.fare,
           fareUrl: cfg.fareUrl,
+          ...(tmrwCount ? { tomorrow: { tripCount: tmrwCount } } : {}),
         }
       })
 
@@ -149,7 +183,10 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const items = await fetchMtisAll(key, date)
+    const [items, tomorrowCounts] = await Promise.all([
+      fetchMtisAll(key, date),
+      fetchTomorrowCounts(key, date, arrGroupKey),
+    ])
     if (!items.length) return fallback()
 
     const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg }> = {}
@@ -165,19 +202,23 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 
     const routes: WandoRoute[] = Object.entries(grouped)
       .sort(([a], [b]) => (ARR_CFG[a]?.priority ?? 99) - (ARR_CFG[b]?.priority ?? 99))
-      .map(([gk, { times, ships, allItems, cfg }]) => ({
-        id: `arr-${gk}`,
-        to: "완도",
-        from: cfg.label,
-        operator: [...ships].join(" · "),
-        times: [...new Set(times)].sort(),
-        status: groupStatus(allItems),
-        isLive: true,
-        terminal: cfg.terminal,
-        islandTerminal: cfg.islandTerminal,
-        fare: cfg.fare,
-        fareUrl: cfg.fareUrl,
-      }))
+      .map(([gk, { times, ships, allItems, cfg }]) => {
+        const tmrwCount = tomorrowCounts[gk]
+        return {
+          id: `arr-${gk}`,
+          to: "완도",
+          from: cfg.label,
+          operator: [...ships].join(" · "),
+          times: [...new Set(times)].sort(),
+          status: groupStatus(allItems),
+          isLive: true,
+          terminal: cfg.terminal,
+          islandTerminal: cfg.islandTerminal,
+          fare: cfg.fare,
+          fareUrl: cfg.fareUrl,
+          ...(tmrwCount ? { tomorrow: { tripCount: tmrwCount } } : {}),
+        }
+      })
 
     return { routes, isLive: true }
   } catch {

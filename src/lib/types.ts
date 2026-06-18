@@ -20,4 +20,7 @@ export interface WandoRoute {
   islandTerminal?: string  // 도착 탭 전용: 섬에서 타는 터미널 (예: "도청항")
   fare?: FareInfo
   fareUrl?: string
+  tomorrow?: {
+    tripCount: number  // 내일 운항 예정 편수 (오늘 데이터와 동일 API, rlvtYmd=내일)
+  }
 }
