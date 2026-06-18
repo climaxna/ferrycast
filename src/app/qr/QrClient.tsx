@@ -1,16 +1,11 @@
 "use client"
 
 import { QRCodeSVG } from "qrcode.react"
-import { useEffect, useState } from "react"
+
+// 공유용 QR은 접속 경로와 무관하게 항상 정식 도메인을 가리킨다
+const url = "https://ferrycast.kr"
 
 export default function QrClient() {
-  const [url, setUrl] = useState("")
-
-  useEffect(() => {
-    // 현재 도메인의 루트 URL (배포 환경에 자동 대응)
-    setUrl(window.location.origin)
-  }, [])
-
   return (
     <main className="min-h-screen bg-white flex flex-col items-center justify-center gap-6 p-8 print:p-4">
       <div className="flex flex-col items-center gap-5 rounded-3xl border border-slate-100 bg-slate-50 p-8 shadow-sm print:border-0 print:shadow-none print:bg-white">
@@ -32,17 +27,15 @@ export default function QrClient() {
         </div>
 
         {/* QR 코드 */}
-        {url && (
-          <div className="rounded-2xl bg-white p-4 shadow-sm">
-            <QRCodeSVG
-              value={url}
-              size={220}
-              level="M"
-              bgColor="#ffffff"
-              fgColor="#1e3a5f"
-            />
-          </div>
-        )}
+        <div className="rounded-2xl bg-white p-4 shadow-sm">
+          <QRCodeSVG
+            value={url}
+            size={220}
+            level="M"
+            bgColor="#ffffff"
+            fgColor="#1e3a5f"
+          />
+        </div>
 
         {/* 안내 문구 */}
         <div className="text-center">
