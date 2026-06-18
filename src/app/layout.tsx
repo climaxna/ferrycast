@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import Script from "next/script"
 import InstallBanner from "@/components/InstallBanner"
 import "./globals.css"
 
@@ -32,6 +33,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <head>
+        {/* beforeinstallprompt는 React 마운트 전에 발생하므로 미리 캡처 */}
+        <Script id="pwa-capture" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html:
+          `window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__deferredPrompt=e;});`
+        }} />
+      </head>
       <body>
         {children}
         <InstallBanner />

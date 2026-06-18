@@ -2,48 +2,57 @@
 
 import { useEffect, useState } from "react"
 
+type DeferredPrompt = Event & { prompt: () => Promise<void> }
+
+declare global {
+  interface Window { __deferredPrompt?: DeferredPrompt }
+}
+
 export default function InstallBanner() {
   const [show, setShow] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<Event & { prompt: () => void } | null>(null)
+  const [prompt, setPrompt] = useState<DeferredPrompt | null>(null)
 
   useEffect(() => {
-    // 이미 설치됐거나 닫은 적 있으면 표시 안 함
     if (
       localStorage.getItem("install-dismissed") ||
       window.matchMedia("(display-mode: standalone)").matches
     ) return
 
+    // service worker 등록 (Android 설치 조건)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {})
+    }
+
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent)
     setIsIOS(ios)
 
     if (ios) {
-      // iOS: Safari에서만 안내 (Chrome·Firefox in-app 제외)
+      // iOS: Safari에서만 안내 (크롬·파이어폭스 인앱브라우저 제외)
       const isSafari = /safari/i.test(navigator.userAgent) && !/crios|fxios/i.test(navigator.userAgent)
       if (isSafari) setShow(true)
       return
     }
 
-    // Android/PC: beforeinstallprompt 대기
+    // 페이지 로드 초반에 캡처된 프롬프트 확인 (layout의 beforeInteractive 스크립트에서 저장)
+    if (window.__deferredPrompt) {
+      setPrompt(window.__deferredPrompt)
+      setShow(true)
+      return
+    }
+
+    // 아직 안 왔으면 이벤트 대기
     const handler = (e: Event) => {
       e.preventDefault()
-      setDeferredPrompt(e as Event & { prompt: () => void })
+      setPrompt(e as DeferredPrompt)
       setShow(true)
     }
     window.addEventListener("beforeinstallprompt", handler)
-
-    // service worker 등록
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {})
-    }
-
     return () => window.removeEventListener("beforeinstallprompt", handler)
   }, [])
 
   const handleInstall = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt()
-    }
+    if (prompt) await prompt.prompt()
     dismiss()
   }
 
