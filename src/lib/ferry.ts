@@ -31,18 +31,42 @@ function parseSailTime(raw: string): string {
   return `${s.slice(0, 2)}:${s.slice(2)}`
 }
 
-async function fetchMtisAll(key: string, date: string): Promise<MtisItem[]> {
+// 운항 스케줄 API는 전국 여객선을 반환 → 한 페이지로는 완도 편이 잘릴 수 있음
+const MTIS_PAGE_SIZE = 500
+const MTIS_MAX_PAGES = 10 // 안전 상한 (최대 5000건)
+
+async function fetchMtisPage(
+  key: string,
+  date: string,
+  pageNo: number,
+): Promise<{ items: MtisItem[]; totalCount: number }> {
   const params = new URLSearchParams({
-    serviceKey: key, pageNo: "1", numOfRows: "200",
+    serviceKey: key, pageNo: String(pageNo), numOfRows: String(MTIS_PAGE_SIZE),
     dataType: "JSON", rlvtYmd: date,
   })
   const res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 300 } })
-  if (!res.ok) return []
+  if (!res.ok) return { items: [], totalCount: 0 }
   const json = await res.json()
-  if (json?.response?.header?.resultCode !== "200") return []
-  const raw = json?.response?.body?.items?.item
-  if (!raw) return []
-  return Array.isArray(raw) ? raw : [raw]
+  if (json?.response?.header?.resultCode !== "200") return { items: [], totalCount: 0 }
+  const body = json?.response?.body
+  const raw = body?.items?.item
+  const items = (Array.isArray(raw) ? raw : raw ? [raw] : []) as MtisItem[]
+  const totalCount = Number(body?.totalCount ?? items.length)
+  return { items, totalCount }
+}
+
+// 전국 스케줄 전체를 페이지네이션으로 수집 (완도 편 누락 방지)
+async function fetchMtisAll(key: string, date: string): Promise<MtisItem[]> {
+  const first = await fetchMtisPage(key, date, 1)
+  const items = [...first.items]
+  const totalPages = Math.min(Math.ceil(first.totalCount / MTIS_PAGE_SIZE), MTIS_MAX_PAGES)
+  if (totalPages > 1) {
+    const rest = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) => fetchMtisPage(key, date, i + 2)),
+    )
+    for (const r of rest) items.push(...r.items)
+  }
+  return items
 }
 
 // ────────────────────────────────────────────────
