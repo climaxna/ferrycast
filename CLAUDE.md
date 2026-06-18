@@ -247,6 +247,7 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
 
 - **청산도**: https://cheongsannh.nonghyup.com/user/indexSub.do?codyMenuSeq=1048386239&siteId=cheongsannh
 - **소안도·보길도·노화**: https://island.theksa.co.kr
+- 제주도 운임요금 확인 필요
 
 ---
 
