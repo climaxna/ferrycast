@@ -144,9 +144,14 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
 
           {/* 시간표 */}
           <div>
-            <p className="mb-3 text-sm font-bold uppercase tracking-wider text-slate-400">
-              {timeHeading}
-            </p>
+            <div className="mb-3 flex items-baseline justify-between">
+              <p className="text-sm font-bold uppercase tracking-wider text-slate-400">
+                {timeHeading}
+              </p>
+              {!isCancelled && (nextTime || futureTimes.length > 0) && (
+                <p className="text-[11px] text-slate-400">🔔 시간 탭 시 알림 설정</p>
+              )}
+            </div>
             {isCancelled ? (
               <div className="rounded-2xl bg-rose-50 px-4 py-6 text-center">
                 <p className="text-3xl">🚢</p>
@@ -173,17 +178,15 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                     <span className="text-[10px] font-semibold leading-tight text-blue-200">
                       {relativeTime(nextTime, nowMinutes)}
                     </span>
-                    <span className="mt-0.5 text-[9px] text-blue-200">🔔 알림</span>
                   </button>
                 )}
                 {futureTimes.map((t) => (
                   <button
                     key={t}
                     onClick={() => setAlarmTime(t)}
-                    className="flex flex-col items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm active:opacity-70"
+                    className="flex items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm active:opacity-70"
                   >
                     {t}
-                    <span className="mt-0.5 text-[9px] text-blue-400">🔔 알림</span>
                   </button>
                 ))}
               </div>
