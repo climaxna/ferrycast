@@ -31,6 +31,22 @@ function parseSailTime(raw: string): string {
   return `${s.slice(0, 2)}:${s.slice(2)}`
 }
 
+// 동일 선착장에서 5분 이내 출항 편은 하나로 병합 (예: 18:00 / 18:01 → 18:00)
+function deduplicateTimes(times: string[]): string[] {
+  const sorted = [...new Set(times)].sort()
+  const result: string[] = []
+  for (const t of sorted) {
+    const [h, m] = t.split(":").map(Number)
+    const mins = h * 60 + m
+    const hasSimilar = result.some((r) => {
+      const [rh, rm] = r.split(":").map(Number)
+      return Math.abs(rh * 60 + rm - mins) < 5
+    })
+    if (!hasSimilar) result.push(t)
+  }
+  return result
+}
+
 // 운항 스케줄 API는 전국 여객선을 반환 → 한 페이지로는 완도 편이 잘릴 수 있음
 const MTIS_PAGE_SIZE = 500
 const MTIS_MAX_PAGES = 10 // 안전 상한 (최대 5000건)
@@ -179,7 +195,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           id: `dep-${gk}`,
           to: cfg.label,
           operator: [...ships].join(" · "),
-          times: [...new Set(times)].sort(),
+          times: deduplicateTimes(times),
           status: groupStatus(allItems),
           isLive: true,
           terminal: cfg.terminal,
@@ -233,7 +249,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           to: "완도",
           from: cfg.label,
           operator: [...ships].join(" · "),
-          times: [...new Set(times)].sort(),
+          times: deduplicateTimes(times),
           status: groupStatus(allItems),
           isLive: true,
           terminal: cfg.terminal,
