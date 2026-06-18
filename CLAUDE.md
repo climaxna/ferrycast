@@ -236,6 +236,13 @@ KMA_API_KEY=발급받은_키        # 기상청 별도 키
   - `predcTdlvVl`: 조위 높이 (cm)
   - `extrSe`: 홀수(1,3)=고조, 짝수(2,4)=저조
 
+### 청산도 시간표 주의사항
+
+- **청산농협**(슬로시티청산도호, 청산아일랜드호)은 TAGO API 미등록 → 정적 시간표 사용 중
+- 정적 시간표는 **평일 기준** (주말·성수기에 편수 증가, 비수기에 감소 가능)
+- 실제 시간표 확인: 청산농협 061-552-9385 또는 island.theksa.co.kr
+- **추후 개선 필요**: 평일/주말/성수기별 시간표 분리 적용
+
 ### 운임 요금 링크
 
 - **청산도**: https://cheongsannh.nonghyup.com/user/indexSub.do?codyMenuSeq=1048386239&siteId=cheongsannh
