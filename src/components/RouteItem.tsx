@@ -75,24 +75,24 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
 
             {/* 전체 시간표 칩 — 지난편·다음편·이후편 한눈에 */}
             {(pastTimes.length > 0 || nextTime || futureTimes.length > 0) && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
+              <div className="mt-2 flex flex-wrap gap-2">
                 {pastTimes.map((t) => (
                   <span
                     key={t}
-                    className="rounded-md px-1.5 py-0.5 text-xs tabular-nums text-slate-400"
+                    className="rounded-md px-2 py-1 text-sm tabular-nums text-slate-400"
                   >
                     {t}
                   </span>
                 ))}
                 {nextTime && (
-                  <span className={`rounded-md px-2 py-0.5 text-xs font-bold tabular-nums text-white ${isArrival ? "bg-teal-500" : "bg-blue-500"}`}>
+                  <span className={`rounded-md px-2.5 py-1 text-sm font-bold tabular-nums text-white ${isArrival ? "bg-teal-500" : "bg-blue-500"}`}>
                     {nextTime}
                   </span>
                 )}
                 {futureTimes.map((t) => (
                   <span
                     key={t}
-                    className={`rounded-md px-2 py-0.5 text-xs font-semibold tabular-nums ${isArrival ? "bg-teal-100 text-teal-700" : "bg-blue-100 text-blue-700"}`}
+                    className={`rounded-md px-2.5 py-1 text-sm font-semibold tabular-nums ${isArrival ? "bg-teal-100 text-teal-700" : "bg-blue-100 text-blue-700"}`}
                   >
                     {t}
                   </span>
