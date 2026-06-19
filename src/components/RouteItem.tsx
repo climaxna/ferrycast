@@ -60,7 +60,7 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
                 isArrival ? "from-teal-50 to-emerald-50" : "from-blue-50 to-sky-50"
               }`}>
                 <div className="flex items-baseline gap-2">
-                  <span className={`text-[11px] font-medium ${isArrival ? "text-teal-600" : "text-blue-500"}`}>{timeLabel}</span>
+                  <span className={`text-xs font-medium ${isArrival ? "text-teal-600" : "text-blue-500"}`}>{timeLabel}</span>
                   <span className={`text-2xl font-bold tabular-nums ${isArrival ? "text-teal-800" : "text-blue-800"}`}>{nextTime}</span>
                 </div>
                 <span className={`text-xs font-semibold ${isArrival ? "text-teal-600" : "text-blue-600"}`}>
@@ -79,7 +79,7 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
                 {pastTimes.map((t) => (
                   <span
                     key={t}
-                    className="rounded-md px-1.5 py-0.5 text-xs tabular-nums text-slate-300"
+                    className="rounded-md px-1.5 py-0.5 text-xs tabular-nums text-slate-400"
                   >
                     {t}
                   </span>
@@ -104,7 +104,7 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
 
         <div className="mt-2 flex flex-wrap items-center gap-1.5">
           <span
-            className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium ${
+            className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium ${
               isAltTerminal
                 ? "bg-amber-50 text-amber-700"
                 : "bg-slate-50 text-slate-400"
@@ -117,13 +117,13 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
             {route.terminal}
           </span>
           {route.operator && (
-            <span className="truncate text-[11px] text-slate-400">{route.operator}</span>
+            <span className="truncate text-xs text-slate-400">{route.operator}</span>
           )}
         </div>
 
         {/* 내일 운항 예정 편수 — 신청 없이 동일 API(rlvtYmd=내일)로 집계 */}
         {route.tomorrow && route.tomorrow.tripCount > 0 && (
-          <div className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700">
+          <div className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
               <rect x="3" y="4" width="18" height="18" rx="2" />
               <path d="M3 10h18M8 2v4M16 2v4" strokeLinecap="round" />

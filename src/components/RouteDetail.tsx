@@ -51,7 +51,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
       <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-4">
         <button
           onClick={onClose}
-          className="flex items-center gap-1.5 rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-100"
+          className="flex items-center gap-1.5 rounded-full p-2.5 text-slate-500 transition-colors hover:bg-slate-100"
           aria-label="닫기"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -136,12 +136,12 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <div>
-                    <p className="text-[11px] font-semibold text-blue-400">타는 곳</p>
+                    <p className="text-xs font-semibold text-blue-500">타는 곳</p>
                     <p className="text-base font-bold text-blue-800">
                       {route.islandTerminal ?? `${route.from} 여객터미널`}
                     </p>
                   </div>
-                  <span className="shrink-0 text-xs font-medium text-blue-400">지도 보기 →</span>
+                  <span className="shrink-0 text-xs font-medium text-blue-500">지도 보기 →</span>
                 </div>
               </div>
             </a>
@@ -163,14 +163,14 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                       )
                       setActiveAlarms(new Set())
                     }}
-                    className="text-[11px] font-semibold text-rose-400"
+                    className="text-xs font-semibold text-rose-500"
                   >
                     🔔 알림 {activeAlarms.size}개 설정됨 · 취소
                   </button>
                 ) : standalone ? (
-                  <p className="text-[11px] text-slate-400">🔔 시간 탭 시 알림 설정</p>
+                  <p className="text-xs text-slate-500">🔔 시간 탭 시 알림 설정</p>
                 ) : (
-                  <p className="text-[11px] text-slate-400">🔔 알림 — 앱 설치 후 가능</p>
+                  <p className="text-xs text-slate-500">🔔 알림 — 앱 설치 후 가능</p>
                 )
               )}
             </div>
@@ -185,7 +185,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                 {pastTimes.map((t) => (
                   <div
                     key={t}
-                    className="flex items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-300 shadow-sm"
+                    className="flex items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-400 shadow-sm"
                   >
                     {t}
                   </div>
@@ -194,10 +194,10 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                   <button
                     key={nextTime}
                     onClick={() => setAlarmTime(nextTime)}
-                    className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-2 shadow-md active:opacity-80"
+                    className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-3 shadow-md active:opacity-80"
                   >
                     <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
-                    <span className="text-[10px] font-semibold leading-tight text-blue-200">
+                    <span className="text-[11px] font-semibold leading-tight text-blue-100">
                       {relativeTime(nextTime, nowMinutes)}
                     </span>
                   </button>
@@ -245,7 +245,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                   <path d="M2 10h20" />
                 </svg>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">운임 요금</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">운임 요금</p>
                   <p className="text-base font-bold text-slate-800">공식 요금표 확인하기</p>
                 </div>
               </div>
