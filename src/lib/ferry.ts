@@ -312,9 +312,10 @@ const CHEONGSANDO_TIMES = {
 }
 
 // 소안도·노화(동천): 하절기(3/1~9/30) / 동절기(10/1~2/28)
+// 하절기 dep은 MTIS 실측 화흥포 출항시각(공식 게시표보다 약 5분 늦음)으로 보정 — 평상시엔 MTIS 실시간 사용
 const SOAN_TIMES = {
   summer: {
-    dep: ["06:40", "07:50", "08:50", "09:50", "10:50", "11:50", "12:50", "13:50", "14:50", "15:50", "16:50", "18:20", "21:00"],
+    dep: ["06:45", "07:55", "08:55", "09:55", "10:55", "11:55", "12:55", "13:55", "14:55", "15:55", "16:55", "18:25", "21:00"],
     arr: ["06:40", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:20", "19:50"],
   },
   winter: {
@@ -347,7 +348,7 @@ function makeStaticDep(kst: Date): WandoRoute[] {
     },
     {
       id: "dep-cheongsando",
-      to: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 권청산호",
+      to: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 퀸청산호",
       times: cs.dep,
       status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
       fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
@@ -376,7 +377,7 @@ function makeStaticArr(kst: Date): WandoRoute[] {
     },
     {
       id: "arr-cheongsando",
-      to: "완도", from: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 권청산호",
+      to: "완도", from: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 퀸청산호",
       times: cs.arr,
       status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
       islandTerminal: "도청항",
