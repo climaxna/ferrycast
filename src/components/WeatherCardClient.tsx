@@ -31,7 +31,7 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
     )
   }
 
-  const { text: ptyText, icon: ptyIcon } = ptyLabel(w.pty)
+  const { text: ptyText, icon: ptyIcon } = ptyLabel(w.pty, w.sky)
   const timeStr = `${w.baseDate.slice(4, 6)}/${w.baseDate.slice(6)} ${w.baseTime.slice(0, 2)}:${w.baseTime.slice(2)}`
   const now = new Date()
   const nowMin = now.getHours() * 60 + now.getMinutes()

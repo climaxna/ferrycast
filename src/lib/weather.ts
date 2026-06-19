@@ -4,6 +4,7 @@ export interface WeatherData {
   windSpeed: number
   windDir: number
   pty: number
+  sky: number
   rain1h: number
   baseDate: string
   baseTime: string
@@ -40,17 +41,23 @@ export function waveLabel(h: number): { text: string; color: string } {
   return              { text: "매우 거침", color: "text-red-600" }
 }
 
-export function ptyLabel(pty: number): { text: string; icon: string } {
-  const map: Record<number, { text: string; icon: string }> = {
-    0: { text: "맑음", icon: "☀️" },
-    1: { text: "비", icon: "🌧️" },
-    2: { text: "비/눈", icon: "🌨️" },
-    3: { text: "눈", icon: "❄️" },
-    5: { text: "빗방울", icon: "🌦️" },
-    6: { text: "빗방울·눈날림", icon: "🌨️" },
-    7: { text: "눈날림", icon: "❄️" },
+// sky: 1=맑음 3=구름많음 4=흐림 (초단기예보 SKY 코드)
+export function ptyLabel(pty: number, sky = 1): { text: string; icon: string } {
+  if (pty > 0) {
+    const map: Record<number, { text: string; icon: string }> = {
+      1: { text: "비", icon: "🌧️" },
+      2: { text: "비/눈", icon: "🌨️" },
+      3: { text: "눈", icon: "❄️" },
+      5: { text: "빗방울", icon: "🌦️" },
+      6: { text: "빗방울·눈날림", icon: "🌨️" },
+      7: { text: "눈날림", icon: "❄️" },
+    }
+    return map[pty] ?? { text: "알 수 없음", icon: "🌫️" }
   }
-  return map[pty] ?? { text: "알 수 없음", icon: "🌫️" }
+  // PTY=0: 강수 없음 → SKY 코드로 날씨 판단
+  if (sky === 4) return { text: "흐림",     icon: "☁️" }
+  if (sky === 3) return { text: "구름많음", icon: "⛅" }
+  return               { text: "맑음",     icon: "☀️" }
 }
 
 function getVilageFcstBase(): { baseDate: string; baseTime: string } {
@@ -68,6 +75,40 @@ function getVilageFcstBase(): { baseDate: string; baseTime: string } {
   }
   const baseDate = `${dateRef.getUTCFullYear()}${pad(dateRef.getUTCMonth() + 1)}${pad(dateRef.getUTCDate())}`
   return { baseDate, baseTime: `${pad(base)}00` }
+}
+
+// 초단기예보(getUltraSrtFcst)에서 SKY 코드 조회
+// PTY=0일 때 맑음/구름많음/흐림 구분을 위해 필요
+async function fetchSky(key: string): Promise<number> {
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const pad = (n: number) => String(n).padStart(2, "0")
+  // 초단기예보는 매 시각 30분 기준, 45분 후 발표
+  const hour = kst.getUTCHours()
+  const baseHour = kst.getUTCMinutes() >= 45 ? hour : hour - 1
+  let dateRef = kst
+  let h = baseHour
+  if (h < 0) { h = 23; dateRef = new Date(kst.getTime() - 86400000) }
+  const baseDate = `${dateRef.getUTCFullYear()}${pad(dateRef.getUTCMonth() + 1)}${pad(dateRef.getUTCDate())}`
+  const baseTime = `${pad(h)}30`
+
+  const params = new URLSearchParams({
+    serviceKey: key, dataType: "JSON", numOfRows: "60", pageNo: "1",
+    base_date: baseDate, base_time: baseTime, nx: "57", ny: "74",
+  })
+  try {
+    const res = await fetch(
+      `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${params}`,
+      { next: { revalidate: 300 } }
+    )
+    if (!res.ok) return 1
+    const json = await res.json()
+    const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
+    if (resultCode !== "00") return 1
+    const items: Array<{ category: string; fcstValue: string }> =
+      json?.response?.body?.items?.item ?? []
+    const skyItem = items.find((i) => i.category === "SKY")
+    return skyItem ? parseInt(skyItem.fcstValue) : 1
+  } catch { return 1 }
 }
 
 async function fetchWaveHeight(key: string): Promise<number | null> {
@@ -127,9 +168,10 @@ export async function getWandoWeather(): Promise<WeatherData | null> {
   const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?${params}`
 
   try {
-    const [res, waveHeight] = await Promise.all([
+    const [res, waveHeight, sky] = await Promise.all([
       fetch(url, { next: { revalidate: 300 } }),
       fetchWaveHeight(key),
+      fetchSky(key),
     ])
     if (!res.ok) return null
 
@@ -150,6 +192,7 @@ export async function getWandoWeather(): Promise<WeatherData | null> {
       windSpeed: get("WSD"),
       windDir: get("VEC"),
       pty: get("PTY"),
+      sky,
       rain1h: get("RN1"),
       baseDate: first?.baseDate ?? baseDate,
       baseTime: first?.baseTime ?? baseTime,
