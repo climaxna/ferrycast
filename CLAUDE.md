@@ -122,6 +122,7 @@
   - `nvg_stts_nm`: 운항 상태 — `"결항"` 감지로 결항 배지 표시
 - **노선 분류**: `depGroupKey()`/`arrGroupKey()`가 출발·도착항 이름으로 groupKey 매핑
   - 단일 호출로 시간표 + 결항을 동시 수신 (TAGO 2회 + KOMSA N회 → MTIS 1회로 통합)
+- **호출 최소화 (쿼터 보호)**: `getMtisDay = cache(...)`로 오늘/내일 데이터를 렌더당 1번만 수신 → 출발·도착이 공유 (4회→2회). 내부 `fetch`는 `revalidate:300` Data Cache로 사용자 수와 무관하게 호출 상한 고정. 페이지네이션은 `allSettled`로 일부 실패해도 받은 페이지 유지. 쿼터 초과 plain-text 응답은 파싱 가드로 빈 배열 처리 → 정적 fallback. **fetchMtisAll 직접 호출 금지, 반드시 getMtisDay 사용할 것**
 - _TAGO·KOMSA(ferry-route-info-v4) 연동은 폐기됨 (2026.06 MTIS 전환)_
 
 ---

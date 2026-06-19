@@ -1,3 +1,4 @@
+import { cache } from "react"
 import type { WandoRoute, RouteStatus, FareInfo } from "./types"
 
 const MTIS_BASE = "https://apis.data.go.kr/B554035/oprt-schd-info-v2/get-oprt-schd-info-v2"
@@ -62,9 +63,16 @@ async function fetchMtisPage(
   })
   const res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 300 } })
   if (!res.ok) return { items: [], totalCount: 0 }
-  const json = await res.json()
-  if (json?.response?.header?.resultCode !== "200") return { items: [], totalCount: 0 }
-  const body = json?.response?.body
+  // 쿼터 초과 시 JSON이 아닌 plain text("API token quota exceeded")를 반환 → 파싱 가드
+  let json: unknown
+  try {
+    json = await res.json()
+  } catch {
+    return { items: [], totalCount: 0 }
+  }
+  const j = json as { response?: { header?: { resultCode?: string }; body?: { items?: { item?: unknown }; totalCount?: number } } }
+  if (j?.response?.header?.resultCode !== "200") return { items: [], totalCount: 0 }
+  const body = j?.response?.body
   const raw = body?.items?.item
   const items = (Array.isArray(raw) ? raw : raw ? [raw] : []) as MtisItem[]
   const totalCount = Number(body?.totalCount ?? items.length)
@@ -72,18 +80,26 @@ async function fetchMtisPage(
 }
 
 // 전국 스케줄 전체를 페이지네이션으로 수집 (완도 편 누락 방지)
+// 일부 페이지가 실패(쿼터 등)해도 받은 페이지는 살린다 (allSettled)
 async function fetchMtisAll(key: string, date: string): Promise<MtisItem[]> {
   const first = await fetchMtisPage(key, date, 1)
   const items = [...first.items]
   const totalPages = Math.min(Math.ceil(first.totalCount / MTIS_PAGE_SIZE), MTIS_MAX_PAGES)
   if (totalPages > 1) {
-    const rest = await Promise.all(
+    const rest = await Promise.allSettled(
       Array.from({ length: totalPages - 1 }, (_, i) => fetchMtisPage(key, date, i + 2)),
     )
-    for (const r of rest) items.push(...r.items)
+    for (const r of rest) {
+      if (r.status === "fulfilled") items.push(...r.value.items)
+    }
   }
   return items
 }
+
+// 요청(렌더) 단위 메모이제이션 — 출발·도착이 같은 날짜 데이터를 공유해
+// fetchMtisAll 중복 호출(출발/도착 × 오늘/내일 = 4회)을 2회로 줄인다.
+// 내부 fetch는 next:{revalidate:300}로 요청 간(=사용자 간) Data Cache도 적용됨.
+const getMtisDay = cache((key: string, date: string): Promise<MtisItem[]> => fetchMtisAll(key, date))
 
 // ────────────────────────────────────────────────
 // 노선 그룹 설정
@@ -143,7 +159,7 @@ async function fetchTomorrowCounts(
 ): Promise<Record<string, number>> {
   const timesPerGroup: Record<string, string[]> = {}
   try {
-    const items = await fetchMtisAll(key, nextDay(todayDate))
+    const items = await getMtisDay(key, nextDay(todayDate))
     for (const it of items) {
       if (it.nvg_stts_nm === "결항") continue
       const gk = keyFn(it)
@@ -172,7 +188,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
     const [items, tomorrowCounts] = await Promise.all([
-      fetchMtisAll(key, date),
+      getMtisDay(key, date),
       fetchTomorrowCounts(key, date, depGroupKey),
     ])
     if (!items.length) return fallback()
@@ -226,7 +242,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
     const [items, tomorrowCounts] = await Promise.all([
-      fetchMtisAll(key, date),
+      getMtisDay(key, date),
       fetchTomorrowCounts(key, date, arrGroupKey),
     ])
     if (!items.length) return fallback()
