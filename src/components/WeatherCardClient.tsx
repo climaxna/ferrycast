@@ -67,10 +67,10 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
 
             {/* 바람 */}
             <div className="shrink-0">
-              <p className="text-[10px] leading-none text-white/40">바람</p>
+              <p className="text-[11px] leading-none text-white/70">바람</p>
               <p className="mt-0.5 text-sm font-bold leading-none">
-                {w.windSpeed}<span className="text-[10px] font-normal text-white/60"> m/s</span>
-                <span className="ml-1 text-[11px] font-normal text-white/60">{windDirLabel(w.windDir)}</span>
+                {w.windSpeed}<span className="text-[11px] font-normal text-white/80"> m/s</span>
+                <span className="ml-1 text-[11px] font-normal text-white/80">{windDirLabel(w.windDir)}</span>
               </p>
             </div>
 
@@ -78,9 +78,9 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
 
             {/* 습도 */}
             <div className="shrink-0">
-              <p className="text-[10px] leading-none text-white/40">습도</p>
+              <p className="text-[11px] leading-none text-white/70">습도</p>
               <p className="mt-0.5 text-sm font-bold leading-none">
-                {w.humidity}<span className="text-[10px] font-normal text-white/60">%</span>
+                {w.humidity}<span className="text-[11px] font-normal text-white/80">%</span>
               </p>
             </div>
 
@@ -89,7 +89,7 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
                 <div className="mx-0.5 h-5 w-px shrink-0 bg-white/20" />
                 {/* 파고 */}
                 <div className="shrink-0">
-                  <p className="text-[10px] leading-none text-white/40">파고</p>
+                  <p className="text-[11px] leading-none text-white/70">파고</p>
                   <p className={`mt-0.5 text-sm font-bold leading-none ${wave.color}`}>
                     {w.waveHeight}m
                   </p>
@@ -106,8 +106,8 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
           </div>
 
           <div className="mt-1.5 flex items-center justify-between">
-            <span className="text-[11px] font-medium text-white/50">{timeStr} 기준</span>
-            <span className="text-[11px] font-medium text-white/50">단기 날씨 예보 →</span>
+            <span className="text-xs font-medium text-white/75">{timeStr} 기준</span>
+            <span className="text-xs font-medium text-white/75">단기 날씨 예보 →</span>
           </div>
         </button>
 
@@ -119,20 +119,20 @@ export default function WeatherCardClient({ weather: w, tidal, forecast5, tidal5
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-white/40">다음 조석</span>
+              <span className="text-[11px] text-white/70">다음 조석</span>
               {nextTide ? (
                 <>
                   <span className="text-sm font-bold text-sky-300">
                     {nextTide.type === "high" ? "만조" : "간조"}
                   </span>
-                  <span className="text-sm tabular-nums text-white/80">{nextTide.time}</span>
-                  <span className="text-[11px] text-white/50">{nextTide.height}cm</span>
+                  <span className="text-sm tabular-nums text-white/90">{nextTide.time}</span>
+                  <span className="text-xs text-white/75">{nextTide.height}cm</span>
                 </>
               ) : (
-                <span className="text-sm text-white/40">정보 없음</span>
+                <span className="text-sm text-white/70">정보 없음</span>
               )}
             </div>
-            <span className="text-[10px] text-white/25">5일 조석 예보 →</span>
+            <span className="text-[11px] text-white/75">5일 조석 예보 →</span>
           </div>
         </button>
       </div>
