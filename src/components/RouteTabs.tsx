@@ -30,13 +30,15 @@ export default function RouteTabs({ departures, arrivals }: Props) {
 
   return (
     <section>
-      {/* 탭 헤더 */}
-      <div className="mb-3 flex items-center gap-1 rounded-xl bg-slate-100 p-1">
-        <TabButton active={tab === "dep"} onClick={() => setTab("dep")}>
-          완도 출발
+      {/* 탭 헤더 — 출발(파랑) / 도착(초록) 색 분리 */}
+      <div className={`mb-3 flex items-center gap-1 rounded-xl p-1 transition-colors ${
+        isDeparture ? "bg-blue-50" : "bg-teal-50"
+      }`}>
+        <TabButton active={tab === "dep"} variant="dep" onClick={() => setTab("dep")}>
+          🚢 완도 출발
         </TabButton>
-        <TabButton active={tab === "arr"} onClick={() => setTab("arr")}>
-          완도 도착
+        <TabButton active={tab === "arr"} variant="arr" onClick={() => setTab("arr")}>
+          ⚓ 완도 도착
         </TabButton>
         {!isLive && (
           <span className="mr-1.5 shrink-0 text-[11px] font-medium text-amber-500">
@@ -53,6 +55,7 @@ export default function RouteTabs({ departures, arrivals }: Props) {
               key={route.id}
               route={route}
               nowMinutes={nowMinutes}
+              isArrival={!isDeparture}
               onClick={() => setSelected(route)}
             />
           ))}
@@ -77,20 +80,24 @@ export default function RouteTabs({ departures, arrivals }: Props) {
 
 function TabButton({
   active,
+  variant,
   onClick,
   children,
 }: {
   active: boolean
+  variant: "dep" | "arr"
   onClick: () => void
   children: React.ReactNode
 }) {
+  const activeClass = variant === "arr"
+    ? "bg-white text-teal-700 shadow-sm"
+    : "bg-white text-blue-700 shadow-sm"
+
   return (
     <button
       onClick={onClick}
       className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
-        active
-          ? "bg-white text-blue-700 shadow-sm"
-          : "text-slate-500 hover:text-slate-700"
+        active ? activeClass : "text-slate-500 hover:text-slate-700"
       }`}
     >
       {children}
