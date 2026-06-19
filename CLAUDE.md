@@ -112,7 +112,8 @@
 
 - **Base URL**: `https://apis.data.go.kr/B554035/oprt-schd-info-v2/get-oprt-schd-info-v2`
 - **사용 키**: `DATAGOKR_API_KEY` (기존 키 그대로, 별도 발급 불필요)
-- **파라미터**: `serviceKey`, `pageNo`, `numOfRows=200`, `dataType=JSON`, `rlvtYmd=YYYYMMDD`
+- **파라미터**: `serviceKey`, `pageNo=1`, `numOfRows=2000`, `dataType=JSON`, `rlvtYmd=YYYYMMDD`
+  - ⚠️ **numOfRows는 반드시 전국 일일 편수(~700)보다 크게** (전건 단일 페이지 수신). 500 등으로 줄이면 일부 노선의 오후·저녁편이 2페이지로 밀려 **누락됨** (소안 8편 버그 사례). 페이지 분할 금지.
 - **성공 코드**: `response.header.resultCode === "200"` (KOMSA 계열 동일, 표준 "00" 아님!)
 - **응답 필드** (`response.body.items.item[]`):
   - `sail_tm`: 출항 시각 HHMM (앞자리 0 없음 — `"700"`=07:00, `"1430"`=14:30 → `parseSailTime`로 4자리 패딩 후 콜론 삽입)

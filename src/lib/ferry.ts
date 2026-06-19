@@ -48,9 +48,11 @@ function deduplicateTimes(times: string[]): string[] {
   return result
 }
 
-// 운항 스케줄 API는 전국 여객선을 반환 → 한 페이지로는 완도 편이 잘릴 수 있음
-const MTIS_PAGE_SIZE = 500
-const MTIS_MAX_PAGES = 10 // 안전 상한 (최대 5000건)
+// 운항 스케줄 API는 전국 여객선을 반환(일 ~700건). numOfRows를 크게 주면
+// MTIS가 전건을 단일 페이지로 반환(검증 완료) → 페이지 분할로 일부 노선의
+// 오후·저녁편이 2페이지로 밀려 누락되던 문제를 원천 차단. totalCount 초과 시에만 페이지네이션.
+const MTIS_PAGE_SIZE = 2000
+const MTIS_MAX_PAGES = 5 // 안전 상한 (최대 10000건)
 
 async function fetchMtisPage(
   key: string,
@@ -79,8 +81,8 @@ async function fetchMtisPage(
   return { items, totalCount }
 }
 
-// 전국 스케줄 전체를 페이지네이션으로 수집 (완도 편 누락 방지)
-// 일부 페이지가 실패(쿼터 등)해도 받은 페이지는 살린다 (allSettled)
+// 전국 스케줄 수집 — 평상시 단일 페이지(numOfRows=2000)로 전건 수신.
+// totalCount가 페이지 크기를 넘는 예외적 경우에만 추가 페이지를 병합한다.
 async function fetchMtisAll(key: string, date: string): Promise<MtisItem[]> {
   const first = await fetchMtisPage(key, date, 1)
   const items = [...first.items]
