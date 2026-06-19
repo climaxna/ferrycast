@@ -47,6 +47,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-NNK3PPZZRT" strategy="afterInteractive" />
+        <Script id="ga4-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html:
+          `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-NNK3PPZZRT');`
+        }} />
         {/* beforeinstallprompt는 React 마운트 전에 발생하므로 미리 캡처 */}
         <Script id="pwa-capture" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html:
           `window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__deferredPrompt=e;});`
