@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { track } from "@vercel/analytics"
 
 type DeferredPrompt = Event & {
   prompt: () => Promise<void>
@@ -9,7 +8,14 @@ type DeferredPrompt = Event & {
 }
 
 declare global {
-  interface Window { __deferredPrompt?: DeferredPrompt }
+  interface Window {
+    __deferredPrompt?: DeferredPrompt
+    gtag?: (command: string, action: string, params?: Record<string, string>) => void
+  }
+}
+
+function gtagEvent(action: string, params: Record<string, string>) {
+  window.gtag?.("event", action, params)
 }
 
 export default function InstallBanner() {
@@ -36,7 +42,7 @@ export default function InstallBanner() {
       const isSafari = /safari/i.test(navigator.userAgent) && !/crios|fxios/i.test(navigator.userAgent)
       if (isSafari) {
         setShow(true)
-        track("pwa_banner_shown", { platform: "ios" })
+        gtagEvent("pwa_banner_shown", { platform: "ios" })
       }
       return
     }
@@ -45,7 +51,7 @@ export default function InstallBanner() {
     if (window.__deferredPrompt) {
       setPrompt(window.__deferredPrompt)
       setShow(true)
-      track("pwa_banner_shown", { platform: "android" })
+      gtagEvent("pwa_banner_shown", { platform: "android" })
       return
     }
 
@@ -54,7 +60,7 @@ export default function InstallBanner() {
       e.preventDefault()
       setPrompt(e as DeferredPrompt)
       setShow(true)
-      track("pwa_banner_shown", { platform: "android" })
+      gtagEvent("pwa_banner_shown", { platform: "android" })
     }
     window.addEventListener("beforeinstallprompt", handler)
     return () => window.removeEventListener("beforeinstallprompt", handler)
@@ -64,7 +70,7 @@ export default function InstallBanner() {
     if (prompt) {
       await prompt.prompt()
       const { outcome } = await prompt.userChoice
-      track("pwa_install", { platform: "android", outcome })
+      gtagEvent("pwa_install", { platform: "android", outcome })
     }
     dismiss()
   }
