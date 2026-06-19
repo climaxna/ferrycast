@@ -275,21 +275,21 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 const STATIC_DEP: WandoRoute[] = [
   {
     id: "dep-jeju",
-    to: "제주", operator: "실버클라우드",
-    times: ["09:20"],
+    to: "제주", operator: "한일골드스텔라 · 실버클라우드",
+    times: ["02:30", "09:20", "15:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
   },
   {
     id: "dep-cheongsando",
-    to: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호",
+    to: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 권청산호",
     times: ["07:00", "08:30", "11:00", "13:00", "14:30", "18:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
     fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
   },
   {
     id: "dep-hwaheungpo-route",
-    to: "소안도·보길도·노화", operator: "대한호 · 민국호",
-    times: ["07:20", "08:30", "09:00", "13:00", "15:00", "15:30"],
+    to: "소안도·보길도·노화", operator: "만세호 · 대한호 · 민국호",
+    times: ["06:45", "07:55", "08:55", "09:55", "10:55", "11:55", "12:55", "13:55", "14:55", "15:55", "16:55", "18:25", "21:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
     fareUrl: FARE_URL_MAP["hwaheungpo-route"],
   },
@@ -298,14 +298,14 @@ const STATIC_DEP: WandoRoute[] = [
 const STATIC_ARR: WandoRoute[] = [
   {
     id: "arr-jeju",
-    to: "완도", from: "제주", operator: "실버클라우드",
+    to: "완도", from: "제주", operator: "한일골드스텔라 · 실버클라우드",
     times: ["16:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
     islandTerminal: "제주항 연안여객터미널",
   },
   {
     id: "arr-cheongsando",
-    to: "완도", from: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호",
+    to: "완도", from: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 권청산호",
     times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"],
     status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
     islandTerminal: "도청항",
@@ -313,7 +313,7 @@ const STATIC_ARR: WandoRoute[] = [
   },
   {
     id: "arr-hwaheungpo-route",
-    to: "완도", from: "소안도", operator: "대한호 · 민국호",
+    to: "완도", from: "소안도", operator: "만세호 · 대한호 · 민국호",
     times: ["07:30", "09:47", "13:12", "16:14", "19:04"],
     status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
     islandTerminal: "소안항여객터미널",
