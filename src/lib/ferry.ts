@@ -138,10 +138,12 @@ function arrGroupKey(item: MtisItem): string | null {
   return null
 }
 
+// 일부 편만 결항이면 정상 운항편이 있으므로 "operating".
+// 전편이 결항일 때만 노선 전체를 "cancelled"로 판정한다.
 function groupStatus(items: MtisItem[]): RouteStatus {
-  if (items.some((it) => it.nvg_stts_nm === "결항")) return "cancelled"
-  if (items.length > 0) return "operating"
-  return "unknown"
+  if (items.length === 0) return "unknown"
+  if (items.some((it) => it.nvg_stts_nm !== "결항")) return "operating"
+  return "cancelled"
 }
 
 // YYYYMMDD → 다음날 YYYYMMDD
@@ -198,9 +200,11 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       const gk = depGroupKey(it)
       if (!gk) continue
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [] }
+      grouped[gk].allItems.push(it)
+      // 결항편은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
+      if (it.nvg_stts_nm === "결항") continue
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
-      grouped[gk].allItems.push(it)
     }
     if (!Object.keys(grouped).length) return fallback()
 
@@ -252,9 +256,11 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
       const gk = arrGroupKey(it)
       if (!gk) continue
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], cfg: ARR_CFG[gk] }
+      grouped[gk].allItems.push(it)
+      // 결항편은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
+      if (it.nvg_stts_nm === "결항") continue
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
-      grouped[gk].allItems.push(it)
     }
     if (!Object.keys(grouped).length) return fallback()
 
