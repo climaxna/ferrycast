@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { track } from "@vercel/analytics"
 
 type DeferredPrompt = Event & {
   prompt: () => Promise<void>
@@ -33,7 +34,10 @@ export default function InstallBanner() {
     if (ios) {
       // iOS: Safari에서만 안내 (크롬·파이어폭스 인앱브라우저 제외)
       const isSafari = /safari/i.test(navigator.userAgent) && !/crios|fxios/i.test(navigator.userAgent)
-      if (isSafari) setShow(true)
+      if (isSafari) {
+        setShow(true)
+        track("pwa_banner_shown", { platform: "ios" })
+      }
       return
     }
 
@@ -41,6 +45,7 @@ export default function InstallBanner() {
     if (window.__deferredPrompt) {
       setPrompt(window.__deferredPrompt)
       setShow(true)
+      track("pwa_banner_shown", { platform: "android" })
       return
     }
 
@@ -49,13 +54,18 @@ export default function InstallBanner() {
       e.preventDefault()
       setPrompt(e as DeferredPrompt)
       setShow(true)
+      track("pwa_banner_shown", { platform: "android" })
     }
     window.addEventListener("beforeinstallprompt", handler)
     return () => window.removeEventListener("beforeinstallprompt", handler)
   }, [])
 
   const handleInstall = async () => {
-    if (prompt) await prompt.prompt()
+    if (prompt) {
+      await prompt.prompt()
+      const { outcome } = await prompt.userChoice
+      track("pwa_install", { platform: "android", outcome })
+    }
     dismiss()
   }
 
