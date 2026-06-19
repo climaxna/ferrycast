@@ -182,7 +182,7 @@ async function fetchTomorrowCounts(
 // ────────────────────────────────────────────────
 export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
-  const fallback = () => ({ routes: STATIC_DEP, isLive: false })
+  const fallback = () => ({ routes: makeStaticDep(kst), isLive: false })
 
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return fallback()
@@ -238,7 +238,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
 // ────────────────────────────────────────────────
 export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
-  const fallback = () => ({ routes: STATIC_ARR, isLive: false })
+  const fallback = () => ({ routes: makeStaticArr(kst), isLive: false })
 
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return fallback()
@@ -292,53 +292,103 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 
 // ────────────────────────────────────────────────
 // 정적 fallback (API 완전 장애 시에만 노출 — "참고 시간표")
-// 청산도는 여름 기준값 (평상시엔 MTIS 실시간 데이터 사용)
+// 출처: docs/청산도.md, docs/소안도.md (소안농협 공식 시간표)
 // ────────────────────────────────────────────────
-const STATIC_DEP: WandoRoute[] = [
-  {
-    id: "dep-jeju",
-    to: "제주", operator: "한일골드스텔라 · 실버클라우드",
-    times: ["02:30", "09:20", "15:00"],
-    status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
-  },
-  {
-    id: "dep-cheongsando",
-    to: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 권청산호",
-    times: ["07:00", "08:30", "11:00", "13:00", "14:30", "18:00"],
-    status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
-    fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
-  },
-  {
-    id: "dep-hwaheungpo-route",
-    to: "소안도·보길도·노화", operator: "만세호 · 대한호 · 민국호",
-    times: ["06:45", "07:55", "08:55", "09:55", "10:55", "11:55", "12:55", "13:55", "14:55", "15:55", "16:55", "18:25", "21:00"],
-    status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
-    fareUrl: FARE_URL_MAP["hwaheungpo-route"],
-  },
-]
 
-const STATIC_ARR: WandoRoute[] = [
-  {
-    id: "arr-jeju",
-    to: "완도", from: "제주", operator: "한일골드스텔라 · 실버클라우드",
-    times: ["16:00"],
-    status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
-    islandTerminal: "제주항 연안여객터미널",
+// 청산도: 겨울(10/16~익년3/16) / 여름(3/17~9/15) / 가을(9/16~10/15)
+const CHEONGSANDO_TIMES = {
+  winter: {
+    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "17:00"],
+    arr: ["06:50", "09:00", "11:30", "13:00", "15:00", "17:00"],
   },
-  {
-    id: "arr-cheongsando",
-    to: "완도", from: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 권청산호",
-    times: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"],
-    status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
-    islandTerminal: "도청항",
-    fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
+  summer: {
+    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "18:00"],
+    arr: ["06:50", "09:00", "11:30", "13:00", "15:00", "18:00"],
   },
-  {
-    id: "arr-hwaheungpo-route",
-    to: "완도", from: "소안도", operator: "만세호 · 대한호 · 민국호",
-    times: ["07:30", "09:47", "13:12", "16:14", "19:04"],
-    status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
-    islandTerminal: "소안항여객터미널",
-    fareUrl: FARE_URL_MAP["hwaheungpo-route"],
+  autumn: {
+    dep: ["07:00", "08:30", "11:00", "13:00", "14:30", "17:30"],
+    arr: ["06:50", "09:00", "11:30", "13:00", "15:00", "17:30"],
   },
-]
+}
+
+// 소안도·노화(동천): 하절기(3/1~9/30) / 동절기(10/1~2/28)
+const SOAN_TIMES = {
+  summer: {
+    dep: ["06:40", "07:50", "08:50", "09:50", "10:50", "11:50", "12:50", "13:50", "14:50", "15:50", "16:50", "18:20", "21:00"],
+    arr: ["06:40", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:20", "19:50"],
+  },
+  winter: {
+    dep: ["07:00", "07:50", "08:50", "09:50", "10:50", "11:50", "12:50", "13:50", "14:50", "15:50", "17:50", "21:00"],
+    arr: ["07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "19:50"],
+  },
+}
+
+function cheongsandoSeason(m: number, d: number): "winter" | "summer" | "autumn" {
+  const md = m * 100 + d
+  if (md >= 317 && md <= 915) return "summer"
+  if (md >= 916 && md <= 1015) return "autumn"
+  return "winter"
+}
+
+function soanSeason(m: number): "summer" | "winter" {
+  return m >= 3 && m <= 9 ? "summer" : "winter"
+}
+
+function makeStaticDep(kst: Date): WandoRoute[] {
+  const m = kst.getUTCMonth() + 1, d = kst.getUTCDate()
+  const cs = CHEONGSANDO_TIMES[cheongsandoSeason(m, d)]
+  const so = SOAN_TIMES[soanSeason(m)]
+  return [
+    {
+      id: "dep-jeju",
+      to: "제주", operator: "한일골드스텔라 · 실버클라우드",
+      times: ["02:30", "09:20", "15:00"],
+      status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+    },
+    {
+      id: "dep-cheongsando",
+      to: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 권청산호",
+      times: cs.dep,
+      status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+      fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
+    },
+    {
+      id: "dep-hwaheungpo-route",
+      to: "소안도·보길도·노화", operator: "대한호 · 민국호",
+      times: so.dep,
+      status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
+      fareUrl: FARE_URL_MAP["hwaheungpo-route"],
+    },
+  ]
+}
+
+function makeStaticArr(kst: Date): WandoRoute[] {
+  const m = kst.getUTCMonth() + 1, d = kst.getUTCDate()
+  const cs = CHEONGSANDO_TIMES[cheongsandoSeason(m, d)]
+  const so = SOAN_TIMES[soanSeason(m)]
+  return [
+    {
+      id: "arr-jeju",
+      to: "완도", from: "제주", operator: "한일골드스텔라 · 실버클라우드",
+      times: ["16:00"],
+      status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+      islandTerminal: "제주항 연안여객터미널",
+    },
+    {
+      id: "arr-cheongsando",
+      to: "완도", from: "청산도", operator: "슬로시티청산도호 · 청산아일랜드호 · 권청산호",
+      times: cs.arr,
+      status: "unknown", isLive: false, terminal: TERMINAL_MAIN,
+      islandTerminal: "도청항",
+      fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"],
+    },
+    {
+      id: "arr-hwaheungpo-route",
+      to: "완도", from: "소안도", operator: "대한호 · 민국호",
+      times: so.arr,
+      status: "unknown", isLive: false, terminal: TERMINAL_HWAHEUNGPO,
+      islandTerminal: "소안항여객터미널",
+      fareUrl: FARE_URL_MAP["hwaheungpo-route"],
+    },
+  ]
+}
