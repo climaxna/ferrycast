@@ -4,10 +4,11 @@ import { toMinutes, relativeTime } from "@/lib/utils"
 interface Props {
   route: WandoRoute
   nowMinutes?: number
+  isArrival?: boolean
   onClick?: () => void
 }
 
-export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
+export default function RouteItem({ route, nowMinutes = 0, isArrival = false, onClick }: Props) {
   const isCancelled = route.status === "cancelled"
   const isUnknown = route.status === "unknown"
   const routeLabel = route.from ? `${route.from} → ${route.to}` : `완도 → ${route.to}`
@@ -18,7 +19,7 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
   const pastTimes = route.times.slice(0, nextIdx === -1 ? route.times.length : nextIdx)
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
-  const accent = isCancelled ? "bg-rose-400" : isUnknown ? "bg-slate-300" : "bg-blue-500"
+  const accent = isCancelled ? "bg-rose-400" : isUnknown ? "bg-slate-300" : isArrival ? "bg-teal-500" : "bg-blue-500"
   const isAltTerminal = route.terminal !== "완도여객선터미널"
 
   return (
@@ -55,12 +56,14 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
           <>
             {/* 다음 출발 강조 */}
             {nextTime ? (
-              <div className="mt-2.5 flex items-center justify-between rounded-xl bg-gradient-to-r from-blue-50 to-sky-50 px-3 py-2">
+              <div className={`mt-2.5 flex items-center justify-between rounded-xl px-3 py-2 bg-gradient-to-r ${
+                isArrival ? "from-teal-50 to-emerald-50" : "from-blue-50 to-sky-50"
+              }`}>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[11px] font-medium text-blue-500">{timeLabel}</span>
-                  <span className="text-2xl font-bold tabular-nums text-blue-800">{nextTime}</span>
+                  <span className={`text-[11px] font-medium ${isArrival ? "text-teal-600" : "text-blue-500"}`}>{timeLabel}</span>
+                  <span className={`text-2xl font-bold tabular-nums ${isArrival ? "text-teal-800" : "text-blue-800"}`}>{nextTime}</span>
                 </div>
-                <span className="text-xs font-semibold text-blue-600">
+                <span className={`text-xs font-semibold ${isArrival ? "text-teal-600" : "text-blue-600"}`}>
                   {relativeTime(nextTime, nowMinutes)}
                 </span>
               </div>
@@ -82,14 +85,14 @@ export default function RouteItem({ route, nowMinutes = 0, onClick }: Props) {
                   </span>
                 ))}
                 {nextTime && (
-                  <span className="rounded-md bg-blue-500 px-2 py-0.5 text-xs font-bold tabular-nums text-white">
+                  <span className={`rounded-md px-2 py-0.5 text-xs font-bold tabular-nums text-white ${isArrival ? "bg-teal-500" : "bg-blue-500"}`}>
                     {nextTime}
                   </span>
                 )}
                 {futureTimes.map((t) => (
                   <span
                     key={t}
-                    className="rounded-md bg-blue-100 px-2 py-0.5 text-xs font-semibold tabular-nums text-blue-700"
+                    className={`rounded-md px-2 py-0.5 text-xs font-semibold tabular-nums ${isArrival ? "bg-teal-100 text-teal-700" : "bg-blue-100 text-blue-700"}`}
                   >
                     {t}
                   </span>
