@@ -17,7 +17,7 @@ export default function AdFitBanner() {
         data-ad-width="320"
         data-ad-height="50"
       />
-      <Script src="//t1.daumcdn.net/kas/static/ba.min.js" strategy="lazyOnload" />
+      <Script src="//t1.kakaocdn.net/kas/static/ba.min.js" strategy="lazyOnload" />
     </div>
   )
 }
