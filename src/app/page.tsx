@@ -65,6 +65,8 @@ export default function Page() {
           <WeatherCard />
         </Suspense>
 
+        <AdFitBanner />
+
         <Suspense fallback={<RouteSkeleton />}>
           <RouteSection />
         </Suspense>

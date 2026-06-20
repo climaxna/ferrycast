@@ -155,12 +155,12 @@ function nextDay(date: string): string {
   return dt.toISOString().slice(0, 10).replace(/-/g, "")
 }
 
-// 내일 스케줄을 groupKey별 편수로 집계 (결항 편 제외, 5분 이내 중복 병합 후 카운트)
-async function fetchTomorrowCounts(
+// 내일 스케줄을 groupKey별 times + 편수로 집계 (결항 편 제외, 5분 이내 중복 병합)
+async function fetchTomorrowData(
   key: string,
   todayDate: string,
   keyFn: (item: MtisItem) => string | null,
-): Promise<Record<string, number>> {
+): Promise<Record<string, { tripCount: number; times: string[] }>> {
   const timesPerGroup: Record<string, string[]> = {}
   try {
     const items = await getMtisDay(key, nextDay(todayDate))
@@ -175,7 +175,10 @@ async function fetchTomorrowCounts(
     // 내일 데이터는 부가 정보 — 실패해도 오늘 데이터에 영향 없음
   }
   return Object.fromEntries(
-    Object.entries(timesPerGroup).map(([gk, times]) => [gk, deduplicateTimes(times).length]),
+    Object.entries(timesPerGroup).map(([gk, rawTimes]) => {
+      const times = deduplicateTimes(rawTimes)
+      return [gk, { tripCount: times.length, times }]
+    }),
   )
 }
 
@@ -191,9 +194,9 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const [items, tomorrowCounts] = await Promise.all([
+    const [items, tomorrowData] = await Promise.all([
       getMtisDay(key, date),
-      fetchTomorrowCounts(key, date, depGroupKey),
+      fetchTomorrowData(key, date, depGroupKey),
     ])
     if (!items.length) return fallback()
 
@@ -214,7 +217,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       .sort(([a], [b]) => (DEP_CFG[a]?.priority ?? 99) - (DEP_CFG[b]?.priority ?? 99))
       .map(([gk, { times, ships, allItems }]) => {
         const cfg = DEP_CFG[gk]
-        const tmrwCount = tomorrowCounts[gk]
+        const tmrw = tomorrowData[gk]
         return {
           id: `dep-${gk}`,
           to: cfg.label,
@@ -225,7 +228,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           terminal: cfg.terminal,
           fare: cfg.fare,
           fareUrl: cfg.fareUrl,
-          ...(tmrwCount ? { tomorrow: { tripCount: tmrwCount } } : {}),
+          ...(tmrw ? { tomorrow: tmrw } : {}),
         }
       })
 
@@ -247,9 +250,9 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const [items, tomorrowCounts] = await Promise.all([
+    const [items, tomorrowData] = await Promise.all([
       getMtisDay(key, date),
-      fetchTomorrowCounts(key, date, arrGroupKey),
+      fetchTomorrowData(key, date, arrGroupKey),
     ])
     if (!items.length) return fallback()
 
@@ -269,7 +272,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
     const routes: WandoRoute[] = Object.entries(grouped)
       .sort(([a], [b]) => (ARR_CFG[a]?.priority ?? 99) - (ARR_CFG[b]?.priority ?? 99))
       .map(([gk, { times, ships, allItems, cfg }]) => {
-        const tmrwCount = tomorrowCounts[gk]
+        const tmrw = tomorrowData[gk]
         return {
           id: `arr-${gk}`,
           to: "완도",
@@ -282,7 +285,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           islandTerminal: cfg.islandTerminal,
           fare: cfg.fare,
           fareUrl: cfg.fareUrl,
-          ...(tmrwCount ? { tomorrow: { tripCount: tmrwCount } } : {}),
+          ...(tmrw ? { tomorrow: tmrw } : {}),
         }
       })
 

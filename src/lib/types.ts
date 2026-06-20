@@ -21,6 +21,7 @@ export interface WandoRoute {
   fare?: FareInfo
   fareUrl?: string
   tomorrow?: {
-    tripCount: number  // 내일 운항 예정 편수 (오늘 데이터와 동일 API, rlvtYmd=내일)
+    tripCount: number
+    times: string[]
   }
 }

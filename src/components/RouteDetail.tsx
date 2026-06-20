@@ -5,6 +5,7 @@ import type { WandoRoute } from "@/lib/types"
 import { useModalClose } from "@/hooks/useModalClose"
 import { toMinutes as toMin, relativeTime } from "@/lib/utils"
 import AlarmSheet from "@/components/AlarmSheet"
+import TomorrowSheet from "@/components/TomorrowSheet"
 
 interface Props {
   route: WandoRoute
@@ -22,6 +23,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
 
   const [nowMinutes, setNowMinutes] = useState(0)
   const [alarmTime, setAlarmTime] = useState<string | null>(null)
+  const [showTomorrow, setShowTomorrow] = useState(false)
   const [activeAlarms, setActiveAlarms] = useState<Set<string>>(new Set())
   const standalone =
     typeof window !== "undefined" &&
@@ -219,15 +221,21 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
               <p className="mt-3 text-sm text-slate-400">오늘 모든 편 출발 완료</p>
             )}
             {route.tomorrow && route.tomorrow.tripCount > 0 && (
-              <div className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2.5">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-emerald-600" aria-hidden="true">
-                  <rect x="3" y="4" width="18" height="18" rx="2" />
-                  <path d="M3 10h18M8 2v4M16 2v4" strokeLinecap="round" />
-                </svg>
-                <span className="text-sm font-medium text-emerald-700">
-                  내일 <strong className="font-bold">{route.tomorrow.tripCount}편</strong> 운항 예정
-                </span>
-              </div>
+              <button
+                onClick={() => setShowTomorrow(true)}
+                className="mt-3 flex w-full items-center justify-between rounded-xl bg-emerald-50 px-3 py-2.5 transition-opacity active:opacity-70"
+              >
+                <div className="flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-emerald-600" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2" />
+                    <path d="M3 10h18M8 2v4M16 2v4" strokeLinecap="round" />
+                  </svg>
+                  <span className="text-sm font-medium text-emerald-700">
+                    내일 <strong className="font-bold">{route.tomorrow.tripCount}편</strong> 운항 예정
+                  </span>
+                </div>
+                <span className="text-xs font-medium text-emerald-600">시간표 보기 →</span>
+              </button>
             )}
           </div>
 
@@ -278,6 +286,14 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
           departureTime={alarmTime}
           onClose={() => setAlarmTime(null)}
           onAlarmSet={(t) => setActiveAlarms((prev) => new Set(prev).add(t))}
+        />
+      )}
+
+      {showTomorrow && route.tomorrow && (
+        <TomorrowSheet
+          routeLabel={routeLabel}
+          times={route.tomorrow.times}
+          onClose={() => setShowTomorrow(false)}
         />
       )}
     </div>
