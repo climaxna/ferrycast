@@ -1,7 +1,8 @@
 "use client"
 
-import type { TidalDayForecast, TidalEvent } from "@/lib/tide"
+import type { TidalDayForecast } from "@/lib/tide"
 import { useModalClose } from "@/hooks/useModalClose"
+import TideCurve from "@/components/TideCurve"
 
 interface Props {
   days: TidalDayForecast[]
