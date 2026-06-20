@@ -3,6 +3,7 @@ import Link from "next/link"
 import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
 import Logo from "@/components/Logo"
+import AdFitBanner from "@/components/AdFitBanner"
 
 export const metadata = {
   title: "FerryCast — 완도 날씨·항로 현황",
@@ -68,10 +69,7 @@ export default function Page() {
           <RouteSection />
         </Suspense>
 
-        {/* 광고 슬롯 자리 — AdSense 승인 후 활성화 */}
-        <div className="flex h-20 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/50">
-          <span className="text-xs text-slate-300">광고 영역</span>
-        </div>
+        <AdFitBanner />
 
         <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-500">
