@@ -74,12 +74,18 @@ function DayTidalCard({
   isToday: boolean
   nowMin: number
 }) {
-  const maxH = day.events.length > 0 ? Math.max(...day.events.map((e) => e.height), 400) : 400
+  // 다음 조석 이벤트 인덱스 (오늘만)
+  const nextIdx = isToday
+    ? day.events.findIndex((e) => {
+        const [h, m] = e.time.split(":").map(Number)
+        return h * 60 + m > nowMin
+      })
+    : -1
 
   return (
     <div className="border-b border-slate-100 px-4 py-5">
       {/* 날짜 헤더 */}
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-2 flex items-center gap-2">
         <span className={`text-base font-bold ${isToday ? "text-blue-600" : "text-slate-800"}`}>
           {day.dateLabel}
         </span>
@@ -94,61 +100,41 @@ function DayTidalCard({
       {day.events.length === 0 ? (
         <p className="text-sm text-slate-400">정보 없음</p>
       ) : (
-        <div className="space-y-3">
-          {day.events.map((event, i) => {
-            const [h, m] = event.time.split(":").map(Number)
-            const eventMin = h * 60 + m
-            const isPast = isToday && eventMin < nowMin
-            const isNext = isToday && !isPast && day.events.slice(0, i).every((prev) => {
-              const [ph, pm] = prev.time.split(":").map(Number)
-              return ph * 60 + pm < nowMin
-            })
-            const pct = Math.round((event.height / maxH) * 100)
-            const isHigh = event.type === "high"
+        <>
+          {/* 조석 곡선 그래프 */}
+          <div className="rounded-2xl bg-slate-50/70 px-1 py-2">
+            <TideCurve events={day.events} nowMin={isToday ? nowMin : -1} gradientId={`tide-${day.date}`} />
+          </div>
 
-            return (
-              <div
-                key={i}
-                className={`rounded-2xl px-4 py-3.5 ${
-                  isNext
-                    ? "bg-blue-50 ring-2 ring-blue-200"
-                    : isPast
-                      ? "bg-slate-50 opacity-50"
+          {/* 요약 칩 — 만조/간조 */}
+          <div className="mt-3 grid grid-cols-4 gap-1.5">
+            {day.events.map((event, i) => {
+              const isHigh = event.type === "high"
+              const isPast = isToday && i < nextIdx
+              const isNext = i === nextIdx
+              return (
+                <div
+                  key={i}
+                  className={`flex flex-col items-center rounded-xl px-1 py-2 ${
+                    isNext
+                      ? "bg-blue-50 ring-1 ring-blue-200"
                       : "bg-slate-50"
-                }`}
-              >
-                <div className="mb-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className={`text-xl font-bold tabular-nums ${isNext ? "text-blue-700" : "text-slate-700"}`}>
-                      {event.time}
-                    </span>
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-sm font-bold ${
-                        isHigh
-                          ? isNext ? "bg-blue-600 text-white" : "bg-blue-100 text-blue-700"
-                          : isNext ? "bg-slate-600 text-white" : "bg-slate-200 text-slate-600"
-                      }`}
-                    >
-                      {isHigh ? "만조" : "간조"}
-                    </span>
-                    {isNext && (
-                      <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">다음</span>
-                    )}
-                  </div>
-                  <span className={`text-xl font-bold tabular-nums ${isNext ? "text-blue-700" : "text-slate-700"}`}>
-                    {event.height}<span className="ml-0.5 text-sm font-normal text-slate-400">cm</span>
+                  } ${isPast ? "opacity-45" : ""}`}
+                >
+                  <span
+                    className={`text-[11px] font-bold ${
+                      isHigh ? "text-blue-600" : "text-slate-500"
+                    }`}
+                  >
+                    {isHigh ? "▲ 만조" : "▼ 간조"}
                   </span>
+                  <span className="mt-0.5 text-sm font-bold tabular-nums text-slate-800">{event.time}</span>
+                  <span className="text-[11px] tabular-nums text-slate-400">{event.height}cm</span>
                 </div>
-                <div className="h-2.5 overflow-hidden rounded-full bg-slate-200">
-                  <div
-                    className={`h-full rounded-full ${isHigh ? "bg-blue-500" : "bg-slate-400"}`}
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        </>
       )}
     </div>
   )
