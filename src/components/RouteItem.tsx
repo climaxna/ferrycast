@@ -99,6 +99,17 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
                 ))}
               </div>
             )}
+
+            {/* 경유편 안내 — 직항과 섞여 있는 노선(제주↔추자도)에서만 노출 */}
+            {viaEntries.length > 0 && (
+              <div className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-amber-50 px-1.5 py-0.5 text-xs font-medium text-amber-700">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+                  <path d="M12 2v6m0 0 3-3m-3 3L9 5M5 12H2m20 0h-3m-2.5 7.5L19 22M7.5 19.5 5 22" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="12" cy="14" r="4" />
+                </svg>
+                {viaEntries.map(([t, place]) => `${t} ${place} 경유`).join(", ")}
+              </div>
+            )}
           </>
         ) : null}
 
