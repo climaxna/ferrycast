@@ -187,9 +187,12 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                 {pastTimes.map((t) => (
                   <div
                     key={t}
-                    className="flex items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-400 shadow-sm"
+                    className="flex flex-col items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-400 shadow-sm"
                   >
                     {t}
+                    {route.via?.[t] && (
+                      <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
+                    )}
                   </div>
                 ))}
                 {nextTime && (
@@ -199,23 +202,35 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                     className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-3 shadow-md active:opacity-80"
                   >
                     <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
-                    <span className="text-[11px] font-semibold leading-tight text-blue-100">
-                      {relativeTime(nextTime, nowMinutes)}
-                    </span>
+                    {route.via?.[nextTime] ? (
+                      <span className="text-[11px] font-semibold leading-tight text-amber-200">{route.via[nextTime]} 경유</span>
+                    ) : (
+                      <span className="text-[11px] font-semibold leading-tight text-blue-100">
+                        {relativeTime(nextTime, nowMinutes)}
+                      </span>
+                    )}
                   </button>
                 )}
                 {futureTimes.map((t) => (
                   <button
                     key={t}
                     onClick={() => setAlarmTime(t)}
-                    className="flex items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm active:opacity-70"
+                    className="flex flex-col items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm active:opacity-70"
                   >
                     {t}
+                    {route.via?.[t] && (
+                      <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
+                    )}
                   </button>
                 ))}
               </div>
             ) : (
               <p className="text-base text-slate-400">시간표 정보 없음</p>
+            )}
+            {!isCancelled && route.via && Object.keys(route.via).length > 0 && (
+              <p className="mt-2.5 text-xs text-amber-600">
+                <span className="font-semibold text-amber-500">경유</span> 표시 편은 해당 기항지를 들렀다 가며 소요 시간이 더 깁니다. 그 외는 직항입니다.
+              </p>
             )}
             {!isCancelled && nextTime === null && route.times.length > 0 && (
               <p className="mt-3 text-sm text-slate-400">오늘 모든 편 출발 완료</p>

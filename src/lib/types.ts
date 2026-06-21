@@ -24,4 +24,5 @@ export interface WandoRoute {
     tripCount: number
     times: string[]
   }
+  via?: Record<string, string>  // "HH:MM" → 경유지명. 예: { "13:40": "추자도" }. 없으면 직항.
 }

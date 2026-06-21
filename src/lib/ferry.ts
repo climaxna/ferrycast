@@ -24,6 +24,19 @@ interface MtisItem {
   dest_nm: string       // destination port name
   nvg_stts_nm: string   // "결항" | "출항전" | ...
   psnshp_nm: string     // ship name
+  nvg_seawy_nm: string  // 운항항로명 (예: "제주완도"=직항, "제주추자도-완도"=추자도 경유)
+}
+
+// 운항항로명에서 출발·도착항명을 제거해 남는 기항지(경유지)를 추출.
+//   "제주추자도-완도" → (제주·완도 제거) → "추자도"  (경유)
+//   "제주완도"        → ""                          (직항 → null)
+function extractVia(item: MtisItem): string | null {
+  let s = (item.nvg_seawy_nm || "").replace(/\(.*?\)/g, "") // 괄호 라벨 제거
+  for (const p of [item.oport_nm, item.dest_nm]) {
+    if (p) s = s.split(p).join("")
+  }
+  s = s.replace(/[-\s]/g, "").trim()
+  return s.length > 0 ? s : null
 }
 
 // "700" → "07:00", "1430" → "14:30"
@@ -200,22 +213,28 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
     ])
     if (!items.length) return fallback()
 
-    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[] }> = {}
+    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string> }> = {}
     for (const it of items) {
       const gk = depGroupKey(it)
       if (!gk) continue
-      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [] }
+      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {} }
       grouped[gk].allItems.push(it)
       // 결항편은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
       if (it.nvg_stts_nm === "결항") continue
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
+      // 경유편 표시는 제주만 (제주는 일부 편만 경유 → 표시 가치 큼.
+      // 소안 노선은 전편이 동일 경유 구조라 통합 라벨로 충분)
+      if (gk === "jeju") {
+        const v = extractVia(it)
+        if (v) grouped[gk].via[parseSailTime(it.sail_tm)] = v
+      }
     }
     if (!Object.keys(grouped).length) return fallback()
 
     const routes: WandoRoute[] = Object.entries(grouped)
       .sort(([a], [b]) => (DEP_CFG[a]?.priority ?? 99) - (DEP_CFG[b]?.priority ?? 99))
-      .map(([gk, { times, ships, allItems }]) => {
+      .map(([gk, { times, ships, allItems, via }]) => {
         const cfg = DEP_CFG[gk]
         const tmrw = tomorrowData[gk]
         return {
@@ -229,6 +248,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           fare: cfg.fare,
           fareUrl: cfg.fareUrl,
           ...(tmrw ? { tomorrow: tmrw } : {}),
+          ...(Object.keys(via).length ? { via } : {}),
         }
       })
 
@@ -256,22 +276,27 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
     ])
     if (!items.length) return fallback()
 
-    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg }> = {}
+    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg; via: Record<string, string> }> = {}
     for (const it of items) {
       const gk = arrGroupKey(it)
       if (!gk) continue
-      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], cfg: ARR_CFG[gk] }
+      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], cfg: ARR_CFG[gk], via: {} }
       grouped[gk].allItems.push(it)
       // 결항편은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
       if (it.nvg_stts_nm === "결항") continue
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
+      // 경유편 표시는 제주만 (도착 탭 제주→완도도 추자도 경유편 존재)
+      if (gk === "jeju") {
+        const v = extractVia(it)
+        if (v) grouped[gk].via[parseSailTime(it.sail_tm)] = v
+      }
     }
     if (!Object.keys(grouped).length) return fallback()
 
     const routes: WandoRoute[] = Object.entries(grouped)
       .sort(([a], [b]) => (ARR_CFG[a]?.priority ?? 99) - (ARR_CFG[b]?.priority ?? 99))
-      .map(([gk, { times, ships, allItems, cfg }]) => {
+      .map(([gk, { times, ships, allItems, cfg, via }]) => {
         const tmrw = tomorrowData[gk]
         return {
           id: `arr-${gk}`,
@@ -286,6 +311,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           fare: cfg.fare,
           fareUrl: cfg.fareUrl,
           ...(tmrw ? { tomorrow: tmrw } : {}),
+          ...(Object.keys(via).length ? { via } : {}),
         }
       })
 
