@@ -1,62 +1,62 @@
 "use client"
 
-import { useEffect, useState } from "react"
-
-const banners = [
-  { src: "https://coupa.ng/cnzk5R", link: "https://link.coupang.com/a/eMkMaQmliK", label: "완도 특산물 1" },
-  { src: "https://coupa.ng/cnzlh4", link: "https://link.coupang.com/a/eMxY1bJHrg", label: "완도 특산물 2" },
-  { src: "https://coupa.ng/cnzlPC", link: "https://link.coupang.com/a/eMyd9PcYgK", label: "제주도 특산물" },
-]
+import { useEffect, useRef } from "react"
 
 export default function CoupangSection() {
-  const [idx, setIdx] = useState(0)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setIdx((prev) => (prev + 1) % banners.length)
-    }, 5000)
-    return () => clearInterval(timer)
+    const container = containerRef.current
+    if (!container) return
+    container.innerHTML = ""
+
+    const initWidget = () => {
+      // g.js가 body에 직접 요소를 append하므로, 추가 전 목록을 기록해둠
+      const before = new Set(Array.from(document.body.children))
+
+      const observer = new MutationObserver(() => {
+        for (const el of Array.from(document.body.children)) {
+          if (!before.has(el) && el.tagName !== "SCRIPT") {
+            observer.disconnect()
+            container.appendChild(el) // 우리 카드 안으로 이동
+            return
+          }
+        }
+      })
+      observer.observe(document.body, { childList: true })
+
+      const s = document.createElement("script")
+      s.textContent = `new PartnersCoupang.G({"id":999288,"template":"carousel","trackingCode":"AF7008655","width":"320","height":"100","tsource":""})`
+      document.body.appendChild(s)
+
+      return observer
+    }
+
+    let observer: MutationObserver | undefined
+    const w = window as Window & { PartnersCoupang?: unknown }
+
+    if (w.PartnersCoupang) {
+      observer = initWidget()
+    } else {
+      const sdk = document.createElement("script")
+      sdk.src = "https://ads-partners.coupang.com/g.js"
+      sdk.async = true
+      sdk.onload = () => {
+        observer = initWidget()
+      }
+      document.head.appendChild(sdk)
+    }
+
+    return () => {
+      observer?.disconnect()
+      container.innerHTML = ""
+    }
   }, [])
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-sm">
-      <p className="mb-2 text-[15px] font-bold text-slate-700">🦐 완도 특산물</p>
-
-      {/* 배너 — iframe 재로딩 방지 위해 모두 마운트 후 opacity 전환 */}
-      <div className="relative mx-auto h-[100px] w-[320px] max-w-full overflow-hidden">
-        {banners.map((banner, i) => (
-          <div
-            key={banner.src}
-            className="absolute inset-0 transition-opacity duration-500"
-            style={{
-              opacity: i === idx ? 1 : 0,
-              pointerEvents: i === idx ? "auto" : "none",
-            }}
-          >
-            <iframe
-              src={banner.src}
-              title={banner.label}
-              width="320"
-              height="100"
-              referrerPolicy="unsafe-url"
-              style={{ border: 0 }}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* 인디케이터 */}
-      <div className="mt-2 flex justify-center gap-2">
-        {banners.map((banner, i) => (
-          <div
-            key={banner.src}
-            className={`h-2 w-2 rounded-full transition-colors ${i === idx ? "bg-blue-500" : "bg-slate-300"}`}
-          />
-        ))}
-      </div>
-
-      {/* 고지 문구 (쿠팡 파트너스 — 법적 필수) */}
-      <p className="mt-2 text-[11px] leading-relaxed text-slate-400">
+      <div ref={containerRef} className="min-h-[100px] w-full overflow-hidden" />
+      <p className="mt-1 overflow-hidden text-ellipsis whitespace-nowrap text-[10px] leading-none text-slate-400">
         이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
       </p>
     </div>
