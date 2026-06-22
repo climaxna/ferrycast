@@ -70,9 +70,10 @@ export default function Page() {
           <RouteSection />
         </Suspense>
 
-        <CoupangSection />
-
-        <AdFitBanner />
+        <div className="space-y-2">
+          <CoupangSection />
+          <AdFitBanner />
+        </div>
 
         <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-500">
