@@ -45,3 +45,6 @@ screenshot-*.png
 
 # claude code (개인용 로컬 설정은 제외, 공유 settings.json만 커밋)
 .claude/settings.local.json
+
+# 부착 사진 원본 (대용량 — 최적화본은 docs/screenshots에 커밋)
+docs/img/
