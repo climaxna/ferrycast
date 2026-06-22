@@ -75,8 +75,8 @@ export default function PrivacyPage() {
           </p>
           <p className="mt-2">
             이메일:{" "}
-            <a href="mailto:climaxna1@gmail.com" className="text-blue-600 underline underline-offset-2">
-              climaxna1@gmail.com
+            <a href="mailto:climaxna@naver.com" className="text-blue-600 underline underline-offset-2">
+              climaxna@naver.com
             </a>
           </p>
         </Section>
