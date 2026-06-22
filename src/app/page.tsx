@@ -4,6 +4,7 @@ import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
 import Logo from "@/components/Logo"
 import AdFitBanner from "@/components/AdFitBanner"
+import CoupangSection from "@/components/CoupangSection"
 
 export const metadata = {
   title: "FerryCast — 완도 날씨·항로 현황",
@@ -68,6 +69,8 @@ export default function Page() {
         <Suspense fallback={<RouteSkeleton />}>
           <RouteSection />
         </Suspense>
+
+        <CoupangSection />
 
         <AdFitBanner />
 
