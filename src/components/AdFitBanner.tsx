@@ -7,10 +7,7 @@ export default function AdFitBanner() {
   if (!UNIT_ID) return null
 
   return (
-    <div className="rounded-2xl border border-slate-100 bg-slate-50/60 px-2 pb-2 pt-1.5">
-      <p className="mb-1 text-center text-[10px] font-medium uppercase tracking-wider text-slate-300">
-        광고
-      </p>
+    <div className="rounded-2xl border border-slate-100 bg-slate-50/60 px-2 py-2">
       <div className="flex justify-center">
         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
         {/* @ts-ignore — kakao_ad_area data-* attrs not in HTMLIns types */}
