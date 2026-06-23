@@ -12,6 +12,7 @@ import RegionRouteTabs from "./RegionRouteTabs"
 import Logo from "@/components/Logo"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
+import RegionNav from "@/components/RegionNav"
 
 export function generateStaticParams() {
   return Object.keys(REGIONS).map((region) => ({ region }))
@@ -134,6 +135,8 @@ export default async function RegionPage({
           <CoupangSection />
           <AdFitBanner />
         </div>
+
+        <RegionNav current={config.slug} />
 
         <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-500">

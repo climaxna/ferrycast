@@ -5,6 +5,7 @@ import RouteSection from "@/components/RouteSection"
 import Logo from "@/components/Logo"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
+import RegionNav from "@/components/RegionNav"
 
 export const metadata = {
   title: "FerryCast — 완도 날씨·항로 현황",
@@ -74,6 +75,8 @@ export default function Page() {
           <CoupangSection />
           <AdFitBanner />
         </div>
+
+        <RegionNav current="" />
 
         <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-500">
