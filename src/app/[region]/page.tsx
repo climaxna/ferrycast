@@ -101,11 +101,22 @@ export default async function RegionPage({
             </p>
           </div>
           <Link
-            href="/"
-            aria-label="완도로"
-            className="rounded-full p-2.5 text-xs font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-blue-600"
+            href={`/${config.slug}/qr`}
+            aria-label="QR 코드"
+            className="rounded-full p-2.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-blue-600"
           >
-            완도
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="18" y="14" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="14" y="18" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="18" y="18" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="5" y="5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="16" y="5" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+              <rect x="5" y="16" width="3" height="3" rx="0.5" fill="currentColor" stroke="none" />
+            </svg>
           </Link>
         </div>
       </header>
