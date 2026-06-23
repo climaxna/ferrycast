@@ -291,6 +291,7 @@ export async function getArrivalsForRegion(
           status: groupStatus(allItems),
           isLive: true,
           terminal: config.mainTerminal,
+          originName: config.name,
           islandTerminal: cfg.islandTerminal,
           fareUrl: cfg.fareUrl,
           ...(tmrw ? { tomorrow: tmrw } : {}),
