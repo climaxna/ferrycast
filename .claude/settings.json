@@ -45,7 +45,8 @@
       "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg7.txt\")",
       "PowerShell(git -C c:\\\\ferrycast log --oneline -1)",
       "PowerShell(git -C c:\\\\ferrycast add src/components/RegionNav.tsx \"src/app/[region]/page.tsx\" src/app/page.tsx)",
-      "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg8.txt\")"
+      "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg8.txt\")",
+      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\wxdiag.mjs\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude"
