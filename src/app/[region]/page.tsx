@@ -1,0 +1,155 @@
+import { Suspense } from "react"
+import { notFound } from "next/navigation"
+import type { Metadata } from "next"
+import Link from "next/link"
+import { REGIONS } from "@/config/regions"
+import { getWeatherForRegion } from "@/lib/regionWeather"
+import { getTidalForRegion, get5DayTidalForRegion } from "@/lib/regionTide"
+import { get5DayForecastForRegion } from "@/lib/regionForecast"
+import { getRoutesForRegion, getArrivalsForRegion } from "@/lib/regionFerry"
+import RegionWeatherCardClient from "./RegionWeatherCardClient"
+import RegionRouteTabs from "./RegionRouteTabs"
+import Logo from "@/components/Logo"
+import AdFitBanner from "@/components/AdFitBanner"
+import CoupangSection from "@/components/CoupangSection"
+
+export function generateStaticParams() {
+  return Object.keys(REGIONS).map((region) => ({ region }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ region: string }>
+}): Promise<Metadata> {
+  const { region } = await params
+  const config = REGIONS[region]
+  if (!config) return {}
+  return {
+    title: `FerryCast — ${config.name} 날씨·항로 현황`,
+    description: config.metaDescription,
+  }
+}
+
+function WeatherSkeleton() {
+  return <div className="h-36 animate-pulse rounded-2xl bg-slate-100" />
+}
+
+function RouteSkeleton() {
+  return (
+    <div className="space-y-2.5">
+      <div className="h-9 w-48 animate-pulse rounded-lg bg-slate-100" />
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+      ))}
+    </div>
+  )
+}
+
+async function RegionWeatherCard({
+  region,
+}: {
+  region: string
+}) {
+  const config = REGIONS[region]
+  const [weather, tidal, forecast5, tidal5] = await Promise.all([
+    getWeatherForRegion(config),
+    config.tidalObsCode ? getTidalForRegion(config.tidalObsCode) : Promise.resolve(null),
+    get5DayForecastForRegion([config.weatherGrid, ...config.seaGrids]),
+    config.tidalObsCode ? get5DayTidalForRegion(config.tidalObsCode) : Promise.resolve([]),
+  ])
+  return (
+    <RegionWeatherCardClient
+      weather={weather}
+      tidal={tidal}
+      forecast5={forecast5}
+      tidal5={tidal5}
+      regionName={config.name}
+    />
+  )
+}
+
+async function RegionRouteSection({ region }: { region: string }) {
+  const config = REGIONS[region]
+  const [departures, arrivals] = await Promise.all([
+    getRoutesForRegion(config),
+    getArrivalsForRegion(config),
+  ])
+  return <RegionRouteTabs departures={departures} arrivals={arrivals} regionName={config.name} />
+}
+
+export default async function RegionPage({
+  params,
+}: {
+  params: Promise<{ region: string }>
+}) {
+  const { region } = await params
+  const config = REGIONS[region]
+  if (!config) notFound()
+
+  return (
+    <main className="min-h-screen bg-slate-50">
+      <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-lg items-center gap-2.5 px-4 py-3">
+          <Logo />
+          <div className="flex-1">
+            <h1 className="text-lg font-bold leading-none tracking-tight text-slate-900">
+              Ferry<span className="text-blue-600">Cast</span>
+            </h1>
+            <p className="mt-1 text-xs font-medium tracking-wide text-slate-400">
+              {config.name} 날씨 · 여객선 현황
+            </p>
+          </div>
+          <Link
+            href="/"
+            aria-label="완도로"
+            className="rounded-full p-2.5 text-xs font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-blue-600"
+          >
+            완도
+          </Link>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-lg space-y-5 px-4 py-5">
+        <Suspense fallback={<WeatherSkeleton />}>
+          <RegionWeatherCard region={region} />
+        </Suspense>
+
+        <Suspense fallback={<RouteSkeleton />}>
+          <RegionRouteSection region={region} />
+        </Suspense>
+
+        <div className="space-y-2">
+          <CoupangSection />
+          <AdFitBanner />
+        </div>
+
+        <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+          <p className="text-sm leading-relaxed text-slate-500">
+            이 정보는 참고용입니다.{" "}
+            <strong className="font-semibold text-slate-700">
+              실제 운항 여부는 출발 전 공식 채널에서 반드시 최종 확인하세요.
+            </strong>{" "}
+            기상 악화·조류 등으로 예고 없이 결항될 수 있습니다.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a
+              href="https://island.theksa.co.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
+            >
+              해운조합 승선예약
+            </a>
+            <Link
+              href="/privacy"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
+            >
+              개인정보처리방침
+            </Link>
+          </div>
+        </footer>
+      </div>
+    </main>
+  )
+}
