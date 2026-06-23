@@ -45,8 +45,9 @@ export const REGIONS: Record<string, RegionConfig> = {
         label: "울릉도(도동)",
         depPortKeywords: ["포항"],
         destKeywords: ["울릉"],   // "포항"발은 dest="울릉" — 영일만발(dest="울릉(사동)")은 dep 불일치로 안 걸림
-        depTerminal: "포항여객선터미널",
+        depTerminal: "포항여객선터미널",        // 구항 (대저페리 엘도라도익스프레스)
         islandTerminal: "울릉도 도동여객선터미널",
+        fareUrl: "https://island.theksa.co.kr",  // 해운조합 통합 예매
         fallbackDep: ["09:50"],
         fallbackArr: ["14:20"],
       },
@@ -55,8 +56,9 @@ export const REGIONS: Record<string, RegionConfig> = {
         label: "울릉도(사동)",
         depPortKeywords: ["영일만"],   // MTIS oport_nm="영일만신항"
         destKeywords: ["사동"],        // dest="울릉(사동)"
-        depTerminal: "포항 영일만항여객터미널",
-        islandTerminal: "울릉 사동항",
+        depTerminal: "포항항국제여객터미널",      // 영일만항/영일만신항 (울릉크루즈 뉴씨다오펄 카페리)
+        islandTerminal: "울릉 사동항여객선터미널",  // 울릉신항
+        fareUrl: "https://www.ulcruise.co.kr",   // 울릉크루즈 공식
         fallbackDep: ["23:00"],
         fallbackArr: ["12:20"],
       },
