@@ -7,6 +7,8 @@ import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
 
+export const revalidate = 60
+
 export const metadata = {
   title: "FerryCast — 완도 날씨·항로 현황",
   description: "완도 현재 날씨와 여객선 출발·도착 시간표·운항 현황을 한눈에",
