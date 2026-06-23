@@ -21,7 +21,7 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
   const accent = isCancelled ? "bg-rose-400" : isUnknown ? "bg-slate-300" : isArrival ? "bg-teal-500" : "bg-blue-500"
-  const isAltTerminal = route.terminal !== "완도여객선터미널"
+  const isAltTerminal = !route.originName && route.terminal !== "완도여객선터미널"
   // 아직 출발 안 한 경유편만 안내 (지난 편 제외), 시각순 정렬
   const viaEntries = route.via
     ? Object.entries(route.via)
