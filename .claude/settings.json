@@ -25,7 +25,14 @@
       "Skill(update-config:*)",
       "PowerShell(git -C c:\\\\ferrycast reset 2>$null)",
       "PowerShell(git -C c:\\\\ferrycast --no-pager diff -- .claude/settings.json)",
-      "PowerShell(git -C c:\\\\ferrycast status --porcelain)"
+      "PowerShell(git -C c:\\\\ferrycast status --porcelain)",
+      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\pohang.mjs\")",
+      "PowerShell(npx next build 2>&1)",
+      "PowerShell(git -C c:\\\\ferrycast rev-list --left-right --count origin/master...HEAD)",
+      "PowerShell(git -C c:\\\\ferrycast add src/config/regions.ts src/lib/regionFerry.ts)",
+      "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg2.txt\")",
+      "PowerShell(git -C c:\\\\ferrycast push)",
+      "PowerShell(git -C c:\\\\ferrycast log --oneline -2)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude"
