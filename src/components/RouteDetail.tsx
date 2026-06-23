@@ -16,9 +16,10 @@ interface Props {
 export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const isCancelled = route.status === "cancelled"
   const isUnknown = route.status === "unknown"
-  const routeLabel = route.from ? `${route.from} → ${route.to}` : `완도 → ${route.to}`
+  const originName = route.originName ?? "완도"
+  const routeLabel = route.from ? `${route.from} → ${route.to}` : `${originName} → ${route.to}`
   const timeHeading = isDeparture ? "오늘 출발 시간표" : `오늘 ${route.from} 출발 시간표`
-  const isAltTerminal = route.terminal !== "완도여객선터미널"
+  const isAltTerminal = !route.originName && route.terminal !== "완도여객선터미널"
   const terminalRole = isDeparture ? "출발" : "도착"
 
   const [nowMinutes, setNowMinutes] = useState(0)
@@ -87,7 +88,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
           {isDeparture ? (
             /* 출발 탭: 완도측 터미널 */
             <a
-              href={`https://map.kakao.com/?q=${encodeURIComponent(isAltTerminal ? "완도 화흥포항" : "완도여객선터미널")}`}
+              href={`https://map.kakao.com/?q=${encodeURIComponent(route.originName ? route.terminal : isAltTerminal ? "완도 화흥포항" : "완도여객선터미널")}`}
               target="_blank"
               rel="noopener noreferrer"
               className={`flex items-start gap-3 rounded-2xl px-4 py-4 transition-opacity active:opacity-70 ${
@@ -105,7 +106,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <p className={`text-base font-bold ${isAltTerminal ? "text-amber-800" : "text-slate-700"}`}>
-                    완도 출발 · {route.terminal}
+                    {originName} 출발 · {route.terminal}
                   </p>
                   <span className={`shrink-0 text-xs font-medium ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}>
                     지도 보기 →

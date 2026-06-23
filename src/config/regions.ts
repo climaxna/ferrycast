@@ -23,16 +23,18 @@ export interface RegionConfig {
 
 // ──────────────────────────────────────────────────────────────
 // 지역 설정
-// ⚠️ KMA 격자·KHOA obsCode 는 로컬 API 응답 확인 후 보정 필요
-// ⚠️ MTIS depPortKeywords 도 실데이터 oport_nm 확인 후 보정 필요
+// ✅ KMA 격자: 공식 LCC 좌표변환으로 검증 (포항 102,94 / 목포 50,67 / 인천 55,124)
+// ✅ KHOA obsCode: obsvtrNm 응답으로 검증 (목포 DT_0007 / 인천 DT_0001, 포항은 전용 관측소 없어 null)
+// ✅ seaGrids: getVilageFcst WAV 수신 셀로 검증
+// ✅ MTIS depPortKeywords: 3개 지역 모두 실시간(LIVE) 매칭 확인
 // ──────────────────────────────────────────────────────────────
 export const REGIONS: Record<string, RegionConfig> = {
   pohang: {
     slug: "pohang",
     name: "포항",
-    weatherGrid: { nx: 102, ny: 81 },
-    seaGrids: [{ nx: 102, ny: 80 }, { nx: 103, ny: 80 }, { nx: 101, ny: 80 }],
-    tidalObsCode: "DT_0012",  // 포항 KHOA 관측소 — 확인 필요
+    weatherGrid: { nx: 102, ny: 94 },  // 포항시 KMA 격자 (LCC 변환 검증)
+    seaGrids: [{ nx: 103, ny: 95 }, { nx: 104, ny: 94 }, { nx: 104, ny: 95 }],  // 동해 WAV 수신 셀(검증)
+    tidalObsCode: null,  // 포항 전용 KHOA 관측소 없음 + 동해안 조차 미미 → 조석 비표시
     mainTerminal: "포항여객터미널",
     routeGroups: [
       {
@@ -51,9 +53,9 @@ export const REGIONS: Record<string, RegionConfig> = {
   mokpo: {
     slug: "mokpo",
     name: "목포",
-    weatherGrid: { nx: 51, ny: 67 },
-    seaGrids: [{ nx: 51, ny: 66 }, { nx: 50, ny: 66 }, { nx: 52, ny: 66 }],
-    tidalObsCode: "DT_0025",  // 목포 KHOA 관측소 — 확인 필요
+    weatherGrid: { nx: 50, ny: 67 },  // 목포시 KMA 격자 (LCC 변환 검증)
+    seaGrids: [{ nx: 49, ny: 66 }, { nx: 48, ny: 66 }, { nx: 49, ny: 65 }],  // 다도해 WAV 수신 셀(검증)
+    tidalObsCode: "DT_0007",  // 목포 KHOA 관측소 (obsvtrNm="목포" 검증)
     mainTerminal: "목포여객선터미널",
     routeGroups: [
       {
@@ -81,9 +83,9 @@ export const REGIONS: Record<string, RegionConfig> = {
   incheon: {
     slug: "incheon",
     name: "인천",
-    weatherGrid: { nx: 55, ny: 124 },
-    seaGrids: [{ nx: 54, ny: 124 }, { nx: 55, ny: 123 }, { nx: 56, ny: 124 }],
-    tidalObsCode: "DT_0001",  // 인천 KHOA 관측소 — 확인 필요
+    weatherGrid: { nx: 55, ny: 124 },  // 인천시 KMA 격자 (검증)
+    seaGrids: [{ nx: 54, ny: 123 }, { nx: 52, ny: 123 }, { nx: 51, ny: 123 }],  // 서해 WAV 수신 셀(검증)
+    tidalObsCode: "DT_0001",  // 인천 KHOA 관측소 (obsvtrNm="인천" 검증)
     mainTerminal: "인천연안여객터미널",
     routeGroups: [
       {
