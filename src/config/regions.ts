@@ -3,6 +3,7 @@ export interface RouteGroupConfig {
   label: string
   depPortKeywords: string[]   // MTIS oport_nm 포함 키워드 (출발편 필터)
   destKeywords: string[]      // MTIS dest_nm 포함 키워드 (출발편 필터)
+  depTerminal?: string        // 이 항로의 본항측 출발 터미널 (없으면 region.mainTerminal). 한 도시 여러 항 대응
   islandTerminal?: string     // 도착 탭 — 섬에서 타는 터미널
   fareAdult?: number
   fareUrl?: string
@@ -35,19 +36,32 @@ export const REGIONS: Record<string, RegionConfig> = {
     weatherGrid: { nx: 102, ny: 94 },  // 포항시 KMA 격자 (LCC 변환 검증)
     seaGrids: [{ nx: 103, ny: 95 }, { nx: 104, ny: 94 }, { nx: 104, ny: 95 }],  // 동해 WAV 수신 셀(검증)
     tidalObsCode: null,  // 포항 전용 KHOA 관측소 없음 + 동해안 조차 미미 → 조석 비표시
-    mainTerminal: "포항여객터미널",
+    mainTerminal: "포항여객선터미널",
+    // ⚠️ 포항권은 출발항이 둘 — MTIS oport_nm: "포항"(주간 도동) / "영일만신항"(야간 사동)
+    //    "영일만신항"은 "포항"을 include 하지 않으므로 반드시 별도 그룹으로 잡아야 야간편이 누락되지 않음 (실데이터 검증)
     routeGroups: [
       {
-        key: "ulleungdo",
-        label: "울릉도",
+        key: "ulleung-dodong",
+        label: "울릉도(도동)",
         depPortKeywords: ["포항"],
-        destKeywords: ["울릉"],
-        islandTerminal: "저동항여객터미널",
-        fallbackDep: ["10:00"],
-        fallbackArr: ["16:00"],
+        destKeywords: ["울릉"],   // "포항"발은 dest="울릉" — 영일만발(dest="울릉(사동)")은 dep 불일치로 안 걸림
+        depTerminal: "포항여객선터미널",
+        islandTerminal: "울릉도 도동여객선터미널",
+        fallbackDep: ["09:50"],
+        fallbackArr: ["14:20"],
+      },
+      {
+        key: "ulleung-sadong",
+        label: "울릉도(사동)",
+        depPortKeywords: ["영일만"],   // MTIS oport_nm="영일만신항"
+        destKeywords: ["사동"],        // dest="울릉(사동)"
+        depTerminal: "포항 영일만항여객터미널",
+        islandTerminal: "울릉 사동항",
+        fallbackDep: ["23:00"],
+        fallbackArr: ["12:20"],
       },
     ],
-    metaDescription: "포항 울릉도 여객선 시간표·운항 현황·날씨·조석 예보",
+    metaDescription: "포항·영일만항 울릉도(도동·사동) 여객선 시간표·운항 현황·날씨",
   },
 
   mokpo: {
