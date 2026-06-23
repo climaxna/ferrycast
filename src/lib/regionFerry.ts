@@ -228,6 +228,7 @@ export async function getRoutesForRegion(
           status: groupStatus(allItems),
           isLive: true,
           terminal: config.mainTerminal,
+          originName: config.name,
           fareUrl: cfg.fareUrl,
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
