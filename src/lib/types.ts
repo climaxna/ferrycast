@@ -17,6 +17,7 @@ export interface WandoRoute {
   status: RouteStatus
   isLive: boolean
   terminal: string      // 완도측 터미널 (예: "완도여객선터미널", "화흥포항")
+  originName?: string   // 출발 지역명 (기본값: "완도", 다지역 확장용)
   islandTerminal?: string  // 도착 탭 전용: 섬에서 타는 터미널 (예: "도청항")
   fare?: FareInfo
   fareUrl?: string

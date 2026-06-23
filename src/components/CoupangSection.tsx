@@ -56,10 +56,10 @@ export default function CoupangSection() {
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-sm">
-      <div ref={containerRef} className="min-h-[140px] w-full overflow-hidden" />
-      <p className="mt-1 overflow-hidden text-ellipsis whitespace-nowrap text-[10px] leading-none text-slate-400">
-        이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+      <p className="mb-1 text-[10px] leading-tight text-slate-900">
+        * 이 게시물은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
       </p>
+      <div ref={containerRef} className="min-h-[140px] w-full overflow-hidden" />
     </div>
   )
 }
