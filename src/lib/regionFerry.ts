@@ -171,6 +171,7 @@ function makeStaticArr(config: RegionConfig): WandoRoute[] {
       status: "unknown" as RouteStatus,
       isLive: false,
       terminal: config.mainTerminal,
+      originName: config.name,
       islandTerminal: g.islandTerminal,
       fareUrl: g.fareUrl,
     }))
