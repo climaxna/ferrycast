@@ -10,7 +10,15 @@
       "Bash(npx tsc *)",
       "Bash(npx next *)",
       "Bash(npx eslint *)",
-      "Bash(git check-ignore *)"
+      "Bash(git check-ignore *)",
+      "Bash(export PYTHONIOENCODING=utf-8)",
+      "Bash(node scripts/shot_coupang.mjs)",
+      "Bash(git commit *)",
+      "PowerShell(git fetch)",
+      "PowerShell(git rev-list --left-right --count HEAD...origin/master)",
+      "PowerShell(git pull --ff-only)",
+      "PowerShell(git add -A)",
+      "PowerShell(git push)"
     ]
   }
 }
