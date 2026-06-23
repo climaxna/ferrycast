@@ -72,28 +72,64 @@ export const REGIONS: Record<string, RegionConfig> = {
     weatherGrid: { nx: 50, ny: 67 },  // 목포시 KMA 격자 (LCC 변환 검증)
     seaGrids: [{ nx: 49, ny: 66 }, { nx: 48, ny: 66 }, { nx: 49, ny: 65 }],  // 다도해 WAV 수신 셀(검증)
     tidalObsCode: "DT_0007",  // 목포 KHOA 관측소 (obsvtrNm="목포" 검증)
-    mainTerminal: "목포여객선터미널",
+    mainTerminal: "목포연안여객선터미널",  // 흑산·홍도·가거 등 신안 다도해 출발
+    // ⚠️ 목포는 출발 터미널이 3종 — 연안(다도해)/북항(비금·도초 차도선)/국제·삼학부두(제주 대형카페리)
+    //    MTIS oport_nm은 대부분 "목포"(+북항)로만 구분되므로 항로별 depTerminal로 보정 (실데이터 검증)
     routeGroups: [
+      {
+        key: "jeju",
+        label: "제주",
+        depPortKeywords: ["목포"],
+        destKeywords: ["제주"],
+        depTerminal: "목포항국제여객터미널",   // 퀸제누비아·퀸메리 대형 카페리 (삼학부두 변동 있음)
+        islandTerminal: "제주항 연안여객터미널",
+        fareUrl: "https://www.seaferry.co.kr",  // 씨월드고속훼리 공식
+        fallbackDep: ["01:00"],
+        fallbackArr: ["13:40"],
+      },
+      {
+        key: "hongdo",
+        label: "홍도",
+        depPortKeywords: ["목포"],
+        destKeywords: ["홍도"],
+        islandTerminal: "홍도항여객선터미널",
+        fareUrl: "https://island.theksa.co.kr",
+        fallbackDep: ["07:50"],
+        fallbackArr: ["13:00"],
+      },
       {
         key: "heuksando",
         label: "흑산도",
         depPortKeywords: ["목포"],
         destKeywords: ["흑산"],
-        islandTerminal: "흑산항여객터미널",
-        fallbackDep: ["07:50"],
-        fallbackArr: ["13:00"],
+        islandTerminal: "흑산항여객선터미널",
+        fareUrl: "https://island.theksa.co.kr",
+        fallbackDep: ["16:00"],
+        fallbackArr: ["11:00"],
       },
       {
-        key: "bigeumdo",
+        key: "bigeum-docho",
         label: "비금·도초도",
         depPortKeywords: ["목포"],
         destKeywords: ["비금", "도초"],
-        islandTerminal: "가산항",
-        fallbackDep: ["08:00"],
+        depTerminal: "목포북항여객선터미널",   // 도초카훼리 등 차도선 주력 (일부 섬사랑선은 연안)
+        islandTerminal: "도초 가산항",
+        fareUrl: "https://island.theksa.co.kr",
+        fallbackDep: ["08:35"],
         fallbackArr: ["14:00"],
       },
+      {
+        key: "gageodo",
+        label: "가거도",
+        depPortKeywords: ["목포"],
+        destKeywords: ["가거"],
+        islandTerminal: "가거도항",
+        fareUrl: "https://island.theksa.co.kr",
+        fallbackDep: ["14:00"],
+        fallbackArr: ["07:00"],
+      },
     ],
-    metaDescription: "목포 신안·흑산도 여객선 시간표·운항 현황·날씨·조석 예보",
+    metaDescription: "목포 제주·홍도·흑산도·비금도초·가거도 여객선 시간표·운항 현황·날씨·조석 예보",
   },
 
   incheon: {
