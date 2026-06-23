@@ -11,7 +11,8 @@ interface Props {
 export default function RouteItem({ route, nowMinutes = 0, isArrival = false, onClick }: Props) {
   const isCancelled = route.status === "cancelled"
   const isUnknown = route.status === "unknown"
-  const routeLabel = route.from ? `${route.from} → ${route.to}` : `완도 → ${route.to}`
+  const originName = route.originName ?? "완도"
+  const routeLabel = route.from ? `${route.from} → ${route.to}` : `${originName} → ${route.to}`
   const timeLabel = route.from ? `${route.from} 출발` : "출발"
 
   const nextIdx = route.times.findIndex((t) => toMinutes(t) > nowMinutes)
