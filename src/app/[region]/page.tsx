@@ -10,7 +10,7 @@ import { getRoutesForRegion, getArrivalsForRegion } from "@/lib/regionFerry"
 import { getTrainsForRegion } from "@/lib/regionTrain"
 import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
-import RegionTrainCard from "./RegionTrainCard"
+import RegionTrainTabs from "./RegionTrainTabs"
 import Logo from "@/components/Logo"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
@@ -85,7 +85,7 @@ async function RegionTrainSection({ region }: { region: string }) {
   const config = REGIONS[region]
   const data = await getTrainsForRegion(config)
   if (!data) return null
-  return <RegionTrainCard data={data} />
+  return <RegionTrainTabs data={data} />
 }
 
 export default async function RegionPage({

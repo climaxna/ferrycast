@@ -2,16 +2,26 @@ import type { RegionConfig } from "@/config/regions"
 
 const BASE = "https://apis.data.go.kr/1613000/TrainInfo"
 
+export interface TrainRun {
+  dep: string         // 출발 "05:35"
+  arr: string         // 도착 "08:01"
+  durationMin: number // 소요(분)
+  grade: string       // "KTX-산천(A-type)"
+  trainNo: string
+}
+
 export interface TrainDirection {
-  label: string      // "포항 → 서울"
-  grade: string      // 대표 등급 "KTX"
-  times: string[]    // ["05:35", ...] HH:MM 정렬
+  fromName: string     // "포항"
+  toName: string       // "서울"
+  fromStation: string  // 지도 검색용 "포항역"
+  toStation: string    // "서울역"
+  runs: TrainRun[]     // 출발시각 정렬
 }
 
 export interface RegionTrainData {
-  stationName: string
-  outbound: TrainDirection   // 지역 → 허브
-  inbound: TrainDirection    // 허브 → 지역
+  stationName: string  // "포항역"
+  outbound: TrainDirection   // 지역 → 허브 (출발 탭)
+  inbound: TrainDirection    // 허브 → 지역 (도착 탭)
   fare?: number
   bookingUrl?: string
   isLive: boolean
@@ -19,7 +29,9 @@ export interface RegionTrainData {
 
 interface TrainItem {
   depplandtime: string  // YYYYMMDDHHMM
+  arrplandtime: string
   traingradename: string
+  trainno: string
 }
 
 function kstYmd(): string {
@@ -33,12 +45,17 @@ function hhmm(plandtime: string): string {
   return `${s.slice(8, 10)}:${s.slice(10, 12)}`
 }
 
-async function fetchTrains(
+function toMin(t: string): number {
+  const [h, m] = t.split(":").map(Number)
+  return h * 60 + m
+}
+
+async function fetchRuns(
   key: string,
   depId: string,
   arrId: string,
   ymd: string,
-): Promise<{ times: string[]; grade: string } | null> {
+): Promise<TrainRun[] | null> {
   const params = new URLSearchParams({
     serviceKey: key, _type: "json", numOfRows: "200", pageNo: "1",
     depPlaceId: depId, arrPlaceId: arrId, depPlandTime: ymd,
@@ -53,8 +70,17 @@ async function fetchTrains(
     const raw = json?.response?.body?.items?.item
     const items: TrainItem[] = Array.isArray(raw) ? raw : raw ? [raw] : []
     if (!items.length) return null
-    const times = [...new Set(items.map((it) => hhmm(it.depplandtime)))].sort()
-    return { times, grade: items[0]?.traingradename ?? "KTX" }
+
+    const byDep = new Map<string, TrainRun>()
+    for (const it of items) {
+      const dep = hhmm(it.depplandtime)
+      if (byDep.has(dep)) continue   // 동일 출발시각 중복 제거
+      const arr = hhmm(it.arrplandtime)
+      let durationMin = toMin(arr) - toMin(dep)
+      if (durationMin < 0) durationMin += 1440
+      byDep.set(dep, { dep, arr, durationMin, grade: it.traingradename ?? "KTX", trainNo: String(it.trainno ?? "") })
+    }
+    return [...byDep.values()].sort((a, b) => toMin(a.dep) - toMin(b.dep))
   } catch {
     return null
   }
@@ -64,11 +90,13 @@ export async function getTrainsForRegion(config: RegionConfig): Promise<RegionTr
   const t = config.train
   if (!t) return null
 
-  const empty = (label: string): TrainDirection => ({ label, grade: "KTX", times: [] })
+  const dir = (fromName: string, toName: string, runs: TrainRun[]): TrainDirection => ({
+    fromName, toName, fromStation: `${fromName}역`, toStation: `${toName}역`, runs,
+  })
   const fallback = (): RegionTrainData => ({
     stationName: t.stationName,
-    outbound: empty(`${t.localName} → ${t.hubName}`),
-    inbound: empty(`${t.hubName} → ${t.localName}`),
+    outbound: dir(t.localName, t.hubName, []),
+    inbound: dir(t.hubName, t.localName, []),
     fare: t.fareHint,
     bookingUrl: t.bookingUrl,
     isLive: false,
@@ -80,14 +108,14 @@ export async function getTrainsForRegion(config: RegionConfig): Promise<RegionTr
   try {
     const ymd = kstYmd()
     const [out, inb] = await Promise.all([
-      fetchTrains(key, t.localId, t.hubId, ymd),
-      fetchTrains(key, t.hubId, t.localId, ymd),
+      fetchRuns(key, t.localId, t.hubId, ymd),
+      fetchRuns(key, t.hubId, t.localId, ymd),
     ])
     if (!out && !inb) return fallback()
     return {
       stationName: t.stationName,
-      outbound: { label: `${t.localName} → ${t.hubName}`, grade: out?.grade ?? "KTX", times: out?.times ?? [] },
-      inbound: { label: `${t.hubName} → ${t.localName}`, grade: inb?.grade ?? "KTX", times: inb?.times ?? [] },
+      outbound: dir(t.localName, t.hubName, out ?? []),
+      inbound: dir(t.hubName, t.localName, inb ?? []),
       fare: t.fareHint,
       bookingUrl: t.bookingUrl,
       isLive: true,
