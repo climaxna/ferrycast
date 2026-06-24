@@ -98,7 +98,7 @@ export default function Page() {
               완도군청 여객선
             </a>
             <a
-              href="https://island.theksa.co.kr"
+              href="https://island.theksa.co.kr/page/booking"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"

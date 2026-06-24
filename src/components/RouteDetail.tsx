@@ -286,7 +286,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
 
           {/* 예약 버튼 */}
           <a
-            href="https://island.theksa.co.kr"
+            href="https://island.theksa.co.kr/page/booking"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 py-4 text-center text-base font-bold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"

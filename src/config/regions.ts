@@ -57,7 +57,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         destKeywords: ["울릉"],   // "포항"발은 dest="울릉" — 영일만발(dest="울릉(사동)")은 dep 불일치로 안 걸림
         depTerminal: "포항여객선터미널",        // 구항 (대저페리 엘도라도익스프레스)
         islandTerminal: "울릉도 도동여객선터미널",
-        fareUrl: "https://island.theksa.co.kr",  // 해운조합 통합 예매
+        fareUrl: "https://island.theksa.co.kr/page/booking",  // 해운조합 통합 예매
         fallbackDep: ["09:50"],
         fallbackArr: ["14:20"],
       },
@@ -112,7 +112,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         depPortKeywords: ["목포"],
         destKeywords: ["홍도"],
         islandTerminal: "홍도항여객선터미널",
-        fareUrl: "https://island.theksa.co.kr",
+        fareUrl: "https://island.theksa.co.kr/page/booking",
         fallbackDep: ["07:50"],
         fallbackArr: ["13:00"],
       },
@@ -122,7 +122,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         depPortKeywords: ["목포"],
         destKeywords: ["흑산"],
         islandTerminal: "흑산항여객선터미널",
-        fareUrl: "https://island.theksa.co.kr",
+        fareUrl: "https://island.theksa.co.kr/page/booking",
         fallbackDep: ["16:00"],
         fallbackArr: ["11:00"],
       },
@@ -133,7 +133,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         destKeywords: ["비금", "도초"],
         depTerminal: "목포북항여객선터미널",   // 도초카훼리 등 차도선 주력 (일부 섬사랑선은 연안)
         islandTerminal: "도초 가산항",
-        fareUrl: "https://island.theksa.co.kr",
+        fareUrl: "https://island.theksa.co.kr/page/booking",
         fallbackDep: ["08:35"],
         fallbackArr: ["14:00"],
       },
@@ -143,7 +143,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         depPortKeywords: ["목포"],
         destKeywords: ["가거"],
         islandTerminal: "가거도항",
-        fareUrl: "https://island.theksa.co.kr",
+        fareUrl: "https://island.theksa.co.kr/page/booking",
         fallbackDep: ["14:00"],
         fallbackArr: ["07:00"],
       },

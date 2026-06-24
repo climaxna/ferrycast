@@ -12,7 +12,7 @@ const FARE_MAP: Record<string, FareInfo> = {
 
 const FARE_URL_MAP: Record<string, string> = {
   "cheongsando":      "https://cheongsannh.nonghyup.com/user/indexSub.do?codyMenuSeq=1048386239&siteId=cheongsannh",
-  "hwaheungpo-route": "https://island.theksa.co.kr",
+  "hwaheungpo-route": "https://island.theksa.co.kr/page/booking",
 }
 
 // ────────────────────────────────────────────────
