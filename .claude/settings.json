@@ -66,7 +66,8 @@
       "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg11.txt\")",
       "Bash(rm -f \"c:/ferrycast/src/app/[region]/RegionTrainTabs.tsx\" && echo \"RegionTrainTabs.tsx 삭제됨\")",
       "PowerShell(git -C c:\\\\ferrycast add \"src/app/[region]/RegionTrainBlock.tsx\" \"src/app/[region]/RegionTrainTabs.tsx\" \"src/app/[region]/RegionRouteTabs.tsx\" \"src/app/[region]/page.tsx\")",
-      "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg12.txt\")"
+      "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg12.txt\")",
+      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\korail.mjs\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude",
