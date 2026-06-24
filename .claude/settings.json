@@ -59,7 +59,8 @@
       "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\train.mjs\")",
       "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\train2.mjs\")",
       "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\train3.mjs\")",
-      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\trainprobe.mjs\")"
+      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\trainprobe.mjs\")",
+      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\train4.mjs\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude"
