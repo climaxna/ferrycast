@@ -60,10 +60,14 @@
       "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\train2.mjs\")",
       "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\train3.mjs\")",
       "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\trainprobe.mjs\")",
-      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\train4.mjs\")"
+      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\train4.mjs\")",
+      "Bash(rm -f \"c:/ferrycast/src/app/[region]/RegionTrainCard.tsx\" && echo \"RegionTrainCard.tsx 삭제됨\")",
+      "PowerShell(git -C c:\\\\ferrycast add src/lib/regionTrain.ts \"src/app/[region]/RegionTrainTabs.tsx\" \"src/app/[region]/RegionTrainDetail.tsx\" \"src/app/[region]/RegionTrainCard.tsx\" \"src/app/[region]/page.tsx\")",
+      "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg11.txt\")"
     ],
     "additionalDirectories": [
-      "C:\\Users\\kim\\.claude"
+      "C:\\Users\\kim\\.claude",
+      "c:\\ferrycast\\src\\app\\[region]"
     ]
   }
 }
