@@ -58,7 +58,7 @@ async function fetchSkySrc(
   try {
     const res = await fetch(
       `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${params}`,
-      { next: { revalidate: 300 } },
+      { next: { revalidate: 600 } },
     )
     if (!res.ok) return 1
     const json = await res.json()
@@ -99,7 +99,23 @@ async function fetchWaveHeightSrc(
   return null
 }
 
+// 지역별 직전 정상값 보관 (서버 인스턴스 메모리) — 기상청 실패 시 빈 화면 방지
+const _lastGoodRegion = new Map<string, { data: WeatherData; at: number }>()
+const REGION_WEATHER_STALE_MAX_MS = 3 * 60 * 60 * 1000  // 최대 3시간
+
 export async function getWeatherForRegion(config: RegionConfig): Promise<WeatherData | null> {
+  const fresh = await fetchRegionWeatherFresh(config)
+  const k = `${config.weatherGrid.nx},${config.weatherGrid.ny}`
+  if (fresh) {
+    _lastGoodRegion.set(k, { data: fresh, at: Date.now() })
+    return fresh
+  }
+  const prev = _lastGoodRegion.get(k)
+  if (prev && Date.now() - prev.at < REGION_WEATHER_STALE_MAX_MS) return prev.data
+  return null
+}
+
+async function fetchRegionWeatherFresh(config: RegionConfig): Promise<WeatherData | null> {
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return null
 
@@ -113,7 +129,7 @@ export async function getWeatherForRegion(config: RegionConfig): Promise<Weather
 
   try {
     const [res, waveHeight, sky] = await Promise.all([
-      fetch(url, { next: { revalidate: 300 } }),
+      fetch(url, { next: { revalidate: 600 } }),
       fetchWaveHeightSrc(key, config.seaGrids),
       fetchSkySrc(key, nx, ny),
     ])

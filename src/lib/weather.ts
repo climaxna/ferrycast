@@ -98,7 +98,7 @@ async function fetchSky(key: string): Promise<number> {
   try {
     const res = await fetch(
       `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${params}`,
-      { next: { revalidate: 300 } }
+      { next: { revalidate: 600 } }
     )
     if (!res.ok) return 1
     const json = await res.json()
@@ -149,7 +149,24 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
   return null
 }
 
+// 서버 인스턴스 메모리에 직전 정상값 보관 — 기상청 호출 실패 시 빈 화면 대신 직전값 노출
+let _lastGoodWando: { data: WeatherData; at: number } | null = null
+const WEATHER_STALE_MAX_MS = 3 * 60 * 60 * 1000  // 직전값 허용 최대 3시간
+
 export async function getWandoWeather(): Promise<WeatherData | null> {
+  const fresh = await fetchWandoWeatherFresh()
+  if (fresh) {
+    _lastGoodWando = { data: fresh, at: Date.now() }
+    return fresh
+  }
+  // 신규 호출 실패(한도초과·NO_DATA·일시오류) 시 직전 정상값으로 빈 화면 방지
+  if (_lastGoodWando && Date.now() - _lastGoodWando.at < WEATHER_STALE_MAX_MS) {
+    return _lastGoodWando.data
+  }
+  return null
+}
+
+async function fetchWandoWeatherFresh(): Promise<WeatherData | null> {
   // apihub.kma.go.kr는 서비스별 별도 등록 필요(403). data.go.kr 공통키 사용.
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return null
@@ -169,7 +186,7 @@ export async function getWandoWeather(): Promise<WeatherData | null> {
 
   try {
     const [res, waveHeight, sky] = await Promise.all([
-      fetch(url, { next: { revalidate: 300 } }),
+      fetch(url, { next: { revalidate: 600 } }),
       fetchWaveHeight(key),
       fetchSky(key),
     ])
