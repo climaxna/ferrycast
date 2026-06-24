@@ -10,7 +10,6 @@ import { getRoutesForRegion, getArrivalsForRegion } from "@/lib/regionFerry"
 import { getTrainsForRegion } from "@/lib/regionTrain"
 import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
-import RegionTrainTabs from "./RegionTrainTabs"
 import Logo from "@/components/Logo"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
@@ -74,18 +73,19 @@ async function RegionWeatherCard({
 
 async function RegionRouteSection({ region }: { region: string }) {
   const config = REGIONS[region]
-  const [departures, arrivals] = await Promise.all([
+  const [departures, arrivals, train] = await Promise.all([
     getRoutesForRegion(config),
     getArrivalsForRegion(config),
+    config.train ? getTrainsForRegion(config) : Promise.resolve(null),
   ])
-  return <RegionRouteTabs departures={departures} arrivals={arrivals} regionName={config.name} />
-}
-
-async function RegionTrainSection({ region }: { region: string }) {
-  const config = REGIONS[region]
-  const data = await getTrainsForRegion(config)
-  if (!data) return null
-  return <RegionTrainTabs data={data} />
+  return (
+    <RegionRouteTabs
+      departures={departures}
+      arrivals={arrivals}
+      regionName={config.name}
+      train={train}
+    />
+  )
 }
 
 export default async function RegionPage({
@@ -139,12 +139,6 @@ export default async function RegionPage({
         <Suspense fallback={<RouteSkeleton />}>
           <RegionRouteSection region={region} />
         </Suspense>
-
-        {config.train && (
-          <Suspense fallback={<div className="h-32 animate-pulse rounded-2xl bg-slate-100" />}>
-            <RegionTrainSection region={region} />
-          </Suspense>
-        )}
 
         <div className="space-y-2">
           <CoupangSection />

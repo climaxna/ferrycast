@@ -4,14 +4,17 @@ import { useState, useEffect } from "react"
 import RouteItem from "@/components/RouteItem"
 import RouteDetail from "@/components/RouteDetail"
 import type { WandoRoute } from "@/lib/types"
+import type { RegionTrainData } from "@/lib/regionTrain"
+import RegionTrainBlock from "./RegionTrainBlock"
 
 interface Props {
   departures: { routes: WandoRoute[]; isLive: boolean }
   arrivals: { routes: WandoRoute[]; isLive: boolean }
   regionName: string
+  train?: RegionTrainData | null
 }
 
-export default function RegionRouteTabs({ departures, arrivals, regionName }: Props) {
+export default function RegionRouteTabs({ departures, arrivals, regionName, train }: Props) {
   const [tab, setTab] = useState<"dep" | "arr">("dep")
   const [selected, setSelected] = useState<WandoRoute | null>(null)
   const [nowMinutes, setNowMinutes] = useState(0)
@@ -64,6 +67,8 @@ export default function RegionRouteTabs({ departures, arrivals, regionName }: Pr
           항로 정보를 불러올 수 없습니다.
         </div>
       )}
+
+      {train && <RegionTrainBlock data={train} direction={tab} now={nowMinutes} />}
 
       {selected && (
         <RouteDetail

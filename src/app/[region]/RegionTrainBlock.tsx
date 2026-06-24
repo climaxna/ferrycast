@@ -1,44 +1,34 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { toMinutes, relativeTime } from "@/lib/utils"
 import type { RegionTrainData, TrainDirection } from "@/lib/regionTrain"
 import RegionTrainDetail from "./RegionTrainDetail"
 
-export default function RegionTrainTabs({ data }: { data: RegionTrainData }) {
-  const [tab, setTab] = useState<"dep" | "arr">("dep")
+// 배편 출발/도착 탭 안에 들어가는 KTX 블록 — 구분선으로 모드 구분
+export default function RegionTrainBlock({
+  data,
+  direction,
+  now,
+}: {
+  data: RegionTrainData
+  direction: "dep" | "arr"
+  now: number
+}) {
   const [open, setOpen] = useState(false)
-  const [now, setNow] = useState(0)
-
-  useEffect(() => {
-    const update = () => {
-      const d = new Date()
-      setNow(d.getHours() * 60 + d.getMinutes())
-    }
-    update()
-    const id = setInterval(update, 60_000)
-    return () => clearInterval(id)
-  }, [])
-
-  const isDep = tab === "dep"
-  const dir = isDep ? data.outbound : data.inbound
-  const localName = data.outbound.fromName
+  const dir = direction === "dep" ? data.outbound : data.inbound
 
   return (
-    <section>
-      <h2 className="mb-2 flex items-center gap-1.5 text-sm font-bold tracking-wide text-slate-500">
-        <span aria-hidden="true">🚆</span> {data.stationName} KTX
-      </h2>
-
-      <div className="mb-3 flex items-center gap-1 rounded-xl bg-indigo-50 p-1">
-        <TabButton active={isDep} onClick={() => setTab("dep")}>{localName} 출발</TabButton>
-        <TabButton active={!isDep} onClick={() => setTab("arr")}>{localName} 도착</TabButton>
-        {!data.isLive && (
-          <span className="mr-1.5 shrink-0 text-[11px] font-medium text-amber-500">참고</span>
-        )}
+    <div className="pt-1.5">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="h-px flex-1 bg-slate-100" />
+        <span className="flex items-center gap-1 text-xs font-bold tracking-wide text-indigo-500">
+          <span aria-hidden="true">🚆</span> {data.stationName} KTX
+        </span>
+        <span className="h-px flex-1 bg-slate-100" />
       </div>
 
-      <TrainCard dir={dir} now={now} onClick={() => setOpen(true)} />
+      <TrainItem dir={dir} now={now} onClick={() => setOpen(true)} />
 
       <div className="mt-2 flex items-center justify-between px-1">
         {data.fare ? (
@@ -57,13 +47,13 @@ export default function RegionTrainTabs({ data }: { data: RegionTrainData }) {
       </div>
 
       {open && (
-        <RegionTrainDetail data={data} direction={tab} onClose={() => setOpen(false)} />
+        <RegionTrainDetail data={data} direction={direction} onClose={() => setOpen(false)} />
       )}
-    </section>
+    </div>
   )
 }
 
-function TrainCard({ dir, now, onClick }: { dir: TrainDirection; now: number; onClick: () => void }) {
+function TrainItem({ dir, now, onClick }: { dir: TrainDirection; now: number; onClick: () => void }) {
   const deps = dir.runs.map((r) => r.dep)
   const nextIdx = deps.findIndex((t) => toMinutes(t) > now)
   const next = nextIdx >= 0 ? deps[nextIdx] : null
@@ -111,19 +101,6 @@ function TrainCard({ dir, now, onClick }: { dir: TrainDirection; now: number; on
         )}
       </div>
       <span className="mt-0.5 shrink-0 text-slate-300 transition-transform group-hover:translate-x-0.5">›</span>
-    </button>
-  )
-}
-
-function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
-        active ? "bg-white text-indigo-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
-      }`}
-    >
-      {children}
     </button>
   )
 }
