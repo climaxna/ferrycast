@@ -81,7 +81,7 @@ export const REGIONS: Record<string, RegionConfig> = {
       hubName: "서울",
       hubId: "NAT010000",
       fareHint: 53600,
-      bookingUrl: "https://www.letskorail.com",
+      bookingUrl: "https://www.korail.com/ticket/search/general",  // 신버전 예매 검색 폼(letskorail 레거시 폐지)
     },
   },
 
