@@ -20,6 +20,16 @@ export interface RegionConfig {
   mainTerminal: string
   routeGroups: RouteGroupConfig[]
   metaDescription: string
+  // 선택: 기차편 섹션 (포항 등 철도 거점 지역). TAGO 열차정보 API 역 노드ID 사용
+  train?: {
+    stationName: string   // 표시명 (예: "포항역")
+    localName: string     // 지역측 역명 (예: "포항")
+    localId: string       // TAGO nodeid (예: "NAT8B0351")
+    hubName: string       // 상대 역명 (예: "서울")
+    hubId: string         // TAGO nodeid (예: "NAT010000")
+    fareHint?: number     // 성인 편도 참고 운임
+    bookingUrl?: string   // 예매 링크
+  }
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -64,6 +74,15 @@ export const REGIONS: Record<string, RegionConfig> = {
       },
     ],
     metaDescription: "포항·영일만항 울릉도(도동·사동) 여객선 시간표·운항 현황·날씨",
+    train: {
+      stationName: "포항역",
+      localName: "포항",
+      localId: "NAT8B0351",   // TAGO 검증
+      hubName: "서울",
+      hubId: "NAT010000",
+      fareHint: 53600,
+      bookingUrl: "https://www.letskorail.com",
+    },
   },
 
   mokpo: {

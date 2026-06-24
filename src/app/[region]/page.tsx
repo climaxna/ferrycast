@@ -7,8 +7,10 @@ import { getWeatherForRegion } from "@/lib/regionWeather"
 import { getTidalForRegion, get5DayTidalForRegion } from "@/lib/regionTide"
 import { get5DayForecastForRegion } from "@/lib/regionForecast"
 import { getRoutesForRegion, getArrivalsForRegion } from "@/lib/regionFerry"
+import { getTrainsForRegion } from "@/lib/regionTrain"
 import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
+import RegionTrainCard from "./RegionTrainCard"
 import Logo from "@/components/Logo"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
@@ -79,6 +81,13 @@ async function RegionRouteSection({ region }: { region: string }) {
   return <RegionRouteTabs departures={departures} arrivals={arrivals} regionName={config.name} />
 }
 
+async function RegionTrainSection({ region }: { region: string }) {
+  const config = REGIONS[region]
+  const data = await getTrainsForRegion(config)
+  if (!data) return null
+  return <RegionTrainCard data={data} />
+}
+
 export default async function RegionPage({
   params,
 }: {
@@ -130,6 +139,12 @@ export default async function RegionPage({
         <Suspense fallback={<RouteSkeleton />}>
           <RegionRouteSection region={region} />
         </Suspense>
+
+        {config.train && (
+          <Suspense fallback={<div className="h-32 animate-pulse rounded-2xl bg-slate-100" />}>
+            <RegionTrainSection region={region} />
+          </Suspense>
+        )}
 
         <div className="space-y-2">
           <CoupangSection />
