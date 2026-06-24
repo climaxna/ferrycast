@@ -46,7 +46,16 @@
       "PowerShell(git -C c:\\\\ferrycast log --oneline -1)",
       "PowerShell(git -C c:\\\\ferrycast add src/components/RegionNav.tsx \"src/app/[region]/page.tsx\" src/app/page.tsx)",
       "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg8.txt\")",
-      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\wxdiag.mjs\")"
+      "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\wxdiag.mjs\")",
+      "PowerShell(cd c:\\\\ferrycast; $env:PORT=3100; npx next start -p 3100)",
+      "PowerShell(git -C c:\\\\ferrycast add src/lib/weather.ts src/lib/regionWeather.ts)",
+      "PowerShell(git -C c:\\\\ferrycast commit -F \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\msg9.txt\")",
+      "PowerShell(git -C c:\\\\ferrycast fetch)",
+      "PowerShell(git -C c:\\\\ferrycast log --oneline -3 origin/master)",
+      "PowerShell(git -C c:\\\\ferrycast pull --rebase)",
+      "PowerShell(git -C c:\\\\ferrycast status -sb)",
+      "PowerShell(git -C c:\\\\ferrycast stash push -m \"settings-temp\" -- .claude/settings.json)",
+      "PowerShell(git -C c:\\\\ferrycast stash pop)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude"
