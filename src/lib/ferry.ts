@@ -123,18 +123,23 @@ const getMtisDay = cache((key: string, date: string): Promise<MtisItem[]> => fet
 interface DepGroupCfg {
   label: string; priority: number; terminal: string
   fare?: FareInfo; fareUrl?: string
+  durationMin?: number  // TAGO 미등록 노선(청산농협 등) 도착시각 fallback용 소요시간(분)
 }
 interface ArrGroupCfg extends DepGroupCfg { islandTerminal: string }
 
+// 청산도는 청산농협 운영 여객선이 TAGO 미등록(행정선만 존재) → 실데이터 도착시각 불가.
+// 완도↔청산도는 고정 단거리 노선(약 50분)이라 fallback 소요시간으로 도착 예정시각 제공.
+const CHEONGSANDO_DURATION_MIN = 50
+
 const DEP_CFG: Record<string, DepGroupCfg> = {
   "jeju":             { label: "제주",             priority: 1, terminal: TERMINAL_MAIN },
-  "cheongsando":      { label: "청산도",            priority: 2, terminal: TERMINAL_MAIN, fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"] },
+  "cheongsando":      { label: "청산도",            priority: 2, terminal: TERMINAL_MAIN, fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"], durationMin: CHEONGSANDO_DURATION_MIN },
   "hwaheungpo-route": { label: "소안도·보길도·노화", priority: 3, terminal: TERMINAL_HWAHEUNGPO, fareUrl: FARE_URL_MAP["hwaheungpo-route"] },
 }
 
 const ARR_CFG: Record<string, ArrGroupCfg> = {
   "jeju":             { label: "제주",   priority: 1, terminal: TERMINAL_MAIN,       islandTerminal: "제주항 연안여객터미널" },
-  "cheongsando":      { label: "청산도", priority: 2, terminal: TERMINAL_MAIN,       islandTerminal: "도청항", fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"] },
+  "cheongsando":      { label: "청산도", priority: 2, terminal: TERMINAL_MAIN,       islandTerminal: "도청항", fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"], durationMin: CHEONGSANDO_DURATION_MIN },
   "hwaheungpo-route": { label: "소안도·보길도·노화", priority: 3, terminal: TERMINAL_HWAHEUNGPO, islandTerminal: "소안항여객터미널", fareUrl: FARE_URL_MAP["hwaheungpo-route"] },
 }
 
@@ -246,7 +251,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
         const cfg = DEP_CFG[gk]
         const tmrw = tomorrowData[gk]
         const dedup = deduplicateTimes(times)
-        const arrivals = arrLookup(gk, dedup)
+        const arrivals = arrLookup(gk, dedup, [...ships])
         return {
           id: `dep-${gk}`,
           to: cfg.label,
@@ -257,6 +262,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           terminal: cfg.terminal,
           fare: cfg.fare,
           fareUrl: cfg.fareUrl,
+          ...(cfg.durationMin ? { durationMin: cfg.durationMin } : {}),
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
@@ -312,7 +318,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
       .map(([gk, { times, ships, allItems, cfg, via }]) => {
         const tmrw = tomorrowData[gk]
         const dedup = deduplicateTimes(times)
-        const arrivals = arrLookup(gk, dedup)
+        const arrivals = arrLookup(gk, dedup, [...ships])
         return {
           id: `arr-${gk}`,
           to: "완도",
@@ -325,6 +331,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           islandTerminal: cfg.islandTerminal,
           fare: cfg.fare,
           fareUrl: cfg.fareUrl,
+          ...(cfg.durationMin ? { durationMin: cfg.durationMin } : {}),
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),

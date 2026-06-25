@@ -31,6 +31,22 @@ function toMinutes(hhmm: string): number {
   return h * 60 + m
 }
 
+// 선박명 정규화 (괄호 톤수·공백 제거) 후 포함관계 비교.
+//   "한일골드스텔라" vs "골드스텔라" → 일치 / "대한호" vs "대한호(700톤)" → 일치
+//   "슬로시티청산도호" vs "섬사랑7호"(행정선) → 불일치 → 도착시각 거부
+function normalizeShip(s: string): string {
+  return (s || "").replace(/\(.*?\)/g, "").replace(/\s/g, "")
+}
+function shipMatches(tagoShip: string, allowed: string[]): boolean {
+  if (!allowed.length) return true  // 허용목록 미지정 → 가드 비활성
+  const b = normalizeShip(tagoShip)
+  if (!b) return false
+  return allowed.some((m) => {
+    const a = normalizeShip(m)
+    return !!a && (a.includes(b) || b.includes(a))
+  })
+}
+
 // 항구명 → nodeId (749개, 거의 안 변함 → 장기 캐시)
 export const getPortNodeMap = cache(async (): Promise<Map<string, string>> => {
   const key = process.env.DATAGOKR_API_KEY
@@ -95,14 +111,14 @@ export async function buildArrivalLookup(
   nodeNames: string[],
   date: string,
   groupOf: (depNm: string, arrNm: string) => string | null,
-): Promise<(groupKey: string, times: string[]) => Record<string, string>> {
+): Promise<(groupKey: string, times: string[], allowedShips?: string[]) => Record<string, string>> {
   const portMap = await getPortNodeMap()
   const nodeIds = nodeNames
     .map((n) => portMap.get(n))
     .filter((id): id is string => !!id)
 
-  // groupKey → [{ depMin, arr }]
-  const byGroup: Record<string, Array<{ depMin: number; arr: string }>> = {}
+  // groupKey → [{ depMin, arr, ship }]
+  const byGroup: Record<string, Array<{ depMin: number; arr: string; ship: string }>> = {}
 
   if (nodeIds.length) {
     const results = await Promise.allSettled(nodeIds.map((id) => getNodeDepartures(id, date)))
@@ -118,20 +134,22 @@ export async function buildArrivalLookup(
         // 비정상 데이터 방어 (10분 미만/25시간 초과 → 신뢰 불가)
         if (dur < 10 || dur > 1500) continue
         if (!byGroup[gk]) byGroup[gk] = []
-        byGroup[gk].push({ depMin: toMinutes(dep), arr })
+        byGroup[gk].push({ depMin: toMinutes(dep), arr, ship: it.vihicleNm ?? "" })
       }
     }
   }
 
-  return (groupKey: string, times: string[]): Record<string, string> => {
+  // allowedShips: MTIS 운영 선박 목록. 지정 시 그 선박편만 신뢰(행정선 오데이터 차단)
+  return (groupKey: string, times: string[], allowedShips: string[] = []): Record<string, string> => {
     const entries = byGroup[groupKey]
     if (!entries || !entries.length) return {}
     const out: Record<string, string> = {}
     for (const t of times) {
       const tMin = toMinutes(t)
-      // 출발시각이 ±5분 이내로 가장 가까운 편의 도착시각
+      // 출발시각이 ±5분 이내, 선박명이 일치하는 가장 가까운 편의 도착시각
       let best: { diff: number; arr: string } | null = null
       for (const e of entries) {
+        if (!shipMatches(e.ship, allowedShips)) continue
         const diff = Math.abs(e.depMin - tMin)
         if (diff <= 5 && (!best || diff < best.diff)) best = { diff, arr: e.arr }
       }

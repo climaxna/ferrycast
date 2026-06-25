@@ -266,7 +266,7 @@ export async function getRoutesForRegion(
         const cfg = config.routeGroups.find((g) => g.key === gk)!
         const tmrw = tomorrowData[gk]
         const dedup = deduplicateTimes(times)
-        const arrivals = arrLookup(gk, dedup)
+        const arrivals = arrLookup(gk, dedup, [...ships])
         return {
           id: `dep-${gk}`,
           to: cfg.label,
@@ -334,7 +334,7 @@ export async function getArrivalsForRegion(
         const cfg = config.routeGroups.find((g) => g.key === gk)!
         const tmrw = tomorrowData[gk]
         const dedup = deduplicateTimes(times)
-        const arrivals = arrLookup(gk, dedup)
+        const arrivals = arrLookup(gk, dedup, [...ships])
         return {
           id: `arr-${gk}`,
           to: config.name,

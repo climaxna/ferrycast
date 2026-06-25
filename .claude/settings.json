@@ -81,7 +81,8 @@
       "Bash(curl -s http://localhost:3001/ -o /dev/null -w \"main:%{http_code} \")",
       "Bash(curl -s http://localhost:3001/pohang -o /dev/null -w \"pohang:%{http_code}\\\\n\")",
       "Bash(curl -s http://localhost:3001/pohang -o /dev/null -w \"pohang:%{http_code} \")",
-      "Bash(curl -s http://localhost:3001/mokpo -o /dev/null -w \"mokpo:%{http_code}\\\\n\")"
+      "Bash(curl -s http://localhost:3001/mokpo -o /dev/null -w \"mokpo:%{http_code}\\\\n\")",
+      "Bash(python -c ' *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude",
