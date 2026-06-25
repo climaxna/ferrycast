@@ -9,6 +9,7 @@ export interface RouteGroupConfig {
   fareUrl?: string
   fallbackDep?: string[]      // API 장애 시 정적 출발 시각
   fallbackArr?: string[]      // API 장애 시 정적 도착 시각
+  durationMin?: number        // 예상 소요시간(분) — 있을 때 상세화면에서 도착 예상시각 표시
 }
 
 export interface RegionConfig {
@@ -60,6 +61,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         fareUrl: "https://island.theksa.co.kr/page/booking",  // 해운조합 통합 예매
         fallbackDep: ["09:50"],
         fallbackArr: ["14:20"],
+        durationMin: 270,  // 09:50→14:20 기준 (4시간 30분)
       },
       {
         key: "ulleung-sadong",
@@ -71,6 +73,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         fareUrl: "https://www.ulcruise.co.kr",   // 울릉크루즈 공식
         fallbackDep: ["23:00"],
         fallbackArr: ["12:20"],
+        durationMin: 810,  // 23:00→12:20 야간 기준 (13시간 20분)
       },
     ],
     metaDescription: "포항·영일만항 울릉도(도동·사동) 여객선 시간표·운항 현황·날씨",

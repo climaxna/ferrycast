@@ -13,6 +13,18 @@ interface Props {
   onClose: () => void
 }
 
+function addMinutes(time: string, mins: number): string {
+  const [h, m] = time.split(":").map(Number)
+  const total = (h * 60 + m + mins) % (24 * 60)
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`
+}
+
+function fmtDuration(mins: number): string {
+  const h = Math.floor(mins / 60)
+  const m = mins % 60
+  return m === 0 ? `${h}시간` : `${h}시간 ${m}분`
+}
+
 export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const isCancelled = route.status === "cancelled"
   const isUnknown = route.status === "unknown"
@@ -184,47 +196,93 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                 <p className="mt-1 text-sm text-rose-500">공식 채널에서 최종 확인하세요.</p>
               </div>
             ) : route.times.length > 0 ? (
-              <div className="grid grid-cols-4 gap-2">
-                {pastTimes.map((t) => (
-                  <div
-                    key={t}
-                    className="flex flex-col items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-400 shadow-sm"
-                  >
-                    {t}
-                    {route.via?.[t] && (
-                      <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
-                    )}
-                  </div>
-                ))}
-                {nextTime && (
-                  <button
-                    key={nextTime}
-                    onClick={() => setAlarmTime(nextTime)}
-                    className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-3 shadow-md active:opacity-80"
-                  >
-                    <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
-                    {route.via?.[nextTime] ? (
-                      <span className="text-[11px] font-semibold leading-tight text-amber-200">{route.via[nextTime]} 경유</span>
-                    ) : (
-                      <span className="text-[11px] font-semibold leading-tight text-blue-100">
-                        {relativeTime(nextTime, nowMinutes)}
-                      </span>
-                    )}
-                  </button>
-                )}
-                {futureTimes.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setAlarmTime(t)}
-                    className="flex flex-col items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm active:opacity-70"
-                  >
-                    {t}
-                    {route.via?.[t] && (
-                      <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
-                    )}
-                  </button>
-                ))}
-              </div>
+              route.durationMin ? (
+                /* durationMin 있을 때 — 수직 리스트 (KTX 스타일, 예상 도착시각 표시) */
+                <div className="space-y-2">
+                  {pastTimes.map((t) => (
+                    <div key={t} className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 opacity-50">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-lg font-bold tabular-nums text-slate-400">{t}</span>
+                        <span className="text-xs text-slate-400">→ {addMinutes(t, route.durationMin!)}</span>
+                      </div>
+                      <span className="text-xs text-slate-400">{fmtDuration(route.durationMin!)}</span>
+                    </div>
+                  ))}
+                  {nextTime && (
+                    <button
+                      onClick={() => setAlarmTime(nextTime)}
+                      className="flex w-full items-center justify-between rounded-xl bg-blue-500 px-4 py-3 shadow-md active:opacity-80"
+                    >
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-lg font-bold tabular-nums text-white">{nextTime}</span>
+                        <span className="text-sm text-blue-100">→ {addMinutes(nextTime, route.durationMin!)}</span>
+                        <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold text-white">다음</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xs font-semibold text-blue-100">{fmtDuration(route.durationMin!)}</div>
+                        <div className="text-[11px] text-blue-200">{relativeTime(nextTime, nowMinutes)}</div>
+                      </div>
+                    </button>
+                  )}
+                  {futureTimes.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setAlarmTime(t)}
+                      className="flex w-full items-center justify-between rounded-xl bg-blue-50 px-4 py-3 active:opacity-70"
+                    >
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-lg font-bold tabular-nums text-blue-700">{t}</span>
+                        <span className="text-xs text-blue-500">→ {addMinutes(t, route.durationMin!)}</span>
+                      </div>
+                      <span className="text-xs text-blue-500">{fmtDuration(route.durationMin!)}</span>
+                    </button>
+                  ))}
+                  <p className="mt-1 text-xs text-slate-400">* 예상 소요시간 기준 도착시각 (실제 다를 수 있음)</p>
+                </div>
+              ) : (
+                /* 기존 4열 그리드 */
+                <div className="grid grid-cols-4 gap-2">
+                  {pastTimes.map((t) => (
+                    <div
+                      key={t}
+                      className="flex flex-col items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-400 shadow-sm"
+                    >
+                      {t}
+                      {route.via?.[t] && (
+                        <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
+                      )}
+                    </div>
+                  ))}
+                  {nextTime && (
+                    <button
+                      key={nextTime}
+                      onClick={() => setAlarmTime(nextTime)}
+                      className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-3 shadow-md active:opacity-80"
+                    >
+                      <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
+                      {route.via?.[nextTime] ? (
+                        <span className="text-[11px] font-semibold leading-tight text-amber-200">{route.via[nextTime]} 경유</span>
+                      ) : (
+                        <span className="text-[11px] font-semibold leading-tight text-blue-100">
+                          {relativeTime(nextTime, nowMinutes)}
+                        </span>
+                      )}
+                    </button>
+                  )}
+                  {futureTimes.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setAlarmTime(t)}
+                      className="flex flex-col items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm active:opacity-70"
+                    >
+                      {t}
+                      {route.via?.[t] && (
+                        <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )
             ) : (
               <p className="text-base text-slate-400">시간표 정보 없음</p>
             )}

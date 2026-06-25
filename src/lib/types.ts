@@ -26,4 +26,5 @@ export interface WandoRoute {
     times: string[]
   }
   via?: Record<string, string>  // "HH:MM" → 경유지명. 예: { "13:40": "추자도" }. 없으면 직항.
+  durationMin?: number          // 예상 소요시간(분). 있을 때 상세화면에서 도착 예상시각 표시
 }

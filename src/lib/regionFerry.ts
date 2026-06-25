@@ -156,6 +156,7 @@ function makeStaticDep(config: RegionConfig): WandoRoute[] {
       terminal: g.depTerminal ?? config.mainTerminal,
       originName: config.name,
       fareUrl: g.fareUrl,
+      ...(g.durationMin ? { durationMin: g.durationMin } : {}),
     }))
 }
 
@@ -174,6 +175,7 @@ function makeStaticArr(config: RegionConfig): WandoRoute[] {
       originName: config.name,
       islandTerminal: g.islandTerminal,
       fareUrl: g.fareUrl,
+      ...(g.durationMin ? { durationMin: g.durationMin } : {}),
     }))
 }
 
@@ -230,6 +232,7 @@ export async function getRoutesForRegion(
           terminal: cfg.depTerminal ?? config.mainTerminal,
           originName: config.name,
           fareUrl: cfg.fareUrl,
+          ...(cfg.durationMin ? { durationMin: cfg.durationMin } : {}),
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
         }
@@ -294,6 +297,7 @@ export async function getArrivalsForRegion(
           originName: config.name,
           islandTerminal: cfg.islandTerminal,
           fareUrl: cfg.fareUrl,
+          ...(cfg.durationMin ? { durationMin: cfg.durationMin } : {}),
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
         }
