@@ -26,6 +26,18 @@ interface MtisItem {
   nvg_stts_nm: string   // "결항" | "출항전" | ...
   psnshp_nm: string     // ship name
   nvg_seawy_nm: string  // 운항항로명 (예: "제주완도"=직항, "제주추자도-완도"=추자도 경유)
+  cntrl_rsn_nm?: string | null  // 통제사유 (예: "풍랑주의보") — 기상 결항 사유
+  nnavi_rsn_nm?: string | null  // 미운항사유 (예: "선박검사", "선박정비")
+}
+
+// 결항편에서 사유 추출 (기상 통제사유 우선, 없으면 미운항사유)
+function cancelReason(items: MtisItem[]): string | undefined {
+  for (const it of items) {
+    if (it.nvg_stts_nm !== "결항") continue
+    const r = it.cntrl_rsn_nm || it.nnavi_rsn_nm
+    if (r && r !== "null") return r
+  }
+  return undefined
 }
 
 // 운항항로명에서 출발·도착항명을 제거해 남는 기항지(경유지)를 추출.
@@ -266,6 +278,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
+          ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
 
@@ -335,6 +348,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
+          ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
 

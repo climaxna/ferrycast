@@ -192,7 +192,12 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
               <div className="rounded-2xl bg-rose-50 px-4 py-6 text-center">
                 <p className="text-3xl">🚢</p>
                 <p className="mt-2 text-lg font-bold text-rose-600">오늘 결항</p>
-                <p className="mt-1 text-sm text-rose-500">공식 채널에서 최종 확인하세요.</p>
+                {route.cancelReason && (
+                  <p className="mt-1.5 inline-block rounded-full bg-rose-100 px-3 py-1 text-sm font-bold text-rose-700">
+                    {route.cancelReason}
+                  </p>
+                )}
+                <p className="mt-2 text-sm text-rose-500">공식 채널에서 최종 확인하세요.</p>
               </div>
             ) : route.times.length > 0 ? (
               hasArrival ? (

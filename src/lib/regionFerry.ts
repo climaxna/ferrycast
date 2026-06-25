@@ -14,6 +14,18 @@ interface MtisItem {
   nvg_stts_nm: string
   psnshp_nm: string
   nvg_seawy_nm: string
+  cntrl_rsn_nm?: string | null  // 통제사유 (예: "풍랑주의보")
+  nnavi_rsn_nm?: string | null  // 미운항사유 (예: "선박정비")
+}
+
+// 결항편에서 사유 추출 (기상 통제사유 우선)
+function cancelReason(items: MtisItem[]): string | undefined {
+  for (const it of items) {
+    if (it.nvg_stts_nm !== "결항") continue
+    const r = it.cntrl_rsn_nm || it.nnavi_rsn_nm
+    if (r && r !== "null") return r
+  }
+  return undefined
 }
 
 function parseSailTime(raw: string): string {
@@ -281,6 +293,7 @@ export async function getRoutesForRegion(
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
+          ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
 
@@ -351,6 +364,7 @@ export async function getArrivalsForRegion(
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
+          ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
 

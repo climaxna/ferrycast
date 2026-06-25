@@ -58,6 +58,9 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
         {isCancelled ? (
           <p className="mt-2 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-500">
             오늘 이 항로는 결항입니다
+            {route.cancelReason && (
+              <span className="ml-1 font-semibold text-rose-600">· {route.cancelReason}</span>
+            )}
           </p>
         ) : route.times.length > 0 ? (
           <>
