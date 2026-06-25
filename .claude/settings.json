@@ -76,7 +76,8 @@
       "Bash(pkill -f next)",
       "Bash(echo \"build exit=$?\")",
       "Bash(grep -oE \"파고.{0,90}\" .next/server/app/index.html)",
-      "Bash(grep -E \"^\\\\s*[┌├└].*/\\\\s|Generating|Collecting\" /tmp/buildlog)"
+      "Bash(grep -E \"^\\\\s*[┌├└].*/\\\\s|Generating|Collecting\" /tmp/buildlog)",
+      "PowerShell(cd c:\\\\ferrycast; $env:PORT=3001; Start-Process -NoNewWindow -FilePath \"npm\" -ArgumentList \"run\",\"dev\",\"--\",\"--port\",\"3001\" -PassThru | Select-Object -ExpandProperty Id)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude",

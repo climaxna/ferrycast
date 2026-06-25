@@ -9,4 +9,5 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  background-color: rgb(2 6 23); /* slate-950 */
 }
