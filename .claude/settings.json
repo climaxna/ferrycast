@@ -77,7 +77,11 @@
       "Bash(echo \"build exit=$?\")",
       "Bash(grep -oE \"파고.{0,90}\" .next/server/app/index.html)",
       "Bash(grep -E \"^\\\\s*[┌├└].*/\\\\s|Generating|Collecting\" /tmp/buildlog)",
-      "PowerShell(cd c:\\\\ferrycast; $env:PORT=3001; Start-Process -NoNewWindow -FilePath \"npm\" -ArgumentList \"run\",\"dev\",\"--\",\"--port\",\"3001\" -PassThru | Select-Object -ExpandProperty Id)"
+      "PowerShell(cd c:\\\\ferrycast; $env:PORT=3001; Start-Process -NoNewWindow -FilePath \"npm\" -ArgumentList \"run\",\"dev\",\"--\",\"--port\",\"3001\" -PassThru | Select-Object -ExpandProperty Id)",
+      "Bash(curl -s http://localhost:3001/ -o /dev/null -w \"main:%{http_code} \")",
+      "Bash(curl -s http://localhost:3001/pohang -o /dev/null -w \"pohang:%{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:3001/pohang -o /dev/null -w \"pohang:%{http_code} \")",
+      "Bash(curl -s http://localhost:3001/mokpo -o /dev/null -w \"mokpo:%{http_code}\\\\n\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude",

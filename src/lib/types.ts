@@ -26,5 +26,6 @@ export interface WandoRoute {
     times: string[]
   }
   via?: Record<string, string>  // "HH:MM" → 경유지명. 예: { "13:40": "추자도" }. 없으면 직항.
-  durationMin?: number          // 예상 소요시간(분). 있을 때 상세화면에서 도착 예상시각 표시
+  arrivals?: Record<string, string>  // "출발HH:MM" → "도착예정HH:MM" (TAGO 여객선 실데이터)
+  durationMin?: number          // TAGO 도착시각 미존재/비정상 시 fallback 계산용 소요시간(분)
 }

@@ -1,6 +1,7 @@
 import { cache } from "react"
 import type { WandoRoute, RouteStatus } from "./types"
 import type { RegionConfig, RouteGroupConfig } from "@/config/regions"
+import { buildArrivalLookup, findPortNames } from "./shipArrival"
 
 const MTIS_BASE = "https://apis.data.go.kr/B554035/oprt-schd-info-v2/get-oprt-schd-info-v2"
 const MTIS_PAGE_SIZE = 2000
@@ -119,6 +120,46 @@ function makeArrGroupKey(groups: RouteGroupConfig[]) {
   }
 }
 
+// TAGO 항구명 한 쌍(출발항, 도착항) → groupKey. MTIS와 달리 TAGO 항구명은
+// 키워드가 서로 포함될 수 있어("포항"⊂"포항영일만"), 가장 구체적(긴) 키워드 매칭을 우선한다.
+function makeDepGroupOf(groups: RouteGroupConfig[]) {
+  return (o: string, d: string): string | null => {
+    let best: string | null = null, bestLen = -1
+    for (const g of groups) {
+      const dep = g.depPortKeywords.filter((k) => o.includes(k))
+      const destMatch = g.destKeywords.some((k) => d.includes(k))
+      if (dep.length && destMatch) {
+        const len = Math.max(...dep.map((k) => k.length))
+        if (len > bestLen) { bestLen = len; best = g.key }
+      }
+    }
+    return best
+  }
+}
+
+function makeArrGroupOf(groups: RouteGroupConfig[]) {
+  return (o: string, d: string): string | null => {
+    let best: string | null = null, bestLen = -1
+    for (const g of groups) {
+      const island = g.destKeywords.filter((k) => o.includes(k))
+      const toMain = g.depPortKeywords.some((k) => d.includes(k))
+      if (island.length && toMain) {
+        const len = Math.max(...island.map((k) => k.length))
+        if (len > bestLen) { bestLen = len; best = g.key }
+      }
+    }
+    return best
+  }
+}
+
+// 지역 config의 모든 출발/도착 키워드 집합
+function depKeywords(config: RegionConfig): string[] {
+  return [...new Set(config.routeGroups.flatMap((g) => g.depPortKeywords))]
+}
+function destKeywords(config: RegionConfig): string[] {
+  return [...new Set(config.routeGroups.flatMap((g) => g.destKeywords))]
+}
+
 async function fetchTomorrowData(
   key: string,
   todayDate: string,
@@ -192,9 +233,11 @@ export async function getRoutesForRegion(
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const [items, tomorrowData] = await Promise.all([
+    const depNodeNames = await findPortNames(depKeywords(config))
+    const [items, tomorrowData, arrLookup] = await Promise.all([
       getMtisDay(key, date),
       fetchTomorrowData(key, date, depGroupKey),
+      buildArrivalLookup(depNodeNames, date, makeDepGroupOf(config.routeGroups)),
     ])
     if (!items.length) return fallback()
 
@@ -222,11 +265,13 @@ export async function getRoutesForRegion(
       .map(([gk, { times, ships, allItems, via }]) => {
         const cfg = config.routeGroups.find((g) => g.key === gk)!
         const tmrw = tomorrowData[gk]
+        const dedup = deduplicateTimes(times)
+        const arrivals = arrLookup(gk, dedup)
         return {
           id: `dep-${gk}`,
           to: cfg.label,
           operator: [...ships].join(" · "),
-          times: deduplicateTimes(times),
+          times: dedup,
           status: groupStatus(allItems),
           isLive: true,
           terminal: cfg.depTerminal ?? config.mainTerminal,
@@ -235,6 +280,7 @@ export async function getRoutesForRegion(
           ...(cfg.durationMin ? { durationMin: cfg.durationMin } : {}),
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
+          ...(Object.keys(arrivals).length ? { arrivals } : {}),
         }
       })
 
@@ -257,9 +303,11 @@ export async function getArrivalsForRegion(
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const [items, tomorrowData] = await Promise.all([
+    const islandNodeNames = await findPortNames(destKeywords(config))
+    const [items, tomorrowData, arrLookup] = await Promise.all([
       getMtisDay(key, date),
       fetchTomorrowData(key, date, arrGroupKey),
+      buildArrivalLookup(islandNodeNames, date, makeArrGroupOf(config.routeGroups)),
     ])
     if (!items.length) return fallback()
 
@@ -285,12 +333,14 @@ export async function getArrivalsForRegion(
       .map(([gk, { times, ships, allItems, via }]) => {
         const cfg = config.routeGroups.find((g) => g.key === gk)!
         const tmrw = tomorrowData[gk]
+        const dedup = deduplicateTimes(times)
+        const arrivals = arrLookup(gk, dedup)
         return {
           id: `arr-${gk}`,
           to: config.name,
           from: cfg.label,
           operator: [...ships].join(" · "),
-          times: deduplicateTimes(times),
+          times: dedup,
           status: groupStatus(allItems),
           isLive: true,
           terminal: cfg.depTerminal ?? config.mainTerminal,
@@ -300,6 +350,7 @@ export async function getArrivalsForRegion(
           ...(cfg.durationMin ? { durationMin: cfg.durationMin } : {}),
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
+          ...(Object.keys(arrivals).length ? { arrivals } : {}),
         }
       })
 

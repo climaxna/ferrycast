@@ -1,5 +1,6 @@
 import { cache } from "react"
 import type { WandoRoute, RouteStatus, FareInfo } from "./types"
+import { buildArrivalLookup } from "./shipArrival"
 
 const MTIS_BASE = "https://apis.data.go.kr/B554035/oprt-schd-info-v2/get-oprt-schd-info-v2"
 
@@ -137,20 +138,25 @@ const ARR_CFG: Record<string, ArrGroupCfg> = {
   "hwaheungpo-route": { label: "소안도·보길도·노화", priority: 3, terminal: TERMINAL_HWAHEUNGPO, islandTerminal: "소안항여객터미널", fareUrl: FARE_URL_MAP["hwaheungpo-route"] },
 }
 
-function depGroupKey(item: MtisItem): string | null {
-  const { oport_nm: o, dest_nm: d } = item
+// 출발항·도착항 이름 한 쌍 → 노선 groupKey (MTIS·TAGO 공용)
+function depGroupOf(o: string, d: string): string | null {
   if (o.includes("완도") && d.includes("제주")) return "jeju"
   if (o.includes("완도") && d.includes("청산")) return "cheongsando"
   if (o.includes("화흥") && (d.includes("소안") || d.includes("보길") || d.includes("노화"))) return "hwaheungpo-route"
   return null
 }
+function depGroupKey(item: MtisItem): string | null {
+  return depGroupOf(item.oport_nm, item.dest_nm)
+}
 
-function arrGroupKey(item: MtisItem): string | null {
-  const { oport_nm: o, dest_nm: d } = item
+function arrGroupOf(o: string, d: string): string | null {
   if (o.includes("제주") && (d.includes("완도") || d.includes("화흥"))) return "jeju"
   if (o.includes("청산") && (d.includes("완도") || d.includes("화흥"))) return "cheongsando"
   if ((o.includes("소안") || o.includes("보길") || o.includes("노화")) && (d.includes("완도") || d.includes("화흥"))) return "hwaheungpo-route"
   return null
+}
+function arrGroupKey(item: MtisItem): string | null {
+  return arrGroupOf(item.oport_nm, item.dest_nm)
 }
 
 // 일부 편만 결항이면 정상 운항편이 있으므로 "operating".
@@ -207,9 +213,11 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const [items, tomorrowData] = await Promise.all([
+    const [items, tomorrowData, arrLookup] = await Promise.all([
       getMtisDay(key, date),
       fetchTomorrowData(key, date, depGroupKey),
+      // 완도·화흥포 출항편 TAGO 도착시각 (실패해도 빈 룩업)
+      buildArrivalLookup(["완도", "완도_화흥포"], date, depGroupOf),
     ])
     if (!items.length) return fallback()
 
@@ -237,11 +245,13 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       .map(([gk, { times, ships, allItems, via }]) => {
         const cfg = DEP_CFG[gk]
         const tmrw = tomorrowData[gk]
+        const dedup = deduplicateTimes(times)
+        const arrivals = arrLookup(gk, dedup)
         return {
           id: `dep-${gk}`,
           to: cfg.label,
           operator: [...ships].join(" · "),
-          times: deduplicateTimes(times),
+          times: dedup,
           status: groupStatus(allItems),
           isLive: true,
           terminal: cfg.terminal,
@@ -249,6 +259,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           fareUrl: cfg.fareUrl,
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
+          ...(Object.keys(arrivals).length ? { arrivals } : {}),
         }
       })
 
@@ -270,9 +281,11 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const [items, tomorrowData] = await Promise.all([
+    const [items, tomorrowData, arrLookup] = await Promise.all([
       getMtisDay(key, date),
       fetchTomorrowData(key, date, arrGroupKey),
+      // 섬 → 완도 입항편 TAGO 도착시각 (완도 도착 예정시각)
+      buildArrivalLookup(["제주도", "청산도", "소안도", "노화_산양 보길"], date, arrGroupOf),
     ])
     if (!items.length) return fallback()
 
@@ -298,12 +311,14 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
       .sort(([a], [b]) => (ARR_CFG[a]?.priority ?? 99) - (ARR_CFG[b]?.priority ?? 99))
       .map(([gk, { times, ships, allItems, cfg, via }]) => {
         const tmrw = tomorrowData[gk]
+        const dedup = deduplicateTimes(times)
+        const arrivals = arrLookup(gk, dedup)
         return {
           id: `arr-${gk}`,
           to: "완도",
           from: cfg.label,
           operator: [...ships].join(" · "),
-          times: deduplicateTimes(times),
+          times: dedup,
           status: groupStatus(allItems),
           isLive: true,
           terminal: cfg.terminal,
@@ -312,6 +327,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           fareUrl: cfg.fareUrl,
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
+          ...(Object.keys(arrivals).length ? { arrivals } : {}),
         }
       })
 
