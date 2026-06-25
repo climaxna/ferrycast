@@ -70,7 +70,13 @@
       "PowerShell(node \"C:\\\\Users\\\\kim\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--ferrycast\\\\420e6291-d578-4813-a302-af4fa391767d\\\\scratchpad\\\\korail.mjs\")",
       "WebFetch(domain:island.theksa.co.kr)",
       "PowerShell(git -C c:\\\\ferrycast add src/config/regions.ts src/lib/ferry.ts src/app/page.tsx \"src/app/[region]/page.tsx\" src/components/RouteDetail.tsx)",
-      "PowerShell(git -C c:\\\\ferrycast commit -m \"fix: �ؿ����� ���� ���� ��ũ�� ���� ȭ�� ����\\(/page/booking\\)���� ���� \\(�ϵ������ס����� ����\\)\" 2>&1)"
+      "PowerShell(git -C c:\\\\ferrycast commit -m \"fix: �ؿ����� ���� ���� ��ũ�� ���� ȭ�� ����\\(/page/booking\\)���� ���� \\(�ϵ������ס����� ����\\)\" 2>&1)",
+      "Bash(grep -oE \"파고.{0,180}\" .next/server/app/index.html)",
+      "Bash(grep -oE '\"/\"[^}]{0,80}' .next/prerender-manifest.json)",
+      "Bash(pkill -f next)",
+      "Bash(echo \"build exit=$?\")",
+      "Bash(grep -oE \"파고.{0,90}\" .next/server/app/index.html)",
+      "Bash(grep -E \"^\\\\s*[┌├└].*/\\\\s|Generating|Collecting\" /tmp/buildlog)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude",
