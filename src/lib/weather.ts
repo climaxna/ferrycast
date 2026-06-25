@@ -166,56 +166,75 @@ export async function getWandoWeather(): Promise<WeatherData | null> {
   return null
 }
 
+interface NcstItem { category: string; obsrValue: string; baseDate: string; baseTime: string }
+
+// 한 시간 이전 base_time (경계시각 NO_DATA 대비 재시도용)
+function prevBase(baseDate: string, baseTime: string): { baseDate: string; baseTime: string } {
+  let h = parseInt(baseTime.slice(0, 2), 10) - 1
+  let d = baseDate
+  if (h < 0) {
+    h = 23
+    const dt = new Date(Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8) - 1))
+    const p = (n: number) => String(n).padStart(2, "0")
+    d = `${dt.getUTCFullYear()}${p(dt.getUTCMonth() + 1)}${p(dt.getUTCDate())}`
+  }
+  return { baseDate: d, baseTime: `${String(h).padStart(2, "0")}00` }
+}
+
+async function fetchNcstItems(key: string, baseDate: string, baseTime: string): Promise<NcstItem[] | null> {
+  const params = new URLSearchParams({
+    serviceKey: key, dataType: "JSON", numOfRows: "10", pageNo: "1",
+    base_date: baseDate, base_time: baseTime, nx: "57", ny: "74",
+  })
+  const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?${params}`
+  try {
+    const res = await fetch(url, { next: { revalidate: 600 } })
+    if (!res.ok) return null
+    const json = await res.json()
+    if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") return null
+    const items: NcstItem[] = json?.response?.body?.items?.item ?? []
+    return Array.isArray(items) && items.length ? items : null
+  } catch {
+    return null
+  }
+}
+
 async function fetchWandoWeatherFresh(): Promise<WeatherData | null> {
   // apihub.kma.go.kr는 서비스별 별도 등록 필요(403). data.go.kr 공통키 사용.
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return null
 
-  const { baseDate, baseTime } = getBaseDateTime()
-  const params = new URLSearchParams({
-    serviceKey: key,
-    dataType: "JSON",
-    numOfRows: "10",
-    pageNo: "1",
-    base_date: baseDate,
-    base_time: baseTime,
-    nx: "57",
-    ny: "74",
-  })
-  const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?${params}`
+  const cur = getBaseDateTime()
+  const [items1, waveHeight, sky] = await Promise.all([
+    fetchNcstItems(key, cur.baseDate, cur.baseTime),
+    fetchWaveHeight(key),
+    fetchSky(key),
+  ])
 
-  try {
-    const [res, waveHeight, sky] = await Promise.all([
-      fetch(url, { next: { revalidate: 600 } }),
-      fetchWaveHeight(key),
-      fetchSky(key),
-    ])
-    if (!res.ok) return null
+  // 현재 base 실패(경계 NO_DATA 등) 시 직전시각으로 1회 재시도
+  let items = items1
+  let usedDate = cur.baseDate
+  let usedTime = cur.baseTime
+  if (!items) {
+    const prev = prevBase(cur.baseDate, cur.baseTime)
+    items = await fetchNcstItems(key, prev.baseDate, prev.baseTime)
+    usedDate = prev.baseDate
+    usedTime = prev.baseTime
+  }
+  if (!items) return null
 
-    const json = await res.json()
-    const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
-    if (resultCode !== "00") return null
-
-    const items: Array<{ category: string; obsrValue: string; baseDate: string; baseTime: string }> =
-      json?.response?.body?.items?.item ?? []
-
-    const get = (cat: string) =>
-      parseFloat(items.find((i) => i.category === cat)?.obsrValue ?? "0")
-
-    const first = items[0]
-    return {
-      temp: get("T1H"),
-      humidity: get("REH"),
-      windSpeed: get("WSD"),
-      windDir: get("VEC"),
-      pty: get("PTY"),
-      sky,
-      rain1h: get("RN1"),
-      baseDate: first?.baseDate ?? baseDate,
-      baseTime: first?.baseTime ?? baseTime,
-      waveHeight: waveHeight ?? undefined,
-    }
-  } catch {
-    return null
+  const get = (cat: string) => parseFloat(items!.find((i) => i.category === cat)?.obsrValue ?? "0")
+  const first = items[0]
+  return {
+    temp: get("T1H"),
+    humidity: get("REH"),
+    windSpeed: get("WSD"),
+    windDir: get("VEC"),
+    pty: get("PTY"),
+    sky,
+    rain1h: get("RN1"),
+    baseDate: first?.baseDate ?? usedDate,
+    baseTime: first?.baseTime ?? usedTime,
+    waveHeight: waveHeight ?? undefined,
   }
 }

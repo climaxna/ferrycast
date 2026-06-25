@@ -67,6 +67,7 @@ async function RegionWeatherCard({
       forecast5={forecast5}
       tidal5={tidal5}
       regionName={config.name}
+      regionSlug={config.slug}
     />
   )
 }
