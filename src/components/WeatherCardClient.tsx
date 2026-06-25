@@ -54,7 +54,7 @@ export default function WeatherCardClient({ weather, tidal, forecast5, tidal5 }:
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#051224] via-blue-950 to-slate-950 text-white shadow-xl shadow-slate-950/70">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 text-white shadow-lg shadow-blue-900/10">
         {/* 장식 원 */}
         <svg
           className="pointer-events-none absolute -right-4 -top-4 h-24 w-24 text-white/5"

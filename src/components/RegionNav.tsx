@@ -11,9 +11,9 @@ export default function RegionNav({ current }: { current: string }) {
   return (
     <nav
       aria-label="지역 이동"
-      className="rounded-2xl border border-slate-800 bg-slate-900 p-4"
+      className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm"
     >
-      <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+      <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
         다른 지역 날씨 · 항로 보기
       </p>
       <div className="flex flex-wrap gap-2">
@@ -27,8 +27,8 @@ export default function RegionNav({ current }: { current: string }) {
               aria-current={active ? "page" : undefined}
               className={`inline-flex items-center rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${
                 active
-                  ? "bg-sky-600 text-white shadow-sm"
-                  : "border border-slate-700 bg-slate-800 text-slate-400 hover:border-sky-700 hover:text-sky-300"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
               }`}
             >
               {it.name}
