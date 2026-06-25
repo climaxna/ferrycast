@@ -102,6 +102,7 @@ export default function RegionWeatherCardClient({ weather, tidal, forecast5, tid
                   <p className="text-[11px] leading-none text-white/70">파고</p>
                   <p className={`mt-0.5 text-sm font-bold leading-none ${wave.color}`}>
                     {w.waveHeight}m
+                    <span className="ml-1 text-[10px] font-normal text-white/75">{wave.text}</span>
                   </p>
                 </div>
               </>
