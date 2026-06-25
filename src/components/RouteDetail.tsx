@@ -19,20 +19,6 @@ function addMinutes(time: string, mins: number): string {
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`
 }
 
-function diffMinutes(dep: string, arr: string): number {
-  const [dh, dm] = dep.split(":").map(Number)
-  const [ah, am] = arr.split(":").map(Number)
-  let d = (ah * 60 + am) - (dh * 60 + dm)
-  if (d < 0) d += 24 * 60  // 익일 도착
-  return d
-}
-
-function fmtDuration(mins: number): string {
-  const h = Math.floor(mins / 60)
-  const m = mins % 60
-  return h === 0 ? `${m}분` : m === 0 ? `${h}시간` : `${h}시간 ${m}분`
-}
-
 export default function RouteDetail({ route, isDeparture, onClose }: Props) {
   const isCancelled = route.status === "cancelled"
   const isUnknown = route.status === "unknown"
@@ -210,7 +196,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
               </div>
             ) : route.times.length > 0 ? (
               hasArrival ? (
-                /* 도착 예정시각 — 수직 리스트 (출발 → 도착예정, 소요시간) */
+                /* 도착 예정시각 — 수직 리스트 (출발 왼쪽 · 도착 예정 오른쪽 끝) */
                 <div className="space-y-2">
                   {pastTimes.map((t) => {
                     const arr = arrOf(t)
@@ -218,10 +204,9 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                       <div key={t} className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 opacity-50">
                         <div className="flex items-baseline gap-2">
                           <span className="text-lg font-bold tabular-nums text-slate-400">{t}</span>
-                          {arr && <span className="text-xs text-slate-400">→ {arr} 도착</span>}
                           {route.via?.[t] && <span className="text-[10px] font-semibold text-amber-500">{route.via[t]} 경유</span>}
                         </div>
-                        {arr && <span className="text-xs text-slate-400">{fmtDuration(diffMinutes(t, arr))}</span>}
+                        {arr && <span className="text-xs text-slate-400"><span className="font-bold tabular-nums">{arr}</span> 도착 예정</span>}
                       </div>
                     )
                   })}
@@ -234,14 +219,14 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                       >
                         <div className="flex items-baseline gap-2">
                           <span className="text-lg font-bold tabular-nums text-white">{nextTime}</span>
-                          {arr && <span className="text-sm text-blue-100">→ {arr} 도착</span>}
                           <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold text-white">다음</span>
                           {route.via?.[nextTime] && <span className="text-[11px] font-semibold text-amber-200">{route.via[nextTime]} 경유</span>}
                         </div>
-                        <div className="text-right">
-                          {arr && <div className="text-xs font-semibold text-blue-100">{fmtDuration(diffMinutes(nextTime, arr))}</div>}
-                          <div className="text-[11px] text-blue-200">{relativeTime(nextTime, nowMinutes)}</div>
-                        </div>
+                        {arr ? (
+                          <span className="text-sm text-blue-50"><span className="font-bold tabular-nums">{arr}</span> 도착 예정</span>
+                        ) : (
+                          <span className="text-[11px] text-blue-100">{relativeTime(nextTime, nowMinutes)}</span>
+                        )}
                       </button>
                     )
                   })()}
@@ -255,10 +240,9 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                       >
                         <div className="flex items-baseline gap-2">
                           <span className="text-lg font-bold tabular-nums text-blue-700">{t}</span>
-                          {arr && <span className="text-xs text-blue-500">→ {arr} 도착</span>}
                           {route.via?.[t] && <span className="text-[10px] font-semibold text-amber-500">{route.via[t]} 경유</span>}
                         </div>
-                        {arr && <span className="text-xs text-blue-500">{fmtDuration(diffMinutes(t, arr))}</span>}
+                        {arr && <span className="text-xs text-blue-500"><span className="font-bold tabular-nums">{arr}</span> 도착 예정</span>}
                       </button>
                     )
                   })}
