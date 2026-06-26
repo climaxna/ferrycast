@@ -82,7 +82,12 @@
       "Bash(curl -s http://localhost:3001/pohang -o /dev/null -w \"pohang:%{http_code}\\\\n\")",
       "Bash(curl -s http://localhost:3001/pohang -o /dev/null -w \"pohang:%{http_code} \")",
       "Bash(curl -s http://localhost:3001/mokpo -o /dev/null -w \"mokpo:%{http_code}\\\\n\")",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(curl -sL -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\)\" --max-time 25 \"https://blog.naver.com/PostView.naver?blogId=tfg5907&logNo=224324903226\" -o naverblog2.html)",
+      "Bash(/c/Python313/python.exe -c ' *)",
+      "Bash(/c/Python313/python.exe)",
+      "Bash(/c/Python313/python.exe -c \"import json;d=json.load\\(open\\('parsed2.json',encoding='utf-8'\\)\\);open\\('title.txt','w',encoding='utf-8'\\).write\\(d['title']\\)\")",
+      "Read(//c/Users/kim/AppData/Local/Temp/**)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude",
