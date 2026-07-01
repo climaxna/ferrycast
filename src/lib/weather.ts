@@ -151,7 +151,7 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
 
 // 서버 인스턴스 메모리에 직전 정상값 보관 — 기상청 호출 실패 시 빈 화면 대신 직전값 노출
 let _lastGoodWando: { data: WeatherData; at: number } | null = null
-const WEATHER_STALE_MAX_MS = 3 * 60 * 60 * 1000  // 직전값 허용 최대 3시간
+const WEATHER_STALE_MAX_MS = 6 * 60 * 60 * 1000  // 직전값 허용 최대 6시간
 
 export async function getWandoWeather(): Promise<WeatherData | null> {
   const fresh = await fetchWandoWeatherFresh()

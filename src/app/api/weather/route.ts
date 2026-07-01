@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
   const config = region ? REGIONS[region] : null
   const data = config ? await getWeatherForRegion(config) : await getWandoWeather()
   return NextResponse.json(data ?? null, {
-    headers: { "Cache-Control": "no-store" },
+    headers: data
+      ? { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600" }
+      : { "Cache-Control": "no-store" },
   })
 }

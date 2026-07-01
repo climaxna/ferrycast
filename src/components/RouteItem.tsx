@@ -20,7 +20,6 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
   const pastTimes = route.times.slice(0, nextIdx === -1 ? route.times.length : nextIdx)
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
-  const accent = isCancelled ? "bg-rose-400" : isUnknown ? "bg-slate-300" : isArrival ? "bg-teal-500" : "bg-blue-500"
   const isAltTerminal = !route.originName && route.terminal !== "완도여객선터미널"
   // 아직 출발 안 한 경유편만 안내 (지난 편 제외), 시각순 정렬
   const viaEntries = route.via
@@ -33,12 +32,13 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
     <button
       type="button"
       onClick={onClick}
-      className="group relative flex w-full items-start gap-3 overflow-hidden rounded-2xl border border-slate-100 bg-white px-4 py-3.5 text-left shadow-sm transition-all hover:border-slate-200 hover:shadow-md active:scale-[0.99]"
+      className={`group relative flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.99] ${
+        isCancelled
+          ? "border-rose-200 bg-rose-50/30 hover:border-rose-300"
+          : "border-slate-100 bg-white hover:border-slate-200"
+      }`}
     >
-      {/* 좌측 상태 액센트 바 */}
-      <span className={`absolute left-0 top-0 h-full w-1 ${accent}`} />
-
-      <div className="min-w-0 flex-1 pl-1">
+      <div className="min-w-0 flex-1">
         {/* 항로명 + 상태 배지 */}
         <div className="flex items-center justify-between gap-2">
           <span className="font-bold text-slate-900">{routeLabel}</span>
@@ -48,7 +48,7 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
                 ? "bg-rose-50 text-rose-600"
                 : isUnknown
                   ? "bg-slate-100 text-slate-500"
-                  : "bg-blue-50 text-blue-700"
+                  : "bg-emerald-50 text-emerald-700"
             }`}
           >
             {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
