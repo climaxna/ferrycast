@@ -91,7 +91,9 @@
       "Bash(npm view *)",
       "Bash(npx --yes impeccable@latest install --help)",
       "Bash(node -e \"const s=require\\('./.claude/settings.json'\\); console.log\\(JSON.stringify\\(s.hooks||'NONE',null,1\\)\\)\")",
-      "Bash(node -e \"const s=require\\('./.claude/settings.local.json'\\); console.log\\(JSON.stringify\\(s.hooks||'NONE',null,1\\)\\)\")"
+      "Bash(node -e \"const s=require\\('./.claude/settings.local.json'\\); console.log\\(JSON.stringify\\(s.hooks||'NONE',null,1\\)\\)\")",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(node shot-local.mjs local-375.png 375)"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude",

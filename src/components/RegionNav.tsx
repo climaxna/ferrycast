@@ -25,10 +25,10 @@ export default function RegionNav({ current }: { current: string }) {
               key={it.slug || "wando"}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`inline-flex items-center rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors ${
+              className={`inline-flex min-h-[44px] items-center rounded-lg px-3.5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
                 active
                   ? "bg-blue-600 text-white shadow-sm"
-                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  : "border border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
               }`}
             >
               {it.name}

@@ -32,7 +32,7 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
     <button
       type="button"
       onClick={onClick}
-      className={`group relative flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.99] ${
+      className={`group relative flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
         isCancelled
           ? "border-rose-200 bg-rose-50/30 hover:border-rose-300"
           : "border-slate-100 bg-white hover:border-slate-200"
