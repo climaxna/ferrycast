@@ -17,9 +17,15 @@ documentModel JSON으로 변환해 RabbitTempPostWrite.naver 로 임시저장한
 import argparse
 import json
 import sys
+import uuid
 from pathlib import Path
 
 import requests
+
+
+def se_id() -> str:
+    """네이버 SE 컴포넌트용 고유 id (예: SE-a1b2c3d4-...)."""
+    return "SE-" + str(uuid.uuid4())
 
 WRITE_URL = "https://blog.naver.com/RabbitTempPostWrite.naver"
 DEFAULT_BLOG_ID = "climaxna"
@@ -98,7 +104,11 @@ def load_session(cookies_path: Path) -> requests.Session:
 def build_document_model(title: str, body_text: str) -> str:
     """제목/본문을 네이버 SE 에디터 documentModel JSON 문자열로 변환."""
     def paragraph(text: str) -> dict:
-        return {"@ctype": "paragraph", "nodes": [{"@ctype": "textNode", "value": text}]}
+        return {
+            "@ctype": "paragraph",
+            "id": se_id(),
+            "nodes": [{"@ctype": "textNode", "id": se_id(), "value": text}],
+        }
 
     # 본문은 줄바꿈 기준으로 문단 분리 (빈 줄 포함 유지)
     body_paragraphs = [paragraph(line) for line in body_text.split("\n")] or [paragraph("")]
@@ -110,8 +120,8 @@ def build_document_model(title: str, body_text: str) -> str:
             "theme": "default",
             "language": "ko-KR",
             "components": [
-                {"@ctype": "documentTitle", "title": [paragraph(title)]},
-                {"@ctype": "text", "value": body_paragraphs},
+                {"@ctype": "documentTitle", "id": se_id(), "title": [paragraph(title)]},
+                {"@ctype": "text", "id": se_id(), "value": body_paragraphs},
             ],
         },
     }
@@ -126,14 +136,21 @@ def build_population_params(category_id: int) -> str:
     return json.dumps(params, ensure_ascii=False, separators=(",", ":"))
 
 
-def save_draft(session, blog_id, title, body_text, category_id) -> bool:
+def save_draft(session, blog_id, title, body_text, category_id, debug=False) -> bool:
     data = {
         "blogId": blog_id,
         "documentModel": build_document_model(title, body_text),
         "populationParams": build_population_params(category_id),
+        "productName": "blog",
     }
+    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
+    if debug:
+        print("[디버그] 전송 URL:", WRITE_URL)
+        print("[디버그] 전송 헤더:", json.dumps({**session.headers, **headers}, ensure_ascii=False))
+        for k, v in data.items():
+            print(f"[디버그] data[{k}] = {v}")
     try:
-        resp = session.post(WRITE_URL, data=data, timeout=30)
+        resp = session.post(WRITE_URL, data=data, headers=headers, timeout=30)
     except requests.RequestException as e:
         print(f"[실패] 요청 오류: {e}")
         return False
@@ -177,6 +194,7 @@ def main():
     ap.add_argument("--category", type=int, default=DEFAULT_CATEGORY_ID,
                     help=f"categoryId (기본 {DEFAULT_CATEGORY_ID})")
     ap.add_argument("--cookies", help="cookies.json 경로 (기본: 자동 탐색)")
+    ap.add_argument("--debug", action="store_true", help="전송 payload/헤더를 출력")
     args = ap.parse_args()
 
     if args.body_file:
@@ -187,7 +205,7 @@ def main():
         ap.error("본문을 body 인자 또는 --body-file 로 제공하세요.")
 
     session = load_session(find_cookies_path(args.cookies))
-    success = save_draft(session, args.blog_id, args.title, body_text, args.category)
+    success = save_draft(session, args.blog_id, args.title, body_text, args.category, debug=args.debug)
     sys.exit(0 if success else 1)
 
 
