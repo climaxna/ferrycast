@@ -48,3 +48,6 @@ screenshot-*.png
 
 # 부착 사진 원본 (대용량 — 최적화본은 docs/screenshots에 커밋)
 docs/img/
+
+# 네이버 로그인 쿠키 (인증정보 — 절대 커밋 금지)
+cookies.json
