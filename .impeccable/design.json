@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-03T00:00:00Z",
+  "title": "Design System: FerryCast",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Harbor Blue", "canonical": "#2563eb", "tonalRamp": ["#0a1e4d", "#132a66", "#1e40af", "#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#dbeafe"] },
+      "arrival": { "role": "secondary", "displayName": "Arrival Teal", "canonical": "#14b8a6", "tonalRamp": ["#0a2e2b", "#115e59", "#0f766e", "#0d9488", "#14b8a6", "#2dd4bf", "#5eead4", "#ccfbf1"] },
+      "note-ink": { "role": "tertiary", "displayName": "Note Amber", "canonical": "#b45309", "tonalRamp": ["#451a03", "#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fcd34d", "#fffbeb"] },
+      "status-operating-ink": { "role": "success", "displayName": "Operating Green", "canonical": "#047857", "tonalRamp": ["#022c22", "#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#6ee7b7", "#ecfdf5"] },
+      "status-cancelled-ink": { "role": "error", "displayName": "Cancelled Rose", "canonical": "#e11d48", "tonalRamp": ["#4c0519", "#881337", "#9f1239", "#e11d48", "#f43f5e", "#fb7185", "#fecdd3", "#fff1f2"] },
+      "body-bg": { "role": "neutral", "displayName": "Sea Mist", "canonical": "#f8fafc", "tonalRamp": ["#0f172a", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f8fafc"] }
+    },
+    "typographyMeta": {
+      "data": { "displayName": "Data", "purpose": "다음 출발 시각 등 시간표 앵커 숫자. tabular-nums." },
+      "headline": { "displayName": "Headline", "purpose": "헤더 로고, 항로명. 위계 최상단." },
+      "body": { "displayName": "Body", "purpose": "면책·안내 문장. 65–75ch." },
+      "label": { "displayName": "Label", "purpose": "상태 배지, 시각 라벨, 칩, 메타." }
+    },
+    "shadows": [
+      { "name": "resting", "value": "0 1px 2px 0 rgba(0,0,0,0.05)", "purpose": "카드·버튼·푸터의 기본 부양감 (flat-by-default)." },
+      { "name": "hover", "value": "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)", "purpose": "눌리는 항로 카드 호버 시 상태 피드백." },
+      { "name": "header-blur", "value": "backdrop-filter: blur(12px); background: rgba(255,255,255,0.8)", "purpose": "sticky 헤더가 콘텐츠 위에 반투명하게 얹힘." }
+    ],
+    "motion": [
+      { "name": "state-transition", "value": "150ms–250ms ease-out", "purpose": "색·그림자 상태 변화 전용. 장식성 모션 금지." },
+      { "name": "press", "value": "active:scale(0.99)", "purpose": "항로 카드 눌림 피드백." }
+    ],
+    "breakpoints": [
+      { "name": "content-max", "value": "512px (max-w-lg)" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Route Card (Operating)",
+      "kind": "card",
+      "refersTo": "route-card",
+      "description": "항로 한 편 카드. 흰 표면 + 옅은 보더 + shadow-sm, 전체가 눌리는 버튼.",
+      "html": "<button class=\"ds-route-card\"><div class=\"ds-route-head\"><span class=\"ds-route-name\">완도 → 제주</span><span class=\"ds-badge-operating\">운항</span></div><div class=\"ds-next\"><span class=\"ds-next-label\">출발</span><span class=\"ds-next-time\">18:00</span><span class=\"ds-next-rel\">32분 후</span></div></button>",
+      "css": ".ds-route-card { display:block; width:100%; text-align:left; background:#ffffff; border:1px solid #f1f5f9; border-radius:16px; padding:14px 16px; box-shadow:0 1px 2px 0 rgba(0,0,0,0.05); transition:box-shadow .2s, border-color .2s, transform .2s; cursor:pointer; } .ds-route-card:hover { box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1); border-color:#e2e8f0; } .ds-route-card:active { transform:scale(.99); } .ds-route-head { display:flex; align-items:center; justify-content:space-between; gap:8px; } .ds-route-name { font-weight:700; color:#0f172a; } .ds-badge-operating { border-radius:9999px; padding:2px 10px; font-size:.75rem; font-weight:600; background:#ecfdf5; color:#047857; } .ds-next { display:flex; align-items:baseline; gap:8px; margin-top:10px; padding:8px 12px; border-radius:12px; background:linear-gradient(to right,#eff6ff,#f0f9ff); } .ds-next-label { font-size:.75rem; font-weight:500; color:#3b82f6; } .ds-next-time { font-size:1.5rem; font-weight:700; color:#1e40af; font-variant-numeric:tabular-nums; } .ds-next-rel { margin-left:auto; font-size:.75rem; font-weight:600; color:#2563eb; }"
+    },
+    {
+      "name": "Route Card (Cancelled)",
+      "kind": "card",
+      "refersTo": "route-card-cancelled",
+      "description": "결항 항로 카드. 카드 전체가 rose 워시로 경고를 입고, 색+라벨+안내문 삼중 표기.",
+      "html": "<button class=\"ds-route-card-x\"><div class=\"ds-route-head\"><span class=\"ds-route-name\">완도 → 청산도</span><span class=\"ds-badge-cancelled\">결항</span></div><p class=\"ds-cancel-note\">오늘 이 항로는 결항입니다 <span>· 기상악화</span></p></button>",
+      "css": ".ds-route-card-x { display:block; width:100%; text-align:left; background:#fff1f2; border:1px solid #fecdd3; border-radius:16px; padding:14px 16px; box-shadow:0 1px 2px 0 rgba(0,0,0,0.05); transition:box-shadow .2s, border-color .2s; cursor:pointer; } .ds-route-card-x:hover { box-shadow:0 4px 6px -1px rgba(0,0,0,.1); border-color:#fb7185; } .ds-route-head { display:flex; align-items:center; justify-content:space-between; gap:8px; } .ds-route-name { font-weight:700; color:#0f172a; } .ds-badge-cancelled { border-radius:9999px; padding:2px 10px; font-size:.75rem; font-weight:600; background:#fff1f2; color:#e11d48; } .ds-cancel-note { margin-top:8px; padding:8px 12px; border-radius:8px; background:#fff1f2; font-size:.75rem; color:#f43f5e; } .ds-cancel-note span { font-weight:600; color:#e11d48; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge-operating",
+      "description": "운항/결항/운항예정 상태 배지. 항상 색+텍스트 라벨 동반.",
+      "html": "<span class=\"ds-badge-operating\">운항</span> <span class=\"ds-badge-cancelled\">결항</span> <span class=\"ds-badge-unknown\">운항예정</span>",
+      "css": ".ds-badge-operating,.ds-badge-cancelled,.ds-badge-unknown { display:inline-block; border-radius:9999px; padding:2px 10px; font-size:.75rem; font-weight:600; } .ds-badge-operating { background:#ecfdf5; color:#047857; } .ds-badge-cancelled { background:#fff1f2; color:#e11d48; } .ds-badge-unknown { background:#f1f5f9; color:#64748b; }"
+    },
+    {
+      "name": "Time Chip Row",
+      "kind": "chip",
+      "refersTo": "time-chip-next",
+      "description": "시간표 칩 3상태 — 지난편(뮤트) / 다음편(채움) / 이후편(틴트). tabular-nums.",
+      "html": "<div class=\"ds-chiprow\"><span class=\"ds-chip-past\">06:00</span><span class=\"ds-chip-next\">13:00</span><span class=\"ds-chip-future\">18:00</span></div>",
+      "css": ".ds-chiprow { display:flex; flex-wrap:wrap; gap:8px; } .ds-chip-past,.ds-chip-next,.ds-chip-future { border-radius:6px; font-variant-numeric:tabular-nums; } .ds-chip-past { padding:4px 8px; font-size:.875rem; color:#94a3b8; } .ds-chip-next { padding:4px 10px; font-size:.875rem; font-weight:700; color:#fff; background:#3b82f6; } .ds-chip-future { padding:4px 10px; font-size:.875rem; font-weight:600; color:#1d4ed8; background:#dbeafe; }"
+    },
+    {
+      "name": "Official Link Button",
+      "kind": "button",
+      "refersTo": "official-link-button",
+      "description": "공식 채널 링크 버튼. 면책 문구 옆 최종 확인 경로.",
+      "html": "<a class=\"ds-official\" href=\"#\">완도군청 여객선</a>",
+      "css": ".ds-official { display:inline-flex; align-items:center; gap:6px; border:1px solid #e2e8f0; background:#fff; border-radius:8px; padding:10px 14px; font-size:.875rem; font-weight:500; color:#475569; text-decoration:none; transition:border-color .2s, color .2s; } .ds-official:hover { border-color:#bfdbfe; color:#1d4ed8; } .ds-official:focus-visible { outline:2px solid #2563eb; outline-offset:2px; }"
+    },
+    {
+      "name": "Loading Skeleton",
+      "kind": "custom",
+      "refersTo": "route-card",
+      "description": "콘텐츠 형태의 펄스 스켈레톤. 스피너 대신 실제 카드 높이·모양.",
+      "html": "<div class=\"ds-skeleton\"></div>",
+      "css": ".ds-skeleton { height:96px; border-radius:16px; background:#f1f5f9; animation:ds-pulse 2s cubic-bezier(.4,0,.6,1) infinite; } @keyframes ds-pulse { 0%,100%{opacity:1} 50%{opacity:.5} } @media (prefers-reduced-motion: reduce){ .ds-skeleton{ animation:none } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "항구의 안내판 (The Harbor Kiosk)",
+    "overview": "FerryCast는 선착장 입구에 붙은 차분하고 믿음직한 안내판이다. 여행객과 주민이 지나가며 한 번 보고 '오늘 배가 뜬다/안 뜬다'를 3초 안에 확신하고 떠나는 곳. 화면은 맑은 여백 위에 정보를 정직하게 정리해 얹고, 바다빛 파랑을 단 하나의 목소리로 삼아 지금 중요한 것만 가리킨다. 밝고 친근하되, 그 친근함은 톤과 색·여백에서 오지 표정 짓는 애니메이션에서 오지 않는다. 슬레이트 뉴트럴의 조용한 배경 위에서 파랑(출발)·틸(도착)·상태색(초록 운항 / 장미 결항)이 각자의 역할만 수행한다.",
+    "keyCharacteristics": [
+      "글랜스 우선: 진입 즉시 모든 핵심 정보. 탭·모달 뒤에 숨기지 않는다.",
+      "단일 목소리의 파랑(#2563eb) + 도착 전용 틸 + 색맹 안전 상태색(색+라벨+아이콘).",
+      "슬레이트 뉴트럴, 맑은 여백, 가벼운 그림자의 산뜻한 정보 카드.",
+      "tabular-nums 숫자 정렬로 시간표가 표처럼 읽힘.",
+      "절제된 모션: 상태 변화·피드백에만, 150–250ms."
+    ],
+    "rules": [
+      { "name": "The One Voice Rule", "body": "파랑(#2563eb)은 유일한 강조 목소리. 강조·링크·현재 선택·출발에만 쓰고 장식으로 칠하지 않는다. 도착은 틸, 상태는 상태색.", "section": "colors" },
+      { "name": "The Triple-Coded Status Rule", "body": "운항(초록)·결항(장미)은 색만으로 구분하지 않는다. 색 + 텍스트 라벨 + 아이콘/배지 형태를 함께. 적록색맹·야외 눈부심 대응.", "section": "colors" },
+      { "name": "The Tabular Time Rule", "body": "모든 운항 시각·숫자는 tabular-nums. 자릿수 정렬로 시간표가 표처럼 스캔된다.", "section": "typography" },
+      { "name": "The Fixed-Scale Rule", "body": "고정 rem 스케일만. 유동 clamp 헤딩 금지. 본문 하한 14px, 핵심 상태는 더 크게.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "표면은 쉴 때 평평(shadow-sm + 보더). 그림자가 짙어지는 건 상태 반응(hover, active)일 때뿐.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do 파랑(#2563eb)을 유일한 강조 목소리로 유지 — 출발·링크·현재 선택에만. 도착은 틸, 상태는 상태색.",
+      "Do 운항/결항을 색 + 텍스트 라벨 + 배지 형태 삼중으로 표기(적록색맹·야외 눈부심 대응).",
+      "Do 모든 시각·숫자에 tabular-nums로 시간표를 표처럼 정렬.",
+      "Do 카드를 flat-by-default로 — shadow-sm 쉬는 상태, hover:shadow-md 반응 상태.",
+      "Do 본문 하한 14px, 핵심 운항 상태는 더 크게. 야외·고령 가독성 우선.",
+      "Do API 실패 시에도 안내 fallback을 표시 — 빈 화면·에러 스택 금지."
+    ],
+    "donts": [
+      "Don't 장난스럽거나 과한 애니메이션을 넣지 마라 — 바운스·엘라스틱 모션, 네온색, 이모지 남발, 장식성 인터랙션. 모션은 상태 변화 전달에만, 150–250ms.",
+      "Don't 화려한 여행 마케팅 랜딩처럼 풀스크린 히어로·큰 슬로건·스크롤 스토리텔링으로 핵심 정보를 밀어내지 마라.",
+      "Don't 관리자 콘솔처럼 위젯·차트를 과밀하게 깔지 마라.",
+      "Don't 상태를 색만으로 구분하지 마라(라벨·아이콘 없는 초록/빨강 점).",
+      "Don't 무거운 그림자·글래스모피즘을 장식으로 쓰지 마라.",
+      "Don't background-clip:text 그라데이션 텍스트, 1px 초과 컬러 side-stripe 보더를 쓰지 마라.",
+      "Don't 라벨·버튼·데이터에 display 폰트를 쓰지 마라. Geist 하나로 굵기·크기 대비만."
+    ]
+  }
+}
