@@ -87,7 +87,11 @@
       "Bash(/c/Python313/python.exe -c ' *)",
       "Bash(/c/Python313/python.exe)",
       "Bash(/c/Python313/python.exe -c \"import json;d=json.load\\(open\\('parsed2.json',encoding='utf-8'\\)\\);open\\('title.txt','w',encoding='utf-8'\\).write\\(d['title']\\)\")",
-      "Read(//c/Users/kim/AppData/Local/Temp/**)"
+      "Read(//c/Users/kim/AppData/Local/Temp/**)",
+      "Bash(npm view *)",
+      "Bash(npx --yes impeccable@latest install --help)",
+      "Bash(node -e \"const s=require\\('./.claude/settings.json'\\); console.log\\(JSON.stringify\\(s.hooks||'NONE',null,1\\)\\)\")",
+      "Bash(node -e \"const s=require\\('./.claude/settings.local.json'\\); console.log\\(JSON.stringify\\(s.hooks||'NONE',null,1\\)\\)\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\kim\\.claude",
