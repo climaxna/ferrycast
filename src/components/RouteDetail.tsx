@@ -177,20 +177,25 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                       )
                       setActiveAlarms(new Set())
                     }}
-                    className="text-xs font-semibold text-rose-500"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-rose-500"
                   >
-                    🔔 알림 {activeAlarms.size}개 설정됨 · 취소
+                    <BellIcon /> 알림 {activeAlarms.size}개 설정됨 · 취소
                   </button>
                 ) : standalone ? (
-                  <p className="text-xs text-slate-500">🔔 시간 탭 시 알림 설정</p>
+                  <p className="inline-flex items-center gap-1 text-xs text-slate-500"><BellIcon /> 시간 탭 시 알림 설정</p>
                 ) : (
-                  <p className="text-xs text-slate-500">🔔 알림 — 앱 설치 후 가능</p>
+                  <p className="inline-flex items-center gap-1 text-xs text-slate-500"><BellIcon /> 알림 — 앱 설치 후 가능</p>
                 )
               )}
             </div>
             {isCancelled ? (
               <div className="rounded-2xl bg-rose-50 px-4 py-6 text-center">
-                <p className="text-3xl">🚢</p>
+                <svg className="mx-auto h-10 w-10 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 14h18l-1.4 4.8a2 2 0 0 1-1.9 1.4H6.3a2 2 0 0 1-1.9-1.4L3 14Z" />
+                  <path d="M5.5 14V8.5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2V14" />
+                  <path d="M12 3v3.5" />
+                  <path d="M4 4l16 16" className="text-rose-500" />
+                </svg>
                 <p className="mt-2 text-lg font-bold text-rose-600">오늘 결항</p>
                 {route.cancelReason && (
                   <p className="mt-1.5 inline-block rounded-full bg-rose-100 px-3 py-1 text-sm font-bold text-rose-700">
@@ -387,5 +392,14 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
         />
       )}
     </div>
+  )
+}
+
+function BellIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden="true">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+    </svg>
   )
 }

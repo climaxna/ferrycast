@@ -33,12 +33,15 @@ export function windDirLabel(deg: number): string {
   return dirs[Math.round(deg / 45) % 8]
 }
 
+// 색상은 파랑 날씨 히어로 카드 배경 위에서 읽히도록 튜닝됨(밝은 톤).
+// 잔잔·약간은 경고 불필요 → 흰색(바람·습도 등 다른 지표와 통일),
+// 보통 이상만 경고색으로 주의를 환기한다.
 export function waveLabel(h: number): { text: string; color: string } {
-  if (h < 0.5) return { text: "잔잔",      color: "text-green-600" }
-  if (h < 1.0) return { text: "약간 출렁", color: "text-blue-600" }
-  if (h < 2.0) return { text: "보통",      color: "text-yellow-600" }
-  if (h < 3.0) return { text: "거침",      color: "text-orange-600" }
-  return              { text: "매우 거침", color: "text-red-600" }
+  if (h < 0.5) return { text: "잔잔",      color: "text-white" }
+  if (h < 1.0) return { text: "약간 출렁", color: "text-white" }
+  if (h < 2.0) return { text: "보통",      color: "text-amber-300" }
+  if (h < 3.0) return { text: "거침",      color: "text-orange-300" }
+  return              { text: "매우 거침", color: "text-red-300" }
 }
 
 // sky: 1=맑음 3=구름많음 4=흐림 (초단기예보 SKY 코드)
