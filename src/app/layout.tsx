@@ -1,13 +1,18 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import localFont from "next/font/local"
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 import InstallBanner from "@/components/InstallBanner"
 import PwaTracker from "@/components/PwaTracker"
 import "./globals.css"
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
+// Pretendard Variable — 한글·라틴·숫자를 단일 패밀리로 (자체 호스팅, tabular-nums 지원)
+const pretendard = localFont({
+  src: "./fonts/PretendardVariable.woff2",
+  variable: "--font-pretendard",
+  weight: "45 920",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ferrycast.kr"),
@@ -48,7 +53,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="ko" className={pretendard.variable}>
       <head>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-NNK3PPZZRT" strategy="afterInteractive" />
         <Script id="ga4-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html:

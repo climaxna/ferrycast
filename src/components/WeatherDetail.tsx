@@ -40,26 +40,26 @@ export default function WeatherDetail({ weather: w, tidal, onClose }: Props) {
         <div className="mx-auto max-w-lg px-4 py-5 space-y-6">
 
           {/* 현재 날씨 카드 */}
-          <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 p-5 text-white">
+          <div className="overflow-hidden rounded-2xl bg-gradient-to-b from-[#2563eb] to-[#1d4ed8] p-5 text-white shadow-sm">
             <div className="flex items-center gap-3">
               <span className="text-5xl font-bold tracking-tight">{Math.round(w.temp)}°</span>
               <span className="text-4xl">{ptyIcon}</span>
               <span className="text-xl font-medium text-white/90">{ptyText}</span>
             </div>
-            <div className="mt-4 grid grid-cols-3 gap-3 border-t border-white/10 pt-4">
+            <div className="mt-4 grid grid-cols-3 gap-3 border-t border-white/25 pt-4">
               <div>
-                <p className="text-xs text-white/50">바람</p>
-                <p className="mt-1 text-lg font-bold">{w.windSpeed} <span className="text-sm font-normal text-white/70">m/s</span></p>
-                <p className="text-xs text-white/60">{windDirLabel(w.windDir)}풍</p>
+                <p className="text-xs text-white/90">바람</p>
+                <p className="mt-1 text-lg font-bold">{w.windSpeed} <span className="text-sm font-normal text-white/90">m/s</span></p>
+                <p className="text-xs text-white/90">{windDirLabel(w.windDir)}풍</p>
               </div>
-              <div className="border-l border-white/10 pl-3">
-                <p className="text-xs text-white/50">습도</p>
-                <p className="mt-1 text-lg font-bold">{w.humidity}<span className="text-sm font-normal text-white/70">%</span></p>
+              <div className="border-l border-white/25 pl-3">
+                <p className="text-xs text-white/90">습도</p>
+                <p className="mt-1 text-lg font-bold">{w.humidity}<span className="text-sm font-normal text-white/90">%</span></p>
               </div>
-              <div className="border-l border-white/10 pl-3">
-                <p className="text-xs text-white/50">강수</p>
-                <p className="mt-1 text-lg font-bold">{w.rain1h > 0 ? `${w.rain1h}` : "–"}<span className="text-sm font-normal text-white/70">{w.rain1h > 0 ? " mm" : ""}</span></p>
-                {w.rain1h <= 0 && <p className="text-xs text-white/60">없음</p>}
+              <div className="border-l border-white/25 pl-3">
+                <p className="text-xs text-white/90">강수</p>
+                <p className="mt-1 text-lg font-bold">{w.rain1h > 0 ? `${w.rain1h}` : "–"}<span className="text-sm font-normal text-white/90">{w.rain1h > 0 ? " mm" : ""}</span></p>
+                {w.rain1h <= 0 && <p className="text-xs text-white/90">없음</p>}
               </div>
             </div>
           </div>

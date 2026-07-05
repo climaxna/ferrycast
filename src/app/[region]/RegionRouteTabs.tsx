@@ -38,10 +38,10 @@ export default function RegionRouteTabs({ departures, arrivals, regionName, trai
         isDeparture ? "bg-blue-50" : "bg-teal-50"
       }`}>
         <TabButton active={tab === "dep"} variant="dep" onClick={() => setTab("dep")}>
-          🚢 {regionName} 출발
+          {regionName} 출발
         </TabButton>
         <TabButton active={tab === "arr"} variant="arr" onClick={() => setTab("arr")}>
-          ⚓ {regionName} 도착
+          {regionName} 도착
         </TabButton>
         {!isLive && (
           <span className="mr-1.5 shrink-0 text-[11px] font-medium text-amber-500">
@@ -99,11 +99,32 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
+      className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-semibold transition-all ${
         active ? activeClass : "text-slate-500 hover:text-slate-700"
       }`}
     >
+      {variant === "dep" ? <FerryIcon /> : <AnchorIcon />}
       {children}
     </button>
+  )
+}
+
+function FerryIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 14h18l-1.4 4.8a2 2 0 0 1-1.9 1.4H6.3a2 2 0 0 1-1.9-1.4L3 14Z" />
+      <path d="M5.5 14V8.5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2V14" />
+      <path d="M12 3v3.5" />
+    </svg>
+  )
+}
+
+function AnchorIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="5" r="2.4" />
+      <path d="M12 7.4V21" />
+      <path d="M5 13H3a9 9 0 0 0 18 0h-2" />
+    </svg>
   )
 }

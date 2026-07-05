@@ -67,7 +67,7 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
             {/* 다음 출발 강조 */}
             {nextTime ? (
               <div className={`mt-2.5 flex items-center justify-between rounded-xl px-3 py-2 bg-gradient-to-r ${
-                isArrival ? "from-teal-50 to-emerald-50" : "from-blue-50 to-sky-50"
+                isArrival ? "from-teal-50 to-teal-100/60" : "from-blue-50 to-sky-50"
               }`}>
                 <div className="flex items-baseline gap-2">
                   <span className={`text-xs font-medium ${isArrival ? "text-teal-600" : "text-blue-500"}`}>{timeLabel}</span>

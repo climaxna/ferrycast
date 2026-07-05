@@ -54,17 +54,7 @@ export default function WeatherCardClient({ weather, tidal, forecast5, tidal5 }:
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 text-white shadow-lg shadow-blue-900/10">
-        {/* 장식 원 */}
-        <svg
-          className="pointer-events-none absolute -right-4 -top-4 h-24 w-24 text-white/5"
-          viewBox="0 0 100 100"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <circle cx="50" cy="50" r="50" />
-        </svg>
-
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#2563eb] to-[#1d4ed8] text-white shadow-sm">
         {/* 새로고침 — 날씨존 버튼 밖(중첩 버튼 방지), 우상단 절대배치 */}
         <div className="absolute right-2 top-2 z-10">
           <RefreshButton />
@@ -82,22 +72,22 @@ export default function WeatherCardClient({ weather, tidal, forecast5, tidal5 }:
             <span className="shrink-0 text-2xl leading-none">{ptyIcon}</span>
             <span className="shrink-0 text-sm font-medium text-white/90">{ptyText}</span>
 
-            <div className="mx-0.5 h-5 w-px shrink-0 bg-white/20" />
+            <div className="mx-0.5 h-5 w-px shrink-0 bg-white/25" />
 
             {/* 바람 */}
             <div className="shrink-0">
-              <p className="text-[11px] leading-none text-white/85">바람</p>
+              <p className="text-[11px] leading-none text-white/90">바람</p>
               <p className="mt-0.5 text-sm font-bold leading-none">
                 {w.windSpeed}<span className="text-[11px] font-normal text-white/90"> m/s</span>
                 <span className="ml-1 text-[11px] font-normal text-white/90">{windDirLabel(w.windDir)}</span>
               </p>
             </div>
 
-            <div className="mx-0.5 h-5 w-px shrink-0 bg-white/20" />
+            <div className="mx-0.5 h-5 w-px shrink-0 bg-white/25" />
 
             {/* 습도 */}
             <div className="shrink-0">
-              <p className="text-[11px] leading-none text-white/85">습도</p>
+              <p className="text-[11px] leading-none text-white/90">습도</p>
               <p className="mt-0.5 text-sm font-bold leading-none">
                 {w.humidity}<span className="text-[11px] font-normal text-white/90">%</span>
               </p>
@@ -105,13 +95,13 @@ export default function WeatherCardClient({ weather, tidal, forecast5, tidal5 }:
 
             {wave && (
               <>
-                <div className="mx-0.5 h-5 w-px shrink-0 bg-white/20" />
+                <div className="mx-0.5 h-5 w-px shrink-0 bg-white/25" />
                 {/* 파고 */}
                 <div className="shrink-0">
-                  <p className="text-[11px] leading-none text-white/85">파고</p>
+                  <p className="text-[11px] leading-none text-white/90">파고</p>
                   <p className={`mt-0.5 text-sm font-bold leading-none ${wave.color}`}>
                     {w.waveHeight}m
-                    <span className="ml-1 text-[11px] font-normal text-white/85">{wave.text}</span>
+                    <span className="ml-1 text-[11px] font-normal text-white/90">{wave.text}</span>
                   </p>
                 </div>
               </>
@@ -120,8 +110,8 @@ export default function WeatherCardClient({ weather, tidal, forecast5, tidal5 }:
           </div>
 
           <div className="mt-1.5 flex items-center justify-between">
-            <span className="text-xs font-medium text-white/85">{timeStr} 기준</span>
-            <span className="text-xs font-medium text-white/85">단기 날씨 예보 →</span>
+            <span className="text-xs font-medium text-white/90">{timeStr} 기준</span>
+            <span className="text-xs font-medium text-white/90">단기 날씨 예보 →</span>
           </div>
         </button>
 
@@ -133,20 +123,20 @@ export default function WeatherCardClient({ weather, tidal, forecast5, tidal5 }:
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-white/85">다음 조석</span>
+              <span className="text-[11px] text-white/90">다음 조석</span>
               {nextTide ? (
                 <>
                   <span className="text-sm font-bold text-sky-300">
                     {nextTide.type === "high" ? "만조" : "간조"}
                   </span>
                   <span className="text-sm tabular-nums text-white/90">{nextTide.time}</span>
-                  <span className="text-xs text-white/85">{nextTide.height}cm</span>
+                  <span className="text-xs text-white/90">{nextTide.height}cm</span>
                 </>
               ) : (
-                <span className="text-sm text-white/85">정보 없음</span>
+                <span className="text-sm text-white/90">정보 없음</span>
               )}
             </div>
-            <span className="text-[11px] text-white/85">5일 조석 예보 →</span>
+            <span className="text-[11px] text-white/90">5일 조석 예보 →</span>
           </div>
         </button>
       </div>
