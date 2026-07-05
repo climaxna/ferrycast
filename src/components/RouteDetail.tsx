@@ -388,6 +388,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
         <TomorrowSheet
           routeLabel={routeLabel}
           times={route.tomorrow.times}
+          isArrival={!isDeparture}
           onClose={() => setShowTomorrow(false)}
         />
       )}
