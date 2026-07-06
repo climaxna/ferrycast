@@ -13,10 +13,14 @@ export default function RegionNav({ current }: { current: string }) {
       aria-label="지역 이동"
       className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm"
     >
-      <p className="mb-2.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+      <p className="mb-2.5 text-xs font-semibold text-slate-400">
         다른 지역 날씨 · 항로 보기
       </p>
-      <div className="flex flex-wrap gap-2">
+      {/* 지역 칩 — 카드 폭을 균등 분할한 세그먼트 정렬 (지역 ≤6개까지 안전, 더 늘면 재조정) */}
+      <div
+        className="grid gap-2"
+        style={{ gridTemplateColumns: `repeat(${ITEMS.length}, minmax(0, 1fr))` }}
+      >
         {ITEMS.map((it) => {
           const href = it.slug ? `/${it.slug}` : "/"
           const active = it.slug === current
@@ -25,10 +29,10 @@ export default function RegionNav({ current }: { current: string }) {
               key={it.slug || "wando"}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`inline-flex min-h-[44px] items-center rounded-lg px-3.5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
+              className={`inline-flex min-h-[44px] items-center justify-center rounded-lg border px-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${
                 active
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "border border-slate-200 bg-slate-50 text-slate-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-slate-200 bg-slate-50 text-slate-600 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
               }`}
             >
               {it.name}
