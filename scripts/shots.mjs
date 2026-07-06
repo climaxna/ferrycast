@@ -66,6 +66,22 @@ await page.goto(`${BASE}/qr`, { waitUntil: "networkidle" })
 await page.waitForTimeout(1500)
 await shot(page, "07_qr.png")
 
+// ⑧ 내일 시간표 바텀시트
+await page.goto(BASE, { waitUntil: "networkidle" })
+await page.getByText("완도 → 제주").first().waitFor({ timeout: 15000 })
+await page.locator("button", { hasText: "완도 → 제주" }).first().click()
+await page.getByText("시간표 보기").first().waitFor({ timeout: 8000 }).catch(() => {})
+await page.getByText("시간표 보기").first().click().catch(() => {})
+await page.getByText("내일 시간표").first().waitFor({ timeout: 8000 }).catch(() => {})
+await shot(page, "08_tomorrow.png")
+
+// ⑨ 지역 이동 바 + 특산물/광고 섹션 (메인 하단)
+await page.goto(BASE, { waitUntil: "networkidle" })
+await page.getByText("완도 → 제주").first().waitFor({ timeout: 15000 })
+await page.getByText("다른 지역").first().scrollIntoViewIfNeeded()
+await page.waitForTimeout(1000)
+await shot(page, "09_region_bottom.png")
+
 await ctx.close()
 
 // ── 알림용 (standalone 에뮬레이션) ──
