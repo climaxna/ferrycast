@@ -36,14 +36,11 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
       type="button"
       onClick={onClick}
       className={`group relative flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
-        accent ? "overflow-hidden" : ""
-      } ${
         isCancelled
           ? "border-rose-200 bg-rose-50/30 hover:border-rose-300"
           : "border-slate-100 bg-white hover:border-slate-200"
       }`}
     >
-      {accent && <span className={`absolute left-0 top-0 h-full w-1 ${theme.bar}`} aria-hidden="true" />}
       <div className="min-w-0 flex-1">
         {/* 항로명 + 상태 배지 */}
         <div className="flex items-center justify-between gap-2">

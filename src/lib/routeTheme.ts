@@ -5,7 +5,6 @@
 //   크로스-휴 그라디언트는 쓰지 않고 동일 색상 톤(indigo-50→indigo-100)만 사용해 과한 보라 톤을 피한다.
 // ⚠️ 클래스는 반드시 리터럴 전체 문자열이어야 Tailwind JIT가 인식한다(동적 조합 금지).
 export interface AccentTheme {
-  bar: string          // 카드 왼쪽 액센트 바 배경
   hero: string         // 다음 출발 강조 박스 그라디언트 (from-x to-y, 동일 색상 톤)
   label: string        // "출발" 라벨 텍스트색
   time: string         // 큰 시각 텍스트색
@@ -19,7 +18,6 @@ export interface AccentTheme {
 
 export const ROUTE_THEME: Record<"blue" | "teal" | "indigo", AccentTheme> = {
   blue: {
-    bar: "bg-blue-500",
     hero: "from-blue-50 to-sky-50",
     label: "text-blue-500",
     time: "text-blue-800",
@@ -31,7 +29,6 @@ export const ROUTE_THEME: Record<"blue" | "teal" | "indigo", AccentTheme> = {
     detailFuture: "bg-blue-50 text-blue-700",
   },
   teal: {
-    bar: "bg-teal-500",
     hero: "from-teal-50 to-teal-100/60",
     label: "text-teal-600",
     time: "text-teal-800",
@@ -43,7 +40,6 @@ export const ROUTE_THEME: Record<"blue" | "teal" | "indigo", AccentTheme> = {
     detailFuture: "bg-teal-50 text-teal-700",
   },
   indigo: {
-    bar: "bg-indigo-500",
     hero: "from-indigo-50 to-indigo-100/60",
     label: "text-indigo-500",
     time: "text-indigo-800",
