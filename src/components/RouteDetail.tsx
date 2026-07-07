@@ -334,6 +334,51 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
             )}
           </div>
 
+          {/* 돌아오는 배 — 섬↔섬(약산권) 복편 시간표 (읽기 전용, 초록 계열) */}
+          {route.returnTrip && route.returnTrip.times.length > 0 && (() => {
+            const rt = route.returnTrip
+            const rNextIdx = rt.times.findIndex((t) => toMin(t) > nowMinutes)
+            return (
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-teal-600" aria-hidden="true">
+                    <path d="M9 14 4 9l5-5" />
+                    <path d="M4 9h11a5 5 0 0 1 5 5v1" />
+                  </svg>
+                  <p className="text-sm font-bold uppercase tracking-wider text-slate-400">
+                    돌아오는 배 · {rt.label}
+                  </p>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {rt.times.map((t, i) => {
+                    const isNext = i === rNextIdx
+                    const isPast = rNextIdx !== -1 && i < rNextIdx
+                    return (
+                      <div
+                        key={t}
+                        className={`flex items-center justify-center rounded-xl py-3 text-base font-bold tabular-nums shadow-sm ${
+                          isPast
+                            ? "bg-slate-50 text-slate-400"
+                            : isNext
+                              ? "bg-teal-500 text-white"
+                              : "bg-teal-50 text-teal-700"
+                        }`}
+                      >
+                        {t}
+                      </div>
+                    )
+                  })}
+                </div>
+                {rNextIdx === -1 && (
+                  <p className="mt-3 text-sm text-slate-400">오늘 돌아오는 배 모두 출발 완료</p>
+                )}
+                <p className="mt-2 text-xs text-slate-400">
+                  돌아오는 배는 알림·예약 없이 시간표만 안내합니다
+                </p>
+              </div>
+            )
+          })()}
+
           {/* 운임 요금 — 공식 링크 */}
           {route.fareUrl && (
             <a
@@ -363,15 +408,29 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
               : "참고용 시간표 · 실제 운항 여부는 공식 채널에서 확인하세요"}
           </p>
 
-          {/* 예약 버튼 */}
-          <a
-            href="https://island.theksa.co.kr/page/booking"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 py-4 text-center text-base font-bold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
-          >
-            해운조합 승선 예약하기
-          </a>
+          {/* 예약 버튼 — 온라인 예매 노선만. 약산권 등 현장 발권 노선은 매표소 안내로 대체 */}
+          {route.noBooking ? (
+            route.bookingNote && (
+              <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-4">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-slate-400" aria-hidden="true">
+                  <path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" strokeLinejoin="round" />
+                </svg>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">예약·문의</p>
+                  <p className="text-base font-bold text-slate-800">{route.bookingNote}</p>
+                </div>
+              </div>
+            )
+          ) : (
+            <a
+              href="https://island.theksa.co.kr/page/booking"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 py-4 text-center text-base font-bold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
+            >
+              해운조합 승선 예약하기
+            </a>
+          )}
         </div>
       </div>
 

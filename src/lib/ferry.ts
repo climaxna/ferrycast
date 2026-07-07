@@ -359,6 +359,114 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 }
 
 // ────────────────────────────────────────────────
+// 약산권 섬↔섬 노선 (완도 본섬 미경유 — 별도 섹션)
+//   약산도 당목항 ↔ 금일도 일정항  (완농페리3호·풍진메이슨·평화페리9호)
+//   약산도 당목항 ↔ 생일도 서성항  (완농페리5호·완농페리호)
+// 두 노선 모두 MTIS 실시간 등록 (docs/약산.md 대조 검증). 완도 터미널 로직과 무관하므로 전용 매핑.
+// ⚠️ 당목↔녹동(약산↔고흥) 편도 존재 → dest/oport를 "일정"·"서성"으로 명시 매칭해 제외한다.
+// ────────────────────────────────────────────────
+const YAKSAN_TERMINAL = "당목항"
+const YAKSAN_PHONE = "061-553-9088"  // 약산농협(당목)
+
+interface YaksanGroupCfg {
+  key: string
+  island: string          // 상대 섬 이름 (금일 / 생일)
+  destPort: string        // MTIS 도착항명 (일정 / 서성)
+}
+
+const YAKSAN_GROUPS: YaksanGroupCfg[] = [
+  { key: "geumil",  island: "금일", destPort: "일정" },
+  { key: "saengil", island: "생일", destPort: "서성" },
+]
+
+// 약산(당목) 출발편 groupKey — 반드시 dest가 일정/서성이어야 함(녹동편 제외)
+function yaksanForwardKey(it: MtisItem): string | null {
+  if (!it.oport_nm.includes("당목")) return null
+  for (const g of YAKSAN_GROUPS) if (it.dest_nm.includes(g.destPort)) return g.key
+  return null
+}
+// 약산(당목) 도착편(=돌아오는 배) groupKey
+function yaksanReturnKey(it: MtisItem): string | null {
+  if (!it.dest_nm.includes("당목")) return null
+  for (const g of YAKSAN_GROUPS) if (it.oport_nm.includes(g.destPort)) return g.key
+  return null
+}
+
+// groupKey별 시각 집계 (결항 제외, 5분 이내 중복 병합)
+function collectTimes(items: MtisItem[], keyFn: (it: MtisItem) => string | null): Record<string, string[]> {
+  const out: Record<string, string[]> = {}
+  for (const it of items) {
+    if (it.nvg_stts_nm === "결항") continue
+    const gk = keyFn(it)
+    if (!gk) continue
+    ;(out[gk] ??= []).push(parseSailTime(it.sail_tm))
+  }
+  return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, deduplicateTimes(v)]))
+}
+
+export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
+  const key = process.env.DATAGOKR_API_KEY
+  if (!key) return { routes: [], isLive: false }
+
+  try {
+    const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+    const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
+    const [items, tomorrow] = await Promise.all([
+      getMtisDay(key, date),
+      getMtisDay(key, nextDay(date)).catch(() => [] as MtisItem[]),
+    ])
+    if (!items.length) return { routes: [], isLive: false }
+
+    const fwdTimes = collectTimes(items, yaksanForwardKey)
+    const retTimes = collectTimes(items, yaksanReturnKey)
+    const fwdTomorrow = collectTimes(tomorrow, yaksanForwardKey)
+    const retTomorrow = collectTimes(tomorrow, yaksanReturnKey)
+
+    // 상태·운영선사는 방향 무관하게 전체 편 기준
+    const allByKey: Record<string, MtisItem[]> = {}
+    const shipsByKey: Record<string, Set<string>> = {}
+    for (const it of items) {
+      const gk = yaksanForwardKey(it) ?? yaksanReturnKey(it)
+      if (!gk) continue
+      ;(allByKey[gk] ??= []).push(it)
+      if (it.nvg_stts_nm !== "결항" && it.psnshp_nm) (shipsByKey[gk] ??= new Set()).add(it.psnshp_nm)
+    }
+
+    const routes: WandoRoute[] = []
+    for (const g of YAKSAN_GROUPS) {
+      const all = allByKey[g.key] ?? []
+      if (!all.length) continue  // 오늘 MTIS에 아예 없는 노선만 생략 (전편 결항은 '결항'으로 노출)
+      const times = fwdTimes[g.key] ?? []
+      const fTmrw = fwdTomorrow[g.key] ?? []
+      const rTmrw = retTomorrow[g.key] ?? []
+      routes.push({
+        id: `yaksan-${g.key}`,
+        to: g.island,
+        originName: "약산",
+        operator: [...(shipsByKey[g.key] ?? [])].join(" · "),
+        times,
+        status: groupStatus(all),
+        isLive: true,
+        terminal: YAKSAN_TERMINAL,
+        noBooking: true,
+        bookingNote: `현장 매표소 발권 · 약산농협 ${YAKSAN_PHONE}`,
+        ...(fTmrw.length ? { tomorrow: { tripCount: fTmrw.length, times: fTmrw } } : {}),
+        returnTrip: {
+          label: `${g.island} → 약산`,
+          times: retTimes[g.key] ?? [],
+          ...(rTmrw.length ? { tomorrow: { tripCount: rTmrw.length, times: rTmrw } } : {}),
+        },
+        ...(() => { const r = cancelReason(all); return r ? { cancelReason: r } : {} })(),
+      })
+    }
+
+    return { routes, isLive: routes.length > 0 }
+  } catch {
+    return { routes: [], isLive: false }
+  }
+}
+
+// ────────────────────────────────────────────────
 // 정적 fallback (API 완전 장애 시에만 노출 — "참고 시간표")
 // 출처: docs/청산도.md, docs/소안도.md (소안농협 공식 시간표)
 // ────────────────────────────────────────────────

@@ -29,4 +29,12 @@ export interface WandoRoute {
   arrivals?: Record<string, string>  // "출발HH:MM" → "도착예정HH:MM" (TAGO 여객선 실데이터)
   durationMin?: number          // TAGO 도착시각 미존재/비정상 시 fallback 계산용 소요시간(분)
   cancelReason?: string         // 결항 사유 (예: "풍랑주의보") — MTIS 통제/미운항 사유
+  // 섬↔섬 노선(약산권) 전용 — 한 카드에 왕복을 함께 담기 위한 반대 방향 시간표
+  returnTrip?: {
+    label: string               // "금일 → 약산"
+    times: string[]
+    tomorrow?: { tripCount: number; times: string[] }
+  }
+  noBooking?: boolean           // 온라인 예매 없음(현장 매표소 발권) → 해운조합 예약 버튼 숨김
+  bookingNote?: string          // 예약 버튼 대체 안내 (예: "현장 매표소 발권 · 약산농협 061-553-9088")
 }

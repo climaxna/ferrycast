@@ -142,6 +142,20 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
           )}
         </div>
 
+        {/* 돌아오는 배 — 섬↔섬(약산권) 왕복. 다음 복편 시각을 클릭 없이 노출 */}
+        {route.returnTrip && route.returnTrip.times.length > 0 && (() => {
+          const back = route.returnTrip.times.find((t) => toMinutes(t) > nowMinutes)
+          return (
+            <div className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-teal-50 px-1.5 py-0.5 text-xs font-medium text-teal-700">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 14 4 9l5-5" />
+                <path d="M4 9h11a5 5 0 0 1 5 5v1" />
+              </svg>
+              돌아오는 배 {back ? `다음 ${back}` : `막배 마감`}
+            </div>
+          )
+        })()}
+
         {/* 내일 운항 예정 편수 — 신청 없이 동일 API(rlvtYmd=내일)로 집계 */}
         {route.tomorrow && route.tomorrow.tripCount > 0 && (
           <div className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700">

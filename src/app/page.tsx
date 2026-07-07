@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
+import YaksanRouteSection from "@/components/YaksanRouteSection"
 import Logo from "@/components/Logo"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
@@ -72,6 +73,10 @@ export default function Page() {
 
         <Suspense fallback={<RouteSkeleton />}>
           <RouteSection />
+        </Suspense>
+
+        <Suspense fallback={null}>
+          <YaksanRouteSection />
         </Suspense>
 
         <div className="space-y-2">
