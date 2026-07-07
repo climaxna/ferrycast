@@ -1,14 +1,17 @@
 import type { WandoRoute } from "@/lib/types"
 import { toMinutes, relativeTime } from "@/lib/utils"
+import { ROUTE_THEME, type AccentTheme } from "@/lib/routeTheme"
 
 interface Props {
   route: WandoRoute
   nowMinutes?: number
   isArrival?: boolean
+  accent?: AccentTheme  // 지정 시 색 테마 override + 왼쪽 액센트 바 (약산권 indigo 구분용)
   onClick?: () => void
 }
 
-export default function RouteItem({ route, nowMinutes = 0, isArrival = false, onClick }: Props) {
+export default function RouteItem({ route, nowMinutes = 0, isArrival = false, accent, onClick }: Props) {
+  const theme = accent ?? (isArrival ? ROUTE_THEME.teal : ROUTE_THEME.blue)
   const isCancelled = route.status === "cancelled"
   const isUnknown = route.status === "unknown"
   const originName = route.originName ?? "완도"
@@ -33,11 +36,14 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
       type="button"
       onClick={onClick}
       className={`group relative flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+        accent ? "overflow-hidden" : ""
+      } ${
         isCancelled
           ? "border-rose-200 bg-rose-50/30 hover:border-rose-300"
           : "border-slate-100 bg-white hover:border-slate-200"
       }`}
     >
+      {accent && <span className={`absolute left-0 top-0 h-full w-1 ${theme.bar}`} aria-hidden="true" />}
       <div className="min-w-0 flex-1">
         {/* 항로명 + 상태 배지 */}
         <div className="flex items-center justify-between gap-2">
@@ -66,14 +72,12 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
           <>
             {/* 다음 출발 강조 */}
             {nextTime ? (
-              <div className={`mt-2.5 flex items-center justify-between rounded-xl px-3 py-2 bg-gradient-to-r ${
-                isArrival ? "from-teal-50 to-teal-100/60" : "from-blue-50 to-sky-50"
-              }`}>
+              <div className={`mt-2.5 flex items-center justify-between rounded-xl px-3 py-2 bg-gradient-to-r ${theme.hero}`}>
                 <div className="flex items-baseline gap-2">
-                  <span className={`text-xs font-medium ${isArrival ? "text-teal-600" : "text-blue-500"}`}>{timeLabel}</span>
-                  <span className={`text-2xl font-bold tabular-nums ${isArrival ? "text-teal-800" : "text-blue-800"}`}>{nextTime}</span>
+                  <span className={`text-xs font-medium ${theme.label}`}>{timeLabel}</span>
+                  <span className={`text-2xl font-bold tabular-nums ${theme.time}`}>{nextTime}</span>
                 </div>
-                <span className={`text-xs font-semibold ${isArrival ? "text-teal-600" : "text-blue-600"}`}>
+                <span className={`text-xs font-semibold ${theme.rel}`}>
                   {relativeTime(nextTime, nowMinutes)}
                 </span>
               </div>
@@ -95,14 +99,14 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, on
                   </span>
                 ))}
                 {nextTime && (
-                  <span className={`rounded-md px-2.5 py-1 text-sm font-bold tabular-nums text-white ${isArrival ? "bg-teal-500" : "bg-blue-500"}`}>
+                  <span className={`rounded-md px-2.5 py-1 text-sm font-bold tabular-nums text-white ${theme.nextChip}`}>
                     {nextTime}
                   </span>
                 )}
                 {futureTimes.map((t) => (
                   <span
                     key={t}
-                    className={`rounded-md px-2.5 py-1 text-sm font-semibold tabular-nums ${isArrival ? "bg-teal-100 text-teal-700" : "bg-blue-100 text-blue-700"}`}
+                    className={`rounded-md px-2.5 py-1 text-sm font-semibold tabular-nums ${theme.future}`}
                   >
                     {t}
                   </span>

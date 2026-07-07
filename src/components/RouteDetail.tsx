@@ -4,12 +4,14 @@ import { useEffect, useState } from "react"
 import type { WandoRoute } from "@/lib/types"
 import { useModalClose } from "@/hooks/useModalClose"
 import { toMinutes as toMin, relativeTime } from "@/lib/utils"
+import { ROUTE_THEME, type AccentTheme } from "@/lib/routeTheme"
 import AlarmSheet from "@/components/AlarmSheet"
 import TomorrowSheet from "@/components/TomorrowSheet"
 
 interface Props {
   route: WandoRoute
   isDeparture: boolean
+  accent?: AccentTheme  // 지정 시 오늘 출발 시간표·헤더 뱃지 색 override (약산권 indigo)
   onClose: () => void
 }
 
@@ -19,7 +21,8 @@ function addMinutes(time: string, mins: number): string {
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`
 }
 
-export default function RouteDetail({ route, isDeparture, onClose }: Props) {
+export default function RouteDetail({ route, isDeparture, accent, onClose }: Props) {
+  const theme = accent ?? ROUTE_THEME.blue
   const isCancelled = route.status === "cancelled"
   const isUnknown = route.status === "unknown"
   const originName = route.originName ?? "완도"
@@ -84,7 +87,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
               ? "bg-rose-50 text-rose-600"
               : isUnknown
                 ? "bg-slate-100 text-slate-500"
-                : "bg-blue-50 text-blue-700"
+                : theme.badgeSoft
           }`}
         >
           {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
@@ -278,13 +281,13 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                     <button
                       key={nextTime}
                       onClick={() => setAlarmTime(nextTime)}
-                      className="flex flex-col items-center justify-center rounded-xl bg-blue-500 py-3 shadow-md active:opacity-80"
+                      className={`flex flex-col items-center justify-center rounded-xl py-3 shadow-md active:opacity-80 ${theme.nextChip}`}
                     >
                       <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
                       {route.via?.[nextTime] ? (
                         <span className="text-[11px] font-semibold leading-tight text-amber-200">{route.via[nextTime]} 경유</span>
                       ) : (
-                        <span className="text-[11px] font-semibold leading-tight text-blue-100">
+                        <span className={`text-[11px] font-semibold leading-tight ${theme.nextSub}`}>
                           {relativeTime(nextTime, nowMinutes)}
                         </span>
                       )}
@@ -294,7 +297,7 @@ export default function RouteDetail({ route, isDeparture, onClose }: Props) {
                     <button
                       key={t}
                       onClick={() => setAlarmTime(t)}
-                      className="flex flex-col items-center justify-center rounded-xl bg-blue-50 py-3 text-base font-bold tabular-nums text-blue-700 shadow-sm active:opacity-70"
+                      className={`flex flex-col items-center justify-center rounded-xl py-3 text-base font-bold tabular-nums shadow-sm active:opacity-70 ${theme.detailFuture}`}
                     >
                       {t}
                       {route.via?.[t] && (
