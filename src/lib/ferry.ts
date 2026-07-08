@@ -71,6 +71,29 @@ function parseSailTime(raw: string): string {
   return `${s.slice(0, 2)}:${s.slice(2)}`
 }
 
+// 한 편의 결항 사유 (통제사유 우선, 없으면 미운항사유)
+function itemReason(it: MtisItem): string | undefined {
+  const r = it.cntrl_rsn_nm || it.nnavi_rsn_nm
+  return r && r !== "null" ? r : undefined
+}
+
+// 부분 결항편 정리 — 정상편과 5분 이내 겹치면 제외(정상 우선), 결항편끼리도 5분 병합, 시각순.
+function partialCancelled(
+  cancelled: { time: string; reason?: string }[],
+  operating: string[],
+): { time: string; reason?: string }[] {
+  const min = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
+  const opMins = operating.map(min)
+  const out: { time: string; reason?: string }[] = []
+  for (const c of [...cancelled].sort((a, b) => min(a.time) - min(b.time))) {
+    const cm = min(c.time)
+    if (opMins.some((o) => Math.abs(o - cm) < 5)) continue
+    if (out.some((o) => Math.abs(min(o.time) - cm) < 5)) continue
+    out.push(c)
+  }
+  return out
+}
+
 // 동일 선착장에서 5분 이내 출항 편은 하나로 병합 (예: 18:00 / 18:01 → 18:00)
 function deduplicateTimes(times: string[]): string[] {
   const sorted = [...new Set(times)].sort()
@@ -251,14 +274,17 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
     ])
     if (!items.length) return fallback()
 
-    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string> }> = {}
+    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string }[] }> = {}
     for (const it of items) {
       const gk = depGroupKey(it)
       if (!gk) continue
-      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {} }
+      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
-      // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
-      if (isCancelled(it)) continue
+      // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems·부분결항 표시용 cancelled에만 남김)
+      if (isCancelled(it)) {
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+        continue
+      }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
       // 경유편 표시는 제주만 (제주는 일부 편만 경유 → 표시 가치 큼.
@@ -272,17 +298,20 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
 
     const routes: WandoRoute[] = Object.entries(grouped)
       .sort(([a], [b]) => (DEP_CFG[a]?.priority ?? 99) - (DEP_CFG[b]?.priority ?? 99))
-      .map(([gk, { times, ships, allItems, via }]) => {
+      .map(([gk, { times, ships, allItems, via, cancelled }]) => {
         const cfg = DEP_CFG[gk]
         const tmrw = tomorrowData[gk]
         const dedup = deduplicateTimes(times)
         const arrivals = arrLookup(gk, dedup, [...ships])
+        const status = groupStatus(allItems)
+        // 부분 결항 — 노선은 운항하나 일부 편만 결항일 때만 표시(전편 결항이면 status로 이미 표현)
+        const partial = status === "operating" ? partialCancelled(cancelled, dedup) : []
         return {
           id: `dep-${gk}`,
           to: cfg.label,
           operator: [...ships].join(" · "),
           times: dedup,
-          status: groupStatus(allItems),
+          status,
           isLive: true,
           terminal: cfg.terminal,
           fare: cfg.fare,
@@ -291,6 +320,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
+          ...(partial.length ? { cancelledTimes: partial } : {}),
           ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
@@ -321,14 +351,17 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
     ])
     if (!items.length) return fallback()
 
-    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg; via: Record<string, string> }> = {}
+    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg; via: Record<string, string>; cancelled: { time: string; reason?: string }[] }> = {}
     for (const it of items) {
       const gk = arrGroupKey(it)
       if (!gk) continue
-      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], cfg: ARR_CFG[gk], via: {} }
+      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], cfg: ARR_CFG[gk], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
-      // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
-      if (isCancelled(it)) continue
+      // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems·부분결항 표시용 cancelled에만 남김)
+      if (isCancelled(it)) {
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+        continue
+      }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
       // 경유편 표시는 제주만 (도착 탭 제주→완도도 추자도 경유편 존재)
@@ -341,17 +374,19 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
 
     const routes: WandoRoute[] = Object.entries(grouped)
       .sort(([a], [b]) => (ARR_CFG[a]?.priority ?? 99) - (ARR_CFG[b]?.priority ?? 99))
-      .map(([gk, { times, ships, allItems, cfg, via }]) => {
+      .map(([gk, { times, ships, allItems, cfg, via, cancelled }]) => {
         const tmrw = tomorrowData[gk]
         const dedup = deduplicateTimes(times)
         const arrivals = arrLookup(gk, dedup, [...ships])
+        const status = groupStatus(allItems)
+        const partial = status === "operating" ? partialCancelled(cancelled, dedup) : []
         return {
           id: `arr-${gk}`,
           to: "완도",
           from: cfg.label,
           operator: [...ships].join(" · "),
           times: dedup,
-          status: groupStatus(allItems),
+          status,
           isLive: true,
           terminal: cfg.terminal,
           islandTerminal: cfg.islandTerminal,
@@ -361,6 +396,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
+          ...(partial.length ? { cancelledTimes: partial } : {}),
           ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
@@ -417,6 +453,18 @@ function collectTimes(items: MtisItem[], keyFn: (it: MtisItem) => string | null)
   return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, deduplicateTimes(v)]))
 }
 
+// groupKey별 결항편 집계 (부분결항 표시용)
+function collectCancelled(items: MtisItem[], keyFn: (it: MtisItem) => string | null): Record<string, { time: string; reason?: string }[]> {
+  const out: Record<string, { time: string; reason?: string }[]> = {}
+  for (const it of items) {
+    if (!isCancelled(it)) continue
+    const gk = keyFn(it)
+    if (!gk) continue
+    ;(out[gk] ??= []).push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+  }
+  return out
+}
+
 export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return { routes: [], isLive: false }
@@ -432,6 +480,7 @@ export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive:
 
     const fwdTimes = collectTimes(items, yaksanForwardKey)
     const retTimes = collectTimes(items, yaksanReturnKey)
+    const fwdCancelled = collectCancelled(items, yaksanForwardKey)
     const fwdTomorrow = collectTimes(tomorrow, yaksanForwardKey)
     const retTomorrow = collectTimes(tomorrow, yaksanReturnKey)
 
@@ -452,17 +501,20 @@ export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive:
       const times = fwdTimes[g.key] ?? []
       const fTmrw = fwdTomorrow[g.key] ?? []
       const rTmrw = retTomorrow[g.key] ?? []
+      const status = groupStatus(all)
+      const partial = status === "operating" ? partialCancelled(fwdCancelled[g.key] ?? [], times) : []
       routes.push({
         id: `yaksan-${g.key}`,
         to: g.island,
         originName: "약산",
         operator: [...(shipsByKey[g.key] ?? [])].join(" · "),
         times,
-        status: groupStatus(all),
+        status,
         isLive: true,
         terminal: YAKSAN_TERMINAL,
         noBooking: true,
         bookingNote: `현장 매표소 발권 · 약산농협 ${YAKSAN_PHONE}`,
+        ...(partial.length ? { cancelledTimes: partial } : {}),
         ...(fTmrw.length ? { tomorrow: { tripCount: fTmrw.length, times: fTmrw } } : {}),
         returnTrip: {
           label: `${g.island} → 약산`,

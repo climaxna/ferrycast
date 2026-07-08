@@ -23,6 +23,16 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
   const pastTimes = route.times.slice(0, nextIdx === -1 ? route.times.length : nextIdx)
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
+  // 부분 결항편(노선은 운항, 일부 편만 결항) — 앞으로 남은 편만 취소선 칩으로 스트립에 병합
+  type Chip = { time: string; kind: "past" | "next" | "future" | "cancelled"; reason?: string }
+  const cancelledUpcoming = (route.cancelledTimes ?? []).filter((c) => toMinutes(c.time) > nowMinutes)
+  const chips: Chip[] = [
+    ...pastTimes.map((t): Chip => ({ time: t, kind: "past" })),
+    ...(nextTime ? [{ time: nextTime, kind: "next" } as Chip] : []),
+    ...futureTimes.map((t): Chip => ({ time: t, kind: "future" })),
+    ...cancelledUpcoming.map((c): Chip => ({ time: c.time, kind: "cancelled", reason: c.reason })),
+  ].sort((a, b) => toMinutes(a.time) - toMinutes(b.time))
+
   const isAltTerminal = !route.originName && route.terminal !== "완도여객선터미널"
   // 아직 출발 안 한 경유편만 안내 (지난 편 제외), 시각순 정렬
   const viaEntries = route.via
@@ -84,30 +94,32 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
               </div>
             )}
 
-            {/* 전체 시간표 칩 — 지난편·다음편·이후편 한눈에 */}
-            {(pastTimes.length > 0 || nextTime || futureTimes.length > 0) && (
+            {/* 전체 시간표 칩 — 지난편·다음편·이후편·결항편 시각순 한눈에 */}
+            {chips.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
-                {pastTimes.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-md px-2 py-1 text-sm tabular-nums text-slate-400"
-                  >
-                    {t}
-                  </span>
-                ))}
-                {nextTime && (
-                  <span className={`rounded-md px-2.5 py-1 text-sm font-bold tabular-nums text-white ${theme.nextChip}`}>
-                    {nextTime}
-                  </span>
+                {chips.map((c) =>
+                  c.kind === "cancelled" ? (
+                    <span
+                      key={`x-${c.time}`}
+                      className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-1 text-sm tabular-nums text-rose-400"
+                    >
+                      <span className="line-through decoration-rose-300">{c.time}</span>
+                      <span className="text-[10px] font-semibold text-rose-500">결항</span>
+                    </span>
+                  ) : c.kind === "past" ? (
+                    <span key={c.time} className="rounded-md px-2 py-1 text-sm tabular-nums text-slate-400">
+                      {c.time}
+                    </span>
+                  ) : c.kind === "next" ? (
+                    <span key={c.time} className={`rounded-md px-2.5 py-1 text-sm font-bold tabular-nums text-white ${theme.nextChip}`}>
+                      {c.time}
+                    </span>
+                  ) : (
+                    <span key={c.time} className={`rounded-md px-2.5 py-1 text-sm font-semibold tabular-nums ${theme.future}`}>
+                      {c.time}
+                    </span>
+                  ),
                 )}
-                {futureTimes.map((t) => (
-                  <span
-                    key={t}
-                    className={`rounded-md px-2.5 py-1 text-sm font-semibold tabular-nums ${theme.future}`}
-                  >
-                    {t}
-                  </span>
-                ))}
               </div>
             )}
 

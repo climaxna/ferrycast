@@ -59,6 +59,29 @@ function deduplicateTimes(times: string[]): string[] {
   return result
 }
 
+// 한 편의 결항 사유 (통제사유 우선, 없으면 미운항사유)
+function itemReason(it: MtisItem): string | undefined {
+  const r = it.cntrl_rsn_nm || it.nnavi_rsn_nm
+  return r && r !== "null" ? r : undefined
+}
+
+// 부분 결항편 정리 — 정상편과 5분 이내 겹치면 제외(정상 우선), 결항끼리도 5분 병합, 시각순.
+function partialCancelled(
+  cancelled: { time: string; reason?: string }[],
+  operating: string[],
+): { time: string; reason?: string }[] {
+  const min = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
+  const opMins = operating.map(min)
+  const out: { time: string; reason?: string }[] = []
+  for (const c of [...cancelled].sort((a, b) => min(a.time) - min(b.time))) {
+    const cm = min(c.time)
+    if (opMins.some((o) => Math.abs(o - cm) < 5)) continue
+    if (out.some((o) => Math.abs(min(o.time) - cm) < 5)) continue
+    out.push(c)
+  }
+  return out
+}
+
 function extractVia(item: MtisItem, depKeywords: string[], destKeywords: string[]): string | null {
   let s = (item.nvg_seawy_nm || "").replace(/\(.*?\)/g, "")
   const ports = [item.oport_nm, item.dest_nm, ...depKeywords, ...destKeywords]
@@ -265,15 +288,18 @@ export async function getRoutesForRegion(
     if (!items.length) return fallback()
 
     const grouped: Record<string, {
-      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>
+      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string }[]
     }> = {}
 
     for (const it of items) {
       const gk = depGroupKey(it)
       if (!gk) continue
-      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {} }
+      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
-      if (isCancelled(it)) continue
+      if (isCancelled(it)) {
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+        continue
+      }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
       const v = extractVia(it, config.routeGroups.find(g => g.key === gk)?.depPortKeywords ?? [], config.routeGroups.find(g => g.key === gk)?.destKeywords ?? [])
@@ -285,17 +311,19 @@ export async function getRoutesForRegion(
     const groupMap = Object.fromEntries(config.routeGroups.map((g, i) => [g.key, i]))
     const routes: WandoRoute[] = Object.entries(grouped)
       .sort(([a], [b]) => (groupMap[a] ?? 99) - (groupMap[b] ?? 99))
-      .map(([gk, { times, ships, allItems, via }]) => {
+      .map(([gk, { times, ships, allItems, via, cancelled }]) => {
         const cfg = config.routeGroups.find((g) => g.key === gk)!
         const tmrw = tomorrowData[gk]
         const dedup = deduplicateTimes(times)
         const arrivals = arrLookup(gk, dedup, [...ships])
+        const status = groupStatus(allItems)
+        const partial = status === "operating" ? partialCancelled(cancelled, dedup) : []
         return {
           id: `dep-${gk}`,
           to: cfg.label,
           operator: [...ships].join(" · "),
           times: dedup,
-          status: groupStatus(allItems),
+          status,
           isLive: true,
           terminal: cfg.depTerminal ?? config.mainTerminal,
           originName: config.name,
@@ -304,6 +332,7 @@ export async function getRoutesForRegion(
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
+          ...(partial.length ? { cancelledTimes: partial } : {}),
           ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
@@ -336,15 +365,18 @@ export async function getArrivalsForRegion(
     if (!items.length) return fallback()
 
     const grouped: Record<string, {
-      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>
+      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string }[]
     }> = {}
 
     for (const it of items) {
       const gk = arrGroupKey(it)
       if (!gk) continue
-      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {} }
+      if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
-      if (isCancelled(it)) continue
+      if (isCancelled(it)) {
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+        continue
+      }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
     }
@@ -354,18 +386,20 @@ export async function getArrivalsForRegion(
     const groupMap = Object.fromEntries(config.routeGroups.map((g, i) => [g.key, i]))
     const routes: WandoRoute[] = Object.entries(grouped)
       .sort(([a], [b]) => (groupMap[a] ?? 99) - (groupMap[b] ?? 99))
-      .map(([gk, { times, ships, allItems, via }]) => {
+      .map(([gk, { times, ships, allItems, via, cancelled }]) => {
         const cfg = config.routeGroups.find((g) => g.key === gk)!
         const tmrw = tomorrowData[gk]
         const dedup = deduplicateTimes(times)
         const arrivals = arrLookup(gk, dedup, [...ships])
+        const status = groupStatus(allItems)
+        const partial = status === "operating" ? partialCancelled(cancelled, dedup) : []
         return {
           id: `arr-${gk}`,
           to: config.name,
           from: cfg.label,
           operator: [...ships].join(" · "),
           times: dedup,
-          status: groupStatus(allItems),
+          status,
           isLive: true,
           terminal: cfg.depTerminal ?? config.mainTerminal,
           originName: config.name,
@@ -375,6 +409,7 @@ export async function getArrivalsForRegion(
           ...(tmrw ? { tomorrow: tmrw } : {}),
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
+          ...(partial.length ? { cancelledTimes: partial } : {}),
           ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })

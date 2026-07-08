@@ -310,6 +310,26 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
             ) : (
               <p className="text-base text-slate-400">시간표 정보 없음</p>
             )}
+            {/* 부분 결항 — 노선은 운항하나 일부 편만 결항 (시각·사유) */}
+            {!isCancelled && route.cancelledTimes && route.cancelledTimes.length > 0 && (
+              <div className="mt-3 rounded-xl border border-rose-100 bg-rose-50/60 px-3.5 py-3">
+                <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-rose-600">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M15 9l-6 6M9 9l6 6" />
+                  </svg>
+                  오늘 일부 편 결항
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {route.cancelledTimes.map((c) => (
+                    <span key={c.time} className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 shadow-sm">
+                      <span className="text-base font-bold tabular-nums text-rose-500 line-through decoration-rose-300 decoration-2">{c.time}</span>
+                      {c.reason && <span className="text-[11px] font-semibold text-rose-500">{c.reason}</span>}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
             {!isCancelled && route.via && Object.keys(route.via).length > 0 && (
               <p className="mt-2.5 text-xs text-amber-600">
                 <span className="font-semibold text-amber-500">경유</span> 표시 편은 해당 기항지를 들렀다 가며 소요 시간이 더 깁니다. 그 외는 직항입니다.
