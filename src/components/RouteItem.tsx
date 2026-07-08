@@ -23,14 +23,14 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
   const pastTimes = route.times.slice(0, nextIdx === -1 ? route.times.length : nextIdx)
   const futureTimes = nextIdx >= 0 ? route.times.slice(nextIdx + 1) : []
 
-  // 부분 결항편(노선은 운항, 일부 편만 결항) — 앞으로 남은 편만 취소선 칩으로 스트립에 병합
+  // 부분 결항편(노선은 운항, 일부 편만 결항) — 지난·남은 구분 없이 취소선 칩으로 스트립에 병합.
+  // (스트립은 지난 정상편도 회색으로 다 보여주므로 결항편도 하루 전체를 노출해야 일관됨)
   type Chip = { time: string; kind: "past" | "next" | "future" | "cancelled"; reason?: string }
-  const cancelledUpcoming = (route.cancelledTimes ?? []).filter((c) => toMinutes(c.time) > nowMinutes)
   const chips: Chip[] = [
     ...pastTimes.map((t): Chip => ({ time: t, kind: "past" })),
     ...(nextTime ? [{ time: nextTime, kind: "next" } as Chip] : []),
     ...futureTimes.map((t): Chip => ({ time: t, kind: "future" })),
-    ...cancelledUpcoming.map((c): Chip => ({ time: c.time, kind: "cancelled", reason: c.reason })),
+    ...(route.cancelledTimes ?? []).map((c): Chip => ({ time: c.time, kind: "cancelled", reason: c.reason })),
   ].sort((a, b) => toMinutes(a.time) - toMinutes(b.time))
 
   const isAltTerminal = !route.originName && route.terminal !== "완도여객선터미널"
