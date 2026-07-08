@@ -12,6 +12,7 @@ const FARE_MAP: Record<string, FareInfo> = {
 }
 
 const FARE_URL_MAP: Record<string, string> = {
+  "jeju":             "https://www.hanilexpress.co.kr",  // 한일고속(골드스텔라·실버클라우드) — 완도↔제주 요금·예매
   "cheongsando":      "https://cheongsannh.nonghyup.com/user/indexSub.do?codyMenuSeq=1048386239&siteId=cheongsannh",
   "hwaheungpo-route": "https://island.theksa.co.kr/page/booking",
 }
@@ -90,13 +91,14 @@ function itemReason(it: MtisItem): string | undefined {
 }
 
 // 부분 결항편 정리 — 정상편과 5분 이내 겹치면 제외(정상 우선), 결항편끼리도 5분 병합, 시각순.
+type CancelledEntry = { time: string; reason?: string; suspended?: boolean; via?: string }
 function partialCancelled(
-  cancelled: { time: string; reason?: string; suspended?: boolean }[],
+  cancelled: CancelledEntry[],
   operating: string[],
-): { time: string; reason?: string; suspended?: boolean }[] {
+): CancelledEntry[] {
   const min = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
   const opMins = operating.map(min)
-  const out: { time: string; reason?: string; suspended?: boolean }[] = []
+  const out: CancelledEntry[] = []
   for (const c of [...cancelled].sort((a, b) => min(a.time) - min(b.time))) {
     const cm = min(c.time)
     if (opMins.some((o) => Math.abs(o - cm) < 5)) continue
@@ -192,13 +194,13 @@ interface ArrGroupCfg extends DepGroupCfg { islandTerminal: string }
 const CHEONGSANDO_DURATION_MIN = 50
 
 const DEP_CFG: Record<string, DepGroupCfg> = {
-  "jeju":             { label: "제주",             priority: 1, terminal: TERMINAL_MAIN },
+  "jeju":             { label: "제주",             priority: 1, terminal: TERMINAL_MAIN, fareUrl: FARE_URL_MAP["jeju"] },
   "cheongsando":      { label: "청산도",            priority: 2, terminal: TERMINAL_MAIN, fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"], durationMin: CHEONGSANDO_DURATION_MIN },
   "hwaheungpo-route": { label: "소안도·보길도·노화", priority: 3, terminal: TERMINAL_HWAHEUNGPO, fareUrl: FARE_URL_MAP["hwaheungpo-route"] },
 }
 
 const ARR_CFG: Record<string, ArrGroupCfg> = {
-  "jeju":             { label: "제주",   priority: 1, terminal: TERMINAL_MAIN,       islandTerminal: "제주항 연안여객터미널" },
+  "jeju":             { label: "제주",   priority: 1, terminal: TERMINAL_MAIN,       islandTerminal: "제주항 연안여객터미널", fareUrl: FARE_URL_MAP["jeju"] },
   "cheongsando":      { label: "청산도", priority: 2, terminal: TERMINAL_MAIN,       islandTerminal: "도청항", fare: FARE_MAP["cheongsando"], fareUrl: FARE_URL_MAP["cheongsando"], durationMin: CHEONGSANDO_DURATION_MIN },
   "hwaheungpo-route": { label: "소안도·보길도·노화", priority: 3, terminal: TERMINAL_HWAHEUNGPO, islandTerminal: "소안항여객터미널", fareUrl: FARE_URL_MAP["hwaheungpo-route"] },
 }
@@ -286,7 +288,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
     ])
     if (!items.length) return fallback()
 
-    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string; suspended?: boolean }[] }> = {}
+    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: CancelledEntry[] }> = {}
     for (const it of items) {
       const gk = depGroupKey(it)
       if (!gk) continue
@@ -294,7 +296,8 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       grouped[gk].allItems.push(it)
       // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems·부분결항 표시용 cancelled에만 남김)
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
+        const cv = gk === "jeju" ? extractVia(it) : null  // 미운항편도 경유(추자도) 라벨 유지
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(cv ? { via: cv } : {}) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -364,7 +367,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
     ])
     if (!items.length) return fallback()
 
-    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg; via: Record<string, string>; cancelled: { time: string; reason?: string; suspended?: boolean }[] }> = {}
+    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg; via: Record<string, string>; cancelled: CancelledEntry[] }> = {}
     for (const it of items) {
       const gk = arrGroupKey(it)
       if (!gk) continue
@@ -372,7 +375,8 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
       grouped[gk].allItems.push(it)
       // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems·부분결항 표시용 cancelled에만 남김)
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
+        const cv = gk === "jeju" ? extractVia(it) : null  // 미운항편도 경유(추자도) 라벨 유지
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(cv ? { via: cv } : {}) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -468,8 +472,8 @@ function collectTimes(items: MtisItem[], keyFn: (it: MtisItem) => string | null)
 }
 
 // groupKey별 결항편 집계 (부분결항 표시용)
-function collectCancelled(items: MtisItem[], keyFn: (it: MtisItem) => string | null): Record<string, { time: string; reason?: string; suspended?: boolean }[]> {
-  const out: Record<string, { time: string; reason?: string; suspended?: boolean }[]> = {}
+function collectCancelled(items: MtisItem[], keyFn: (it: MtisItem) => string | null): Record<string, CancelledEntry[]> {
+  const out: Record<string, CancelledEntry[]> = {}
   for (const it of items) {
     if (!isCancelled(it)) continue
     const gk = keyFn(it)

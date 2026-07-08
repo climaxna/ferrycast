@@ -33,7 +33,8 @@ export interface WandoRoute {
   cancelKind?: "cancelled" | "suspended"
   // 부분 결항 — 노선 전체는 운항(status="operating")이지만 일부 편만 미운항일 때 그 편들.
   // 정상편과 5분 이내 겹치는 시각은 제외(정상 우선). suspended=true면 비운항(선박검사 등), 아니면 결항(기상).
-  cancelledTimes?: { time: string; reason?: string; suspended?: boolean }[]
+  // via: 경유지명(예: "추자도") — 미운항편도 어느 서비스인지 구분되도록 경유 라벨 유지.
+  cancelledTimes?: { time: string; reason?: string; suspended?: boolean; via?: string }[]
   // 섬↔섬 노선(약산권) 전용 — 한 카드에 왕복을 함께 담기 위한 반대 방향 시간표
   returnTrip?: {
     label: string               // "금일 → 약산"

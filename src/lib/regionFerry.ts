@@ -77,13 +77,14 @@ function itemReason(it: MtisItem): string | undefined {
 }
 
 // 부분 결항편 정리 — 정상편과 5분 이내 겹치면 제외(정상 우선), 결항끼리도 5분 병합, 시각순.
+type CancelledEntry = { time: string; reason?: string; suspended?: boolean; via?: string }
 function partialCancelled(
-  cancelled: { time: string; reason?: string; suspended?: boolean }[],
+  cancelled: CancelledEntry[],
   operating: string[],
-): { time: string; reason?: string; suspended?: boolean }[] {
+): CancelledEntry[] {
   const min = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
   const opMins = operating.map(min)
-  const out: { time: string; reason?: string; suspended?: boolean }[] = []
+  const out: CancelledEntry[] = []
   for (const c of [...cancelled].sort((a, b) => min(a.time) - min(b.time))) {
     const cm = min(c.time)
     if (opMins.some((o) => Math.abs(o - cm) < 5)) continue
@@ -299,7 +300,7 @@ export async function getRoutesForRegion(
     if (!items.length) return fallback()
 
     const grouped: Record<string, {
-      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string; suspended?: boolean }[]
+      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: CancelledEntry[]
     }> = {}
 
     for (const it of items) {
@@ -307,14 +308,15 @@ export async function getRoutesForRegion(
       if (!gk) continue
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
+      const cfgG = config.routeGroups.find(g => g.key === gk)
+      const via1 = extractVia(it, cfgG?.depPortKeywords ?? [], cfgG?.destKeywords ?? [])
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(via1 ? { via: via1 } : {}) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
-      const v = extractVia(it, config.routeGroups.find(g => g.key === gk)?.depPortKeywords ?? [], config.routeGroups.find(g => g.key === gk)?.destKeywords ?? [])
-      if (v) grouped[gk].via[parseSailTime(it.sail_tm)] = v
+      if (via1) grouped[gk].via[parseSailTime(it.sail_tm)] = via1
     }
 
     if (!Object.keys(grouped).length) return fallback()
@@ -377,7 +379,7 @@ export async function getArrivalsForRegion(
     if (!items.length) return fallback()
 
     const grouped: Record<string, {
-      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string; suspended?: boolean }[]
+      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: CancelledEntry[]
     }> = {}
 
     for (const it of items) {

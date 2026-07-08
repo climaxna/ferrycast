@@ -28,12 +28,12 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
 
   // 부분 결항편(노선은 운항, 일부 편만 결항) — 지난·남은 구분 없이 취소선 칩으로 스트립에 병합.
   // (스트립은 지난 정상편도 회색으로 다 보여주므로 결항편도 하루 전체를 노출해야 일관됨)
-  type Chip = { time: string; kind: "past" | "next" | "future" | "cancelled"; reason?: string; suspended?: boolean }
+  type Chip = { time: string; kind: "past" | "next" | "future" | "cancelled"; reason?: string; suspended?: boolean; via?: string }
   const chips: Chip[] = [
     ...pastTimes.map((t): Chip => ({ time: t, kind: "past" })),
     ...(nextTime ? [{ time: nextTime, kind: "next" } as Chip] : []),
     ...futureTimes.map((t): Chip => ({ time: t, kind: "future" })),
-    ...(route.cancelledTimes ?? []).map((c): Chip => ({ time: c.time, kind: "cancelled", reason: c.reason, suspended: c.suspended })),
+    ...(route.cancelledTimes ?? []).map((c): Chip => ({ time: c.time, kind: "cancelled", reason: c.reason, suspended: c.suspended, via: c.via })),
   ].sort((a, b) => toMinutes(a.time) - toMinutes(b.time))
 
   const isAltTerminal = !route.originName && route.terminal !== "완도여객선터미널"
@@ -111,6 +111,7 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
                       className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm tabular-nums ${c.suspended ? "bg-amber-50 text-amber-500" : "bg-rose-50 text-rose-400"}`}
                     >
                       <span className={`line-through ${c.suspended ? "decoration-amber-300" : "decoration-rose-300"}`}>{c.time}</span>
+                      {c.via && <span className="text-[10px] font-semibold text-amber-600">{c.via} 경유</span>}
                       <span className={`text-[10px] font-semibold ${c.suspended ? "text-amber-600" : "text-rose-500"}`}>{c.suspended ? "비운항" : "결항"}</span>
                     </span>
                   ) : c.kind === "past" ? (
