@@ -23,17 +23,30 @@ interface MtisItem {
   sail_tm: string       // HHMM without leading zero (e.g. "700" = 07:00)
   oport_nm: string      // departure port name
   dest_nm: string       // destination port name
-  nvg_stts_nm: string   // "결항" | "출항전" | ...
+  nvg_stts_nm: string   // 진행상태: "출항전" | "운항중" | "완료" | (드물게) "결항"
+  nvg_se_cd?: string    // 운항구분코드: 1=정상 2=증선 3=증회 4=비운 5=통제
+  nvg_se_nm?: string    // 운항구분명: "정상"|"증선"|"증회"|"비운"|"통제"
   psnshp_nm: string     // ship name
   nvg_seawy_nm: string  // 운항항로명 (예: "제주완도"=직항, "제주추자도-완도"=추자도 경유)
-  cntrl_rsn_nm?: string | null  // 통제사유 (예: "풍랑주의보") — 기상 결항 사유
-  nnavi_rsn_nm?: string | null  // 미운항사유 (예: "선박검사", "선박정비")
+  cntrl_rsn_nm?: string | null  // 통제사유 (예: "풍랑주의보") — 기상 통제(결항) 사유
+  nnavi_rsn_nm?: string | null  // 미운항사유 (예: "선박검사", "선박정비") — 비운 사유
+}
+
+// 실제 미운항(=배 안 뜸) 판정. MTIS 진행상태(nvg_stts_nm)의 "결항"은 오늘자 267편 중
+// 0건일 만큼 드물게만 나타난다. 실제 운항 여부를 가르는 권위 필드는 운항구분(nvg_se_nm):
+//   정상·증선·증회 = 운항 / 비운(선박검사·정비·휴항)·통제(풍랑 등 기상) = 미운항.
+// (전국 689편 교차검증: 비운·통제 267편은 전부 출항전, 완료·운항중 편은 전부 정상)
+// ⚠️ nnavi_rsn_nm(선박검사 등)은 정상 운항편에도 붙는 노이즈라 결항 판정에 쓰지 말 것.
+function isCancelled(it: MtisItem): boolean {
+  return it.nvg_se_cd === "4" || it.nvg_se_cd === "5"
+    || it.nvg_se_nm === "비운" || it.nvg_se_nm === "통제"
+    || it.nvg_stts_nm === "결항"
 }
 
 // 결항편에서 사유 추출 (기상 통제사유 우선, 없으면 미운항사유)
 function cancelReason(items: MtisItem[]): string | undefined {
   for (const it of items) {
-    if (it.nvg_stts_nm !== "결항") continue
+    if (!isCancelled(it)) continue
     const r = it.cntrl_rsn_nm || it.nnavi_rsn_nm
     if (r && r !== "null") return r
   }
@@ -180,7 +193,7 @@ function arrGroupKey(item: MtisItem): string | null {
 // 전편이 결항일 때만 노선 전체를 "cancelled"로 판정한다.
 function groupStatus(items: MtisItem[]): RouteStatus {
   if (items.length === 0) return "unknown"
-  if (items.some((it) => it.nvg_stts_nm !== "결항")) return "operating"
+  if (items.some((it) => !isCancelled(it))) return "operating"
   return "cancelled"
 }
 
@@ -201,7 +214,7 @@ async function fetchTomorrowData(
   try {
     const items = await getMtisDay(key, nextDay(todayDate))
     for (const it of items) {
-      if (it.nvg_stts_nm === "결항") continue
+      if (isCancelled(it)) continue
       const gk = keyFn(it)
       if (!gk) continue
       if (!timesPerGroup[gk]) timesPerGroup[gk] = []
@@ -244,8 +257,8 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       if (!gk) continue
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {} }
       grouped[gk].allItems.push(it)
-      // 결항편은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
-      if (it.nvg_stts_nm === "결항") continue
+      // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
+      if (isCancelled(it)) continue
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
       // 경유편 표시는 제주만 (제주는 일부 편만 경유 → 표시 가치 큼.
@@ -314,8 +327,8 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
       if (!gk) continue
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], cfg: ARR_CFG[gk], via: {} }
       grouped[gk].allItems.push(it)
-      // 결항편은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
-      if (it.nvg_stts_nm === "결항") continue
+      // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems에만 남김)
+      if (isCancelled(it)) continue
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
       // 경유편 표시는 제주만 (도착 탭 제주→완도도 추자도 경유편 존재)
@@ -396,7 +409,7 @@ function yaksanReturnKey(it: MtisItem): string | null {
 function collectTimes(items: MtisItem[], keyFn: (it: MtisItem) => string | null): Record<string, string[]> {
   const out: Record<string, string[]> = {}
   for (const it of items) {
-    if (it.nvg_stts_nm === "결항") continue
+    if (isCancelled(it)) continue
     const gk = keyFn(it)
     if (!gk) continue
     ;(out[gk] ??= []).push(parseSailTime(it.sail_tm))
@@ -429,7 +442,7 @@ export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive:
       const gk = yaksanForwardKey(it) ?? yaksanReturnKey(it)
       if (!gk) continue
       ;(allByKey[gk] ??= []).push(it)
-      if (it.nvg_stts_nm !== "결항" && it.psnshp_nm) (shipsByKey[gk] ??= new Set()).add(it.psnshp_nm)
+      if (!isCancelled(it) && it.psnshp_nm) (shipsByKey[gk] ??= new Set()).add(it.psnshp_nm)
     }
 
     const routes: WandoRoute[] = []

@@ -11,17 +11,28 @@ interface MtisItem {
   sail_tm: string
   oport_nm: string
   dest_nm: string
-  nvg_stts_nm: string
+  nvg_stts_nm: string           // 진행상태: "출항전"|"운항중"|"완료"|(드물게)"결항"
+  nvg_se_cd?: string            // 운항구분코드: 1=정상 2=증선 3=증회 4=비운 5=통제
+  nvg_se_nm?: string            // 운항구분명
   psnshp_nm: string
   nvg_seawy_nm: string
   cntrl_rsn_nm?: string | null  // 통제사유 (예: "풍랑주의보")
   nnavi_rsn_nm?: string | null  // 미운항사유 (예: "선박정비")
 }
 
+// 실제 미운항 판정 — 운항구분(nvg_se_nm)이 권위 필드. 비운(선박검사·정비·휴항)·통제(기상)
+// = 미운항. nvg_stts_nm="결항"은 드물게만 나타나므로 보조로만 본다.
+// ⚠️ nnavi_rsn_nm은 정상 운항편에도 붙는 노이즈라 결항 판정에 쓰지 말 것. (ferry.ts 동일)
+function isCancelled(it: MtisItem): boolean {
+  return it.nvg_se_cd === "4" || it.nvg_se_cd === "5"
+    || it.nvg_se_nm === "비운" || it.nvg_se_nm === "통제"
+    || it.nvg_stts_nm === "결항"
+}
+
 // 결항편에서 사유 추출 (기상 통제사유 우선)
 function cancelReason(items: MtisItem[]): string | undefined {
   for (const it of items) {
-    if (it.nvg_stts_nm !== "결항") continue
+    if (!isCancelled(it)) continue
     const r = it.cntrl_rsn_nm || it.nnavi_rsn_nm
     if (r && r !== "null") return r
   }
@@ -60,7 +71,7 @@ function extractVia(item: MtisItem, depKeywords: string[], destKeywords: string[
 
 function groupStatus(items: MtisItem[]): RouteStatus {
   if (items.length === 0) return "unknown"
-  if (items.some((it) => it.nvg_stts_nm !== "결항")) return "operating"
+  if (items.some((it) => !isCancelled(it))) return "operating"
   return "cancelled"
 }
 
@@ -181,7 +192,7 @@ async function fetchTomorrowData(
   try {
     const items = await getMtisDay(key, nextDay(todayDate))
     for (const it of items) {
-      if (it.nvg_stts_nm === "결항") continue
+      if (isCancelled(it)) continue
       const gk = keyFn(it)
       if (!gk) continue
       if (!timesPerGroup[gk]) timesPerGroup[gk] = []
@@ -262,7 +273,7 @@ export async function getRoutesForRegion(
       if (!gk) continue
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {} }
       grouped[gk].allItems.push(it)
-      if (it.nvg_stts_nm === "결항") continue
+      if (isCancelled(it)) continue
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
       const v = extractVia(it, config.routeGroups.find(g => g.key === gk)?.depPortKeywords ?? [], config.routeGroups.find(g => g.key === gk)?.destKeywords ?? [])
@@ -333,7 +344,7 @@ export async function getArrivalsForRegion(
       if (!gk) continue
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {} }
       grouped[gk].allItems.push(it)
-      if (it.nvg_stts_nm === "결항") continue
+      if (isCancelled(it)) continue
       grouped[gk].times.push(parseSailTime(it.sail_tm))
       if (it.psnshp_nm) grouped[gk].ships.add(it.psnshp_nm)
     }
