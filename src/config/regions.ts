@@ -5,7 +5,6 @@ export interface RouteGroupConfig {
   destKeywords: string[]      // MTIS dest_nm 포함 키워드 (출발편 필터)
   depTerminal?: string        // 이 항로의 본항측 출발 터미널 (없으면 region.mainTerminal). 한 도시 여러 항 대응
   islandTerminal?: string     // 도착 탭 — 섬에서 타는 터미널
-  fareAdult?: number
   fareUrl?: string
   fallbackDep?: string[]      // API 장애 시 정적 출발 시각
   fallbackArr?: string[]      // API 장애 시 정적 도착 시각

@@ -1,159 +1,17 @@
-import { cache } from "react"
 import type { WandoRoute, RouteStatus } from "./types"
 import type { RegionConfig, RouteGroupConfig } from "@/config/regions"
 import { buildArrivalLookup, findPortNames } from "./shipArrival"
+import {
+  type MtisItem, type CancelledEntry,
+  getMtisDay, fetchTomorrowData,
+  isCancelled, isSuspended, cancelKindOf, cancelReason, itemReason,
+  extractVia, parseSailTime, deduplicateTimes, partialCancelled, groupStatus,
+} from "./mtis"
 
-const MTIS_BASE = "https://apis.data.go.kr/B554035/oprt-schd-info-v2/get-oprt-schd-info-v2"
-const MTIS_PAGE_SIZE = 2000
-const MTIS_MAX_PAGES = 5
-
-interface MtisItem {
-  sail_tm: string
-  oport_nm: string
-  dest_nm: string
-  nvg_stts_nm: string           // 진행상태: "출항전"|"운항중"|"완료"|(드물게)"결항"
-  nvg_se_cd?: string            // 운항구분코드: 1=정상 2=증선 3=증회 4=비운 5=통제
-  nvg_se_nm?: string            // 운항구분명
-  psnshp_nm: string
-  nvg_seawy_nm: string
-  cntrl_rsn_nm?: string | null  // 통제사유 (예: "풍랑주의보")
-  nnavi_rsn_nm?: string | null  // 미운항사유 (예: "선박정비")
-}
-
-// 실제 미운항 판정 — 운항구분(nvg_se_nm)이 권위 필드. 비운(선박검사·정비·휴항)·통제(기상)
-// = 미운항. nvg_stts_nm="결항"은 드물게만 나타나므로 보조로만 본다.
-// ⚠️ nnavi_rsn_nm은 정상 운항편에도 붙는 노이즈라 결항 판정에 쓰지 말 것. (ferry.ts 동일)
-function isCancelled(it: MtisItem): boolean {
-  return it.nvg_se_cd === "4" || it.nvg_se_cd === "5"
-    || it.nvg_se_nm === "비운" || it.nvg_se_nm === "통제"
-    || it.nvg_stts_nm === "결항"
-}
-
-// 비운(계획된 미운항: 선박검사·정비·휴항 = "비운항") vs 통제(기상 = "결항") 구분.
-function isSuspended(it: MtisItem): boolean {
-  return it.nvg_se_cd === "4" || it.nvg_se_nm === "비운"
-}
-
-// 전편 미운항 시 노선 성격 — 기상 통제가 하나라도 섞이면 "cancelled", 전부 계획 비운이면 "suspended".
-function cancelKindOf(items: MtisItem[]): "cancelled" | "suspended" {
-  const cancelled = items.filter(isCancelled)
-  return cancelled.length > 0 && cancelled.every(isSuspended) ? "suspended" : "cancelled"
-}
-
-// 결항편에서 사유 추출 (기상 통제사유 우선)
-function cancelReason(items: MtisItem[]): string | undefined {
-  for (const it of items) {
-    if (!isCancelled(it)) continue
-    const r = it.cntrl_rsn_nm || it.nnavi_rsn_nm
-    if (r && r !== "null") return r
-  }
-  return undefined
-}
-
-function parseSailTime(raw: string): string {
-  const s = raw.padStart(4, "0")
-  return `${s.slice(0, 2)}:${s.slice(2)}`
-}
-
-function deduplicateTimes(times: string[]): string[] {
-  const sorted = [...new Set(times)].sort()
-  const result: string[] = []
-  for (const t of sorted) {
-    const [h, m] = t.split(":").map(Number)
-    const mins = h * 60 + m
-    const hasSimilar = result.some((r) => {
-      const [rh, rm] = r.split(":").map(Number)
-      return Math.abs(rh * 60 + rm - mins) < 5
-    })
-    if (!hasSimilar) result.push(t)
-  }
-  return result
-}
-
-// 한 편의 결항 사유 (통제사유 우선, 없으면 미운항사유)
-function itemReason(it: MtisItem): string | undefined {
-  const r = it.cntrl_rsn_nm || it.nnavi_rsn_nm
-  return r && r !== "null" ? r : undefined
-}
-
-// 부분 결항편 정리 — 정상편과 5분 이내 겹치면 제외(정상 우선), 결항끼리도 5분 병합, 시각순.
-type CancelledEntry = { time: string; reason?: string; suspended?: boolean; via?: string }
-function partialCancelled(
-  cancelled: CancelledEntry[],
-  operating: string[],
-): CancelledEntry[] {
-  const min = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
-  const opMins = operating.map(min)
-  const out: CancelledEntry[] = []
-  for (const c of [...cancelled].sort((a, b) => min(a.time) - min(b.time))) {
-    const cm = min(c.time)
-    if (opMins.some((o) => Math.abs(o - cm) < 5)) continue
-    if (out.some((o) => Math.abs(min(o.time) - cm) < 5)) continue
-    out.push(c)
-  }
-  return out
-}
-
-function extractVia(item: MtisItem, depKeywords: string[], destKeywords: string[]): string | null {
-  let s = (item.nvg_seawy_nm || "").replace(/\(.*?\)/g, "")
-  const ports = [item.oport_nm, item.dest_nm, ...depKeywords, ...destKeywords]
-  for (const p of ports) {
-    if (p) s = s.split(p).join("")
-  }
-  s = s.replace(/[-\s]/g, "").trim()
-  return s.length > 0 ? s : null
-}
-
-function groupStatus(items: MtisItem[]): RouteStatus {
-  if (items.length === 0) return "unknown"
-  if (items.some((it) => !isCancelled(it))) return "operating"
-  return "cancelled"
-}
-
-function nextDay(date: string): string {
-  const y = +date.slice(0, 4), m = +date.slice(4, 6), d = +date.slice(6, 8)
-  const dt = new Date(Date.UTC(y, m - 1, d + 1))
-  return dt.toISOString().slice(0, 10).replace(/-/g, "")
-}
-
-async function fetchMtisPage(
-  key: string,
-  date: string,
-  pageNo: number,
-): Promise<{ items: MtisItem[]; totalCount: number }> {
-  const params = new URLSearchParams({
-    serviceKey: key, pageNo: String(pageNo), numOfRows: String(MTIS_PAGE_SIZE),
-    dataType: "JSON", rlvtYmd: date,
-  })
-  const res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 300 } })
-  if (!res.ok) return { items: [], totalCount: 0 }
-  let json: unknown
-  try { json = await res.json() } catch { return { items: [], totalCount: 0 } }
-  const j = json as { response?: { header?: { resultCode?: string }; body?: { items?: { item?: unknown }; totalCount?: number } } }
-  if (j?.response?.header?.resultCode !== "200") return { items: [], totalCount: 0 }
-  const body = j?.response?.body
-  const raw = body?.items?.item
-  const items = (Array.isArray(raw) ? raw : raw ? [raw] : []) as MtisItem[]
-  const totalCount = Number(body?.totalCount ?? items.length)
-  return { items, totalCount }
-}
-
-async function fetchMtisAll(key: string, date: string): Promise<MtisItem[]> {
-  const first = await fetchMtisPage(key, date, 1)
-  const items = [...first.items]
-  const totalPages = Math.min(Math.ceil(first.totalCount / MTIS_PAGE_SIZE), MTIS_MAX_PAGES)
-  if (totalPages > 1) {
-    const rest = await Promise.allSettled(
-      Array.from({ length: totalPages - 1 }, (_, i) => fetchMtisPage(key, date, i + 2)),
-    )
-    for (const r of rest) {
-      if (r.status === "fulfilled") items.push(...r.value.items)
-    }
-  }
-  return items
-}
-
-const getMtisDay = cache((key: string, date: string): Promise<MtisItem[]> => fetchMtisAll(key, date))
+// ────────────────────────────────────────────────
+// 다지역(포항·목포·인천) 항로 — MTIS 코어는 ./mtis, 노선 매핑은 config/regions 기반.
+// 완도(ferry.ts)와 동일한 코어를 공유해 결항 판정·시간표 파싱이 어긋나지 않는다.
+// ────────────────────────────────────────────────
 
 function makeDepGroupKey(groups: RouteGroupConfig[]) {
   return (item: MtisItem): string | null => {
@@ -218,34 +76,10 @@ function destKeywords(config: RegionConfig): string[] {
   return [...new Set(config.routeGroups.flatMap((g) => g.destKeywords))]
 }
 
-async function fetchTomorrowData(
-  key: string,
-  todayDate: string,
-  keyFn: (item: MtisItem) => string | null,
-): Promise<Record<string, { tripCount: number; times: string[] }>> {
-  const timesPerGroup: Record<string, string[]> = {}
-  try {
-    const items = await getMtisDay(key, nextDay(todayDate))
-    for (const it of items) {
-      if (isCancelled(it)) continue
-      const gk = keyFn(it)
-      if (!gk) continue
-      if (!timesPerGroup[gk]) timesPerGroup[gk] = []
-      timesPerGroup[gk].push(parseSailTime(it.sail_tm))
-    }
-  } catch { /* 내일 데이터 실패는 무시 */ }
-  return Object.fromEntries(
-    Object.entries(timesPerGroup).map(([gk, rawTimes]) => {
-      const times = deduplicateTimes(rawTimes)
-      return [gk, { tripCount: times.length, times }]
-    }),
-  )
-}
-
 function makeStaticDep(config: RegionConfig): WandoRoute[] {
   return config.routeGroups
     .filter((g) => g.fallbackDep?.length)
-    .map((g, i) => ({
+    .map((g) => ({
       id: `dep-${g.key}`,
       to: g.label,
       operator: "",
@@ -309,7 +143,7 @@ export async function getRoutesForRegion(
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
       const cfgG = config.routeGroups.find(g => g.key === gk)
-      const via1 = extractVia(it, cfgG?.depPortKeywords ?? [], cfgG?.destKeywords ?? [])
+      const via1 = extractVia(it, [...(cfgG?.depPortKeywords ?? []), ...(cfgG?.destKeywords ?? [])])
       if (isCancelled(it)) {
         grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(via1 ? { via: via1 } : {}) })
         continue
