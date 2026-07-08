@@ -180,7 +180,27 @@ export const REGIONS: Record<string, RegionConfig> = {
         fallbackDep: ["08:30"],
         fallbackArr: ["14:00"],
       },
+      {
+        // 덕적도 — 인천연안여객터미널 출발. MTIS dest_nm="덕적" (직항 + 자월·승봉·이작 경유 혼재)
+        key: "deokjeokdo",
+        label: "덕적도",
+        depPortKeywords: ["인천"],
+        destKeywords: ["덕적"],
+        islandTerminal: "덕적도여객선터미널",
+        fallbackDep: ["08:00", "14:30"],
+        fallbackArr: ["09:30", "16:00"],
+      },
+      {
+        // 대이작도 — 항로 "인팔-자-승-이"(인천·팔미도·자월·승봉·이작). MTIS dest_nm="대이작"
+        key: "daeijakdo",
+        label: "대이작도",
+        depPortKeywords: ["인천"],
+        destKeywords: ["대이작"],
+        islandTerminal: "대이작도 선착장",
+        fallbackDep: ["07:50", "08:30"],
+        fallbackArr: ["14:30", "15:10"],
+      },
     ],
-    metaDescription: "인천 백령도·연평도 여객선 시간표·운항 현황·날씨·조석 예보",
+    metaDescription: "인천 백령도·연평도·덕적도·대이작도 여객선 시간표·운항 현황·날씨·조석 예보",
   },
 }
