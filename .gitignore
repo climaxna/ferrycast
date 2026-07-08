@@ -43,6 +43,10 @@ next-env.d.ts
 # screenshots
 screenshot-*.png
 
+# python bytecode (scripts/ 마케팅 유틸)
+__pycache__/
+*.pyc
+
 # claude code (개인용 로컬 설정은 제외, 공유 settings.json만 커밋)
 .claude/settings.local.json
 
