@@ -29,9 +29,11 @@ export interface WandoRoute {
   arrivals?: Record<string, string>  // "출발HH:MM" → "도착예정HH:MM" (TAGO 여객선 실데이터)
   durationMin?: number          // TAGO 도착시각 미존재/비정상 시 fallback 계산용 소요시간(분)
   cancelReason?: string         // 결항 사유 (예: "풍랑주의보") — MTIS 통제/미운항 사유
-  // 부분 결항 — 노선 전체는 운항(status="operating")이지만 일부 편만 결항일 때 그 편들.
-  // 정상편과 5분 이내 겹치는 시각은 제외(정상 우선). status="cancelled"(전편 결항)면 비움.
-  cancelledTimes?: { time: string; reason?: string }[]
+  // 전편 미운항(status="cancelled")의 성격 — "cancelled"=기상 통제(결항) / "suspended"=계획 비운(선박검사·정비·휴항→비운항)
+  cancelKind?: "cancelled" | "suspended"
+  // 부분 결항 — 노선 전체는 운항(status="operating")이지만 일부 편만 미운항일 때 그 편들.
+  // 정상편과 5분 이내 겹치는 시각은 제외(정상 우선). suspended=true면 비운항(선박검사 등), 아니면 결항(기상).
+  cancelledTimes?: { time: string; reason?: string; suspended?: boolean }[]
   // 섬↔섬 노선(약산권) 전용 — 한 카드에 왕복을 함께 담기 위한 반대 방향 시간표
   returnTrip?: {
     label: string               // "금일 → 약산"

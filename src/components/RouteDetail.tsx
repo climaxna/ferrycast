@@ -24,6 +24,9 @@ function addMinutes(time: string, mins: number): string {
 export default function RouteDetail({ route, isDeparture, accent, onClose }: Props) {
   const theme = accent ?? ROUTE_THEME.blue
   const isCancelled = route.status === "cancelled"
+  // 계획된 비운(선박검사·정비·휴항) → "비운항"(amber), 기상 통제 → "결항"(rose)
+  const suspended = isCancelled && route.cancelKind === "suspended"
+  const cancelLabel = suspended ? "비운항" : "결항"
   const isUnknown = route.status === "unknown"
   const originName = route.originName ?? "완도"
   const routeLabel = route.from ? `${route.from} → ${route.to}` : `${originName} → ${route.to}`
@@ -83,14 +86,16 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
         </div>
         <span
           className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-bold ${
-            isCancelled
-              ? "bg-rose-50 text-rose-600"
-              : isUnknown
-                ? "bg-slate-100 text-slate-500"
-                : theme.badgeSoft
+            suspended
+              ? "bg-amber-50 text-amber-700"
+              : isCancelled
+                ? "bg-rose-50 text-rose-600"
+                : isUnknown
+                  ? "bg-slate-100 text-slate-500"
+                  : theme.badgeSoft
           }`}
         >
-          {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
+          {isCancelled ? cancelLabel : isUnknown ? "운항예정" : "운항"}
         </span>
       </div>
 
@@ -192,20 +197,24 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               )}
             </div>
             {isCancelled ? (
-              <div className="rounded-2xl bg-rose-50 px-4 py-6 text-center">
-                <svg className="mx-auto h-10 w-10 text-rose-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <div className={`rounded-2xl px-4 py-6 text-center ${suspended ? "bg-amber-50" : "bg-rose-50"}`}>
+                <svg className={`mx-auto h-10 w-10 ${suspended ? "text-amber-400" : "text-rose-400"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M3 14h18l-1.4 4.8a2 2 0 0 1-1.9 1.4H6.3a2 2 0 0 1-1.9-1.4L3 14Z" />
                   <path d="M5.5 14V8.5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2V14" />
                   <path d="M12 3v3.5" />
-                  <path d="M4 4l16 16" className="text-rose-500" />
+                  <path d="M4 4l16 16" className={suspended ? "text-amber-500" : "text-rose-500"} />
                 </svg>
-                <p className="mt-2 text-lg font-bold text-rose-600">오늘 결항</p>
+                <p className={`mt-2 text-lg font-bold ${suspended ? "text-amber-700" : "text-rose-600"}`}>
+                  {suspended ? "오늘 비운항" : "오늘 결항"}
+                </p>
                 {route.cancelReason && (
-                  <p className="mt-1.5 inline-block rounded-full bg-rose-100 px-3 py-1 text-sm font-bold text-rose-700">
+                  <p className={`mt-1.5 inline-block rounded-full px-3 py-1 text-sm font-bold ${suspended ? "bg-amber-100 text-amber-800" : "bg-rose-100 text-rose-700"}`}>
                     {route.cancelReason}
                   </p>
                 )}
-                <p className="mt-2 text-sm text-rose-500">공식 채널에서 최종 확인하세요.</p>
+                <p className={`mt-2 text-sm ${suspended ? "text-amber-600" : "text-rose-500"}`}>
+                  {suspended ? "선박검사·정비 등으로 운항하지 않습니다. 공식 채널에서 확인하세요." : "공식 채널에서 최종 확인하세요."}
+                </p>
               </div>
             ) : route.times.length > 0 ? (
               hasArrival ? (
@@ -310,26 +319,32 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
             ) : (
               <p className="text-base text-slate-400">시간표 정보 없음</p>
             )}
-            {/* 부분 결항 — 노선은 운항하나 일부 편만 결항 (시각·사유) */}
-            {!isCancelled && route.cancelledTimes && route.cancelledTimes.length > 0 && (
-              <div className="mt-3 rounded-xl border border-rose-100 bg-rose-50/60 px-3.5 py-3">
-                <p className="mb-2 flex items-center gap-1.5 text-sm font-bold text-rose-600">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M15 9l-6 6M9 9l6 6" />
-                  </svg>
-                  오늘 일부 편 결항
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {route.cancelledTimes.map((c) => (
-                    <span key={c.time} className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 shadow-sm">
-                      <span className="text-base font-bold tabular-nums text-rose-500 line-through decoration-rose-300 decoration-2">{c.time}</span>
-                      {c.reason && <span className="text-[11px] font-semibold text-rose-500">{c.reason}</span>}
-                    </span>
-                  ))}
+            {/* 부분 미운항 — 노선은 운항하나 일부 편만 결항(기상)/비운항(선박검사 등) */}
+            {!isCancelled && route.cancelledTimes && route.cancelledTimes.length > 0 && (() => {
+              const cx = route.cancelledTimes!
+              const anyWeather = cx.some((c) => !c.suspended)
+              const anySuspended = cx.some((c) => c.suspended)
+              const title = anyWeather && anySuspended ? "오늘 일부 편 결항·비운항" : anySuspended ? "오늘 일부 편 비운항" : "오늘 일부 편 결항"
+              return (
+                <div className={`mt-3 rounded-xl border px-3.5 py-3 ${anyWeather ? "border-rose-100 bg-rose-50/60" : "border-amber-100 bg-amber-50/60"}`}>
+                  <p className={`mb-2 flex items-center gap-1.5 text-sm font-bold ${anyWeather ? "text-rose-600" : "text-amber-700"}`}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M15 9l-6 6M9 9l6 6" />
+                    </svg>
+                    {title}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {cx.map((c) => (
+                      <span key={c.time} className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 shadow-sm">
+                        <span className={`text-base font-bold tabular-nums line-through decoration-2 ${c.suspended ? "text-amber-600 decoration-amber-300" : "text-rose-500 decoration-rose-300"}`}>{c.time}</span>
+                        <span className={`text-[11px] font-semibold ${c.suspended ? "text-amber-600" : "text-rose-500"}`}>{c.reason ?? (c.suspended ? "비운항" : "결항")}</span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            })()}
             {!isCancelled && route.via && Object.keys(route.via).length > 0 && (
               <p className="mt-2.5 text-xs text-amber-600">
                 <span className="font-semibold text-amber-500">경유</span> 표시 편은 해당 기항지를 들렀다 가며 소요 시간이 더 깁니다. 그 외는 직항입니다.

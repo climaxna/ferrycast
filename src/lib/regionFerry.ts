@@ -29,6 +29,17 @@ function isCancelled(it: MtisItem): boolean {
     || it.nvg_stts_nm === "결항"
 }
 
+// 비운(계획된 미운항: 선박검사·정비·휴항 = "비운항") vs 통제(기상 = "결항") 구분.
+function isSuspended(it: MtisItem): boolean {
+  return it.nvg_se_cd === "4" || it.nvg_se_nm === "비운"
+}
+
+// 전편 미운항 시 노선 성격 — 기상 통제가 하나라도 섞이면 "cancelled", 전부 계획 비운이면 "suspended".
+function cancelKindOf(items: MtisItem[]): "cancelled" | "suspended" {
+  const cancelled = items.filter(isCancelled)
+  return cancelled.length > 0 && cancelled.every(isSuspended) ? "suspended" : "cancelled"
+}
+
 // 결항편에서 사유 추출 (기상 통제사유 우선)
 function cancelReason(items: MtisItem[]): string | undefined {
   for (const it of items) {
@@ -67,12 +78,12 @@ function itemReason(it: MtisItem): string | undefined {
 
 // 부분 결항편 정리 — 정상편과 5분 이내 겹치면 제외(정상 우선), 결항끼리도 5분 병합, 시각순.
 function partialCancelled(
-  cancelled: { time: string; reason?: string }[],
+  cancelled: { time: string; reason?: string; suspended?: boolean }[],
   operating: string[],
-): { time: string; reason?: string }[] {
+): { time: string; reason?: string; suspended?: boolean }[] {
   const min = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
   const opMins = operating.map(min)
-  const out: { time: string; reason?: string }[] = []
+  const out: { time: string; reason?: string; suspended?: boolean }[] = []
   for (const c of [...cancelled].sort((a, b) => min(a.time) - min(b.time))) {
     const cm = min(c.time)
     if (opMins.some((o) => Math.abs(o - cm) < 5)) continue
@@ -288,7 +299,7 @@ export async function getRoutesForRegion(
     if (!items.length) return fallback()
 
     const grouped: Record<string, {
-      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string }[]
+      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string; suspended?: boolean }[]
     }> = {}
 
     for (const it of items) {
@@ -297,7 +308,7 @@ export async function getRoutesForRegion(
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -333,6 +344,7 @@ export async function getRoutesForRegion(
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
           ...(partial.length ? { cancelledTimes: partial } : {}),
+          ...(status === "cancelled" ? { cancelKind: cancelKindOf(allItems) } : {}),
           ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
@@ -365,7 +377,7 @@ export async function getArrivalsForRegion(
     if (!items.length) return fallback()
 
     const grouped: Record<string, {
-      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string }[]
+      times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string; suspended?: boolean }[]
     }> = {}
 
     for (const it of items) {
@@ -374,7 +386,7 @@ export async function getArrivalsForRegion(
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -410,6 +422,7 @@ export async function getArrivalsForRegion(
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
           ...(partial.length ? { cancelledTimes: partial } : {}),
+          ...(status === "cancelled" ? { cancelKind: cancelKindOf(allItems) } : {}),
           ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })

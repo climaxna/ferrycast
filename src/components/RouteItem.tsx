@@ -13,6 +13,9 @@ interface Props {
 export default function RouteItem({ route, nowMinutes = 0, isArrival = false, accent, onClick }: Props) {
   const theme = accent ?? (isArrival ? ROUTE_THEME.teal : ROUTE_THEME.blue)
   const isCancelled = route.status === "cancelled"
+  // 전편 미운항 중 계획된 비운(선박검사·정비·휴항) → "비운항"(amber), 기상 통제 → "결항"(rose)
+  const suspended = isCancelled && route.cancelKind === "suspended"
+  const cancelLabel = suspended ? "비운항" : "결항"
   const isUnknown = route.status === "unknown"
   const originName = route.originName ?? "완도"
   const routeLabel = route.from ? `${route.from} → ${route.to}` : `${originName} → ${route.to}`
@@ -25,12 +28,12 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
 
   // 부분 결항편(노선은 운항, 일부 편만 결항) — 지난·남은 구분 없이 취소선 칩으로 스트립에 병합.
   // (스트립은 지난 정상편도 회색으로 다 보여주므로 결항편도 하루 전체를 노출해야 일관됨)
-  type Chip = { time: string; kind: "past" | "next" | "future" | "cancelled"; reason?: string }
+  type Chip = { time: string; kind: "past" | "next" | "future" | "cancelled"; reason?: string; suspended?: boolean }
   const chips: Chip[] = [
     ...pastTimes.map((t): Chip => ({ time: t, kind: "past" })),
     ...(nextTime ? [{ time: nextTime, kind: "next" } as Chip] : []),
     ...futureTimes.map((t): Chip => ({ time: t, kind: "future" })),
-    ...(route.cancelledTimes ?? []).map((c): Chip => ({ time: c.time, kind: "cancelled", reason: c.reason })),
+    ...(route.cancelledTimes ?? []).map((c): Chip => ({ time: c.time, kind: "cancelled", reason: c.reason, suspended: c.suspended })),
   ].sort((a, b) => toMinutes(a.time) - toMinutes(b.time))
 
   const isAltTerminal = !route.originName && route.terminal !== "완도여객선터미널"
@@ -46,9 +49,11 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
       type="button"
       onClick={onClick}
       className={`group relative flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
-        isCancelled
-          ? "border-rose-200 bg-rose-50/30 hover:border-rose-300"
-          : "border-slate-100 bg-white hover:border-slate-200"
+        suspended
+          ? "border-amber-200 bg-amber-50/30 hover:border-amber-300"
+          : isCancelled
+            ? "border-rose-200 bg-rose-50/30 hover:border-rose-300"
+            : "border-slate-100 bg-white hover:border-slate-200"
       }`}
     >
       <div className="min-w-0 flex-1">
@@ -57,22 +62,24 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
           <span className="font-bold text-slate-900">{routeLabel}</span>
           <span
             className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-              isCancelled
-                ? "bg-rose-50 text-rose-600"
-                : isUnknown
-                  ? "bg-slate-100 text-slate-500"
-                  : "bg-emerald-50 text-emerald-700"
+              suspended
+                ? "bg-amber-50 text-amber-700"
+                : isCancelled
+                  ? "bg-rose-50 text-rose-600"
+                  : isUnknown
+                    ? "bg-slate-100 text-slate-500"
+                    : "bg-emerald-50 text-emerald-700"
             }`}
           >
-            {isCancelled ? "결항" : isUnknown ? "운항예정" : "운항"}
+            {isCancelled ? cancelLabel : isUnknown ? "운항예정" : "운항"}
           </span>
         </div>
 
         {isCancelled ? (
-          <p className="mt-2 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-500">
-            오늘 이 항로는 결항입니다
+          <p className={`mt-2 rounded-lg px-3 py-2 text-xs ${suspended ? "bg-amber-50 text-amber-600" : "bg-rose-50 text-rose-500"}`}>
+            {suspended ? "오늘 이 항로는 비운항입니다 (선박검사·정비 등)" : "오늘 이 항로는 결항입니다"}
             {route.cancelReason && (
-              <span className="ml-1 font-semibold text-rose-600">· {route.cancelReason}</span>
+              <span className={`ml-1 font-semibold ${suspended ? "text-amber-700" : "text-rose-600"}`}>· {route.cancelReason}</span>
             )}
           </p>
         ) : route.times.length > 0 ? (
@@ -101,10 +108,10 @@ export default function RouteItem({ route, nowMinutes = 0, isArrival = false, ac
                   c.kind === "cancelled" ? (
                     <span
                       key={`x-${c.time}`}
-                      className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-1 text-sm tabular-nums text-rose-400"
+                      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm tabular-nums ${c.suspended ? "bg-amber-50 text-amber-500" : "bg-rose-50 text-rose-400"}`}
                     >
-                      <span className="line-through decoration-rose-300">{c.time}</span>
-                      <span className="text-[10px] font-semibold text-rose-500">결항</span>
+                      <span className={`line-through ${c.suspended ? "decoration-amber-300" : "decoration-rose-300"}`}>{c.time}</span>
+                      <span className={`text-[10px] font-semibold ${c.suspended ? "text-amber-600" : "text-rose-500"}`}>{c.suspended ? "비운항" : "결항"}</span>
                     </span>
                   ) : c.kind === "past" ? (
                     <span key={c.time} className="rounded-md px-2 py-1 text-sm tabular-nums text-slate-400">

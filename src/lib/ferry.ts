@@ -43,6 +43,18 @@ function isCancelled(it: MtisItem): boolean {
     || it.nvg_stts_nm === "결항"
 }
 
+// 비운(계획된 미운항: 선박검사·정비·휴항 = "비운항") vs 통제(기상 = "결항") 구분.
+// 비운이면 true → UI에서 "비운항", 아니면(통제·결항) false → "결항".
+function isSuspended(it: MtisItem): boolean {
+  return it.nvg_se_cd === "4" || it.nvg_se_nm === "비운"
+}
+
+// 전편 미운항일 때 노선 성격 — 기상 통제(결항)가 하나라도 섞이면 "cancelled", 전부 계획 비운이면 "suspended".
+function cancelKindOf(items: MtisItem[]): "cancelled" | "suspended" {
+  const cancelled = items.filter(isCancelled)
+  return cancelled.length > 0 && cancelled.every(isSuspended) ? "suspended" : "cancelled"
+}
+
 // 결항편에서 사유 추출 (기상 통제사유 우선, 없으면 미운항사유)
 function cancelReason(items: MtisItem[]): string | undefined {
   for (const it of items) {
@@ -79,12 +91,12 @@ function itemReason(it: MtisItem): string | undefined {
 
 // 부분 결항편 정리 — 정상편과 5분 이내 겹치면 제외(정상 우선), 결항편끼리도 5분 병합, 시각순.
 function partialCancelled(
-  cancelled: { time: string; reason?: string }[],
+  cancelled: { time: string; reason?: string; suspended?: boolean }[],
   operating: string[],
-): { time: string; reason?: string }[] {
+): { time: string; reason?: string; suspended?: boolean }[] {
   const min = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
   const opMins = operating.map(min)
-  const out: { time: string; reason?: string }[] = []
+  const out: { time: string; reason?: string; suspended?: boolean }[] = []
   for (const c of [...cancelled].sort((a, b) => min(a.time) - min(b.time))) {
     const cm = min(c.time)
     if (opMins.some((o) => Math.abs(o - cm) < 5)) continue
@@ -274,7 +286,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
     ])
     if (!items.length) return fallback()
 
-    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string }[] }> = {}
+    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; via: Record<string, string>; cancelled: { time: string; reason?: string; suspended?: boolean }[] }> = {}
     for (const it of items) {
       const gk = depGroupKey(it)
       if (!gk) continue
@@ -282,7 +294,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       grouped[gk].allItems.push(it)
       // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems·부분결항 표시용 cancelled에만 남김)
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -321,6 +333,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
           ...(partial.length ? { cancelledTimes: partial } : {}),
+          ...(status === "cancelled" ? { cancelKind: cancelKindOf(allItems) } : {}),
           ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
@@ -351,7 +364,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
     ])
     if (!items.length) return fallback()
 
-    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg; via: Record<string, string>; cancelled: { time: string; reason?: string }[] }> = {}
+    const grouped: Record<string, { times: string[]; ships: Set<string>; allItems: MtisItem[]; cfg: ArrGroupCfg; via: Record<string, string>; cancelled: { time: string; reason?: string; suspended?: boolean }[] }> = {}
     for (const it of items) {
       const gk = arrGroupKey(it)
       if (!gk) continue
@@ -359,7 +372,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
       grouped[gk].allItems.push(it)
       // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems·부분결항 표시용 cancelled에만 남김)
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -397,6 +410,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
           ...(Object.keys(via).length ? { via } : {}),
           ...(Object.keys(arrivals).length ? { arrivals } : {}),
           ...(partial.length ? { cancelledTimes: partial } : {}),
+          ...(status === "cancelled" ? { cancelKind: cancelKindOf(allItems) } : {}),
           ...(() => { const r = cancelReason(allItems); return r ? { cancelReason: r } : {} })(),
         }
       })
@@ -454,13 +468,13 @@ function collectTimes(items: MtisItem[], keyFn: (it: MtisItem) => string | null)
 }
 
 // groupKey별 결항편 집계 (부분결항 표시용)
-function collectCancelled(items: MtisItem[], keyFn: (it: MtisItem) => string | null): Record<string, { time: string; reason?: string }[]> {
-  const out: Record<string, { time: string; reason?: string }[]> = {}
+function collectCancelled(items: MtisItem[], keyFn: (it: MtisItem) => string | null): Record<string, { time: string; reason?: string; suspended?: boolean }[]> {
+  const out: Record<string, { time: string; reason?: string; suspended?: boolean }[]> = {}
   for (const it of items) {
     if (!isCancelled(it)) continue
     const gk = keyFn(it)
     if (!gk) continue
-    ;(out[gk] ??= []).push({ time: parseSailTime(it.sail_tm), reason: itemReason(it) })
+    ;(out[gk] ??= []).push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
   }
   return out
 }
@@ -503,6 +517,7 @@ export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive:
       const rTmrw = retTomorrow[g.key] ?? []
       const status = groupStatus(all)
       const partial = status === "operating" ? partialCancelled(fwdCancelled[g.key] ?? [], times) : []
+      const cKind = status === "cancelled" ? cancelKindOf(all) : undefined
       routes.push({
         id: `yaksan-${g.key}`,
         to: g.island,
@@ -515,6 +530,7 @@ export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive:
         noBooking: true,
         bookingNote: `현장 매표소 발권 · 약산농협 ${YAKSAN_PHONE}`,
         ...(partial.length ? { cancelledTimes: partial } : {}),
+        ...(cKind ? { cancelKind: cKind } : {}),
         ...(fTmrw.length ? { tomorrow: { tripCount: fTmrw.length, times: fTmrw } } : {}),
         returnTrip: {
           label: `${g.island} → 약산`,
