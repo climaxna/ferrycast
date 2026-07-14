@@ -27,9 +27,22 @@ export async function generateMetadata({
   const { region } = await params
   const config = REGIONS[region]
   if (!config) return {}
+  // 링크 미리보기(카톡·블로그·네이버)는 <title>이 아닌 og:title/og:description을 읽는다.
+  // openGraph를 지역별로 덮어쓰지 않으면 루트 layout의 완도 OG가 그대로 노출된다.
+  const title = `FerryCast — ${config.name} 날씨·항로 현황`
+  const url = `https://ferrycast.kr/${config.slug}`
   return {
-    title: `FerryCast — ${config.name} 날씨·항로 현황`,
+    title,
     description: config.metaDescription,
+    alternates: { canonical: `/${config.slug}` },
+    openGraph: {
+      type: "website",
+      siteName: "FerryCast",
+      title,
+      description: config.metaDescription,
+      url,
+      locale: "ko_KR",
+    },
   }
 }
 
