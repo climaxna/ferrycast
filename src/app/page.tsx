@@ -81,8 +81,8 @@ export default function Page() {
 
         <div className="space-y-2">
           <CoupangSection />
-          {/* 완도는 카카오 애드핏 대신 지역 광고 모집 슬롯 (다지역은 AdFitBanner 유지) */}
-          <LocalAdSlot />
+          {/* 카카오 애드핏 대신 지역 광고 모집 슬롯 (완도·포항·목포·인천 공용) */}
+          <LocalAdSlot regionName="완도" adsPath="/ads" />
         </div>
 
         <RegionNav current="" />

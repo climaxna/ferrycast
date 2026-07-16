@@ -1,10 +1,17 @@
 import Link from "next/link"
-import { AD_MAIL, AD_MAILTO } from "@/lib/adInquiry"
+import { AD_MAIL, buildAdMailto } from "@/lib/adInquiry"
 
-// 완도 메인 전용 — 카카오 애드핏 대신 지역 광고를 모집하는 빈 슬롯.
-// 메일 버튼은 광고 문의 메일(제목·양식 자동 완성), 예시 버튼은 /ads 시안 페이지로.
-// 다지역 페이지는 AdFitBanner 유지.
-export default function LocalAdSlot() {
+// 카카오 애드핏 대신 지역 광고를 모집하는 빈 슬롯 (완도·포항·목포·인천 공용).
+// 문구는 지역 무관 공용 — 지역명·미리보기 경로만 props로 주입.
+// 메일 버튼은 광고 문의(제목·양식 자동 완성), 예시 버튼은 지역 /ads 시안 페이지로.
+export default function LocalAdSlot({
+  regionName,
+  adsPath,
+}: {
+  regionName: string
+  adsPath: string
+}) {
+  const mailto = buildAdMailto({ regionName, adsPath })
   return (
     <div className="rounded-2xl border-2 border-dashed border-blue-200 bg-blue-50/40 px-4 py-3.5">
       <div className="flex items-start gap-3">
@@ -19,20 +26,19 @@ export default function LocalAdSlot() {
             이 자리에 사장님의 가게를 알려보세요
           </p>
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
-            펜션 · 식당 · 카페 · 특산물 · 렌터카 — 완도 배편과 날씨를 보러
-            하루 100여 명이 찾는 화면에 소개됩니다.
-            배너 제작도 무료로 해드립니다.
+            펜션 · 식당 · 카페 · 특산물 · 렌터카 — 배편과 날씨를 보러 찾는
+            방문자에게 매일 소개됩니다. 배너 제작도 무료로 해드립니다.
           </p>
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <a
-              href={AD_MAILTO}
+              href={mailto}
               className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
             >
               광고 문의하기
               <span aria-hidden="true">→</span>
             </a>
             <Link
-              href="/ads"
+              href={adsPath}
               className="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-white px-3 py-1.5 text-xs font-semibold text-blue-600 transition-colors hover:border-blue-300 hover:bg-blue-50"
             >
               게재 예시 보기
