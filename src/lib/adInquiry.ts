@@ -1,6 +1,6 @@
 // 지역 광고 문의 메일 정보 — LocalAdSlot(완도 메인)과 /ads(광고 안내 페이지)가 공유
+// 문의는 메일로만 받는다 (전화번호 비공개)
 export const AD_MAIL = "climaxna@naver.com"
-export const AD_PHONE = "010-8478-7552"
 
 const SUBJECT = encodeURIComponent("[FerryCast] 완도 지역 광고 문의")
 const BODY = encodeURIComponent(
@@ -20,7 +20,6 @@ const BODY = encodeURIComponent(
     "  펜션·식당·카페·특산물·렌터카의 실제 잠재 손님입니다.",
     "· 배 시간을 확인하려고 하루에도 여러 번 다시 열어보는 화면이라,",
     "  같은 방문자에게 반복 노출되는 자리입니다.",
-    "· 한 번에 한 업체만 게재되는 단독 자리입니다.",
     "",
     "· 배너(광고 이미지)는 저희가 무료로 만들어드립니다.",
     "  가게 사진 2~3장과 소개 한 줄이면 충분합니다.",

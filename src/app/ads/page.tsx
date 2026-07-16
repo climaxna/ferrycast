@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { AD_MAIL, AD_PHONE, AD_MAILTO } from "@/lib/adInquiry"
+import { AD_MAIL, AD_MAILTO } from "@/lib/adInquiry"
 
 const TITLE = "FerryCast — 완도 지역 광고 안내"
 const DESC = "완도 배편·날씨를 보러 오는 방문자에게 사장님 가게를 소개하세요. 배너 제작 무료."
@@ -59,7 +59,6 @@ export default function AdsPage() {
             <li>· 하루 <strong className="font-bold text-white">100여 명</strong>이 완도 배편·날씨를 확인하러 방문합니다</li>
             <li>· 방문자 상당수가 <strong className="font-bold text-white">완도 여행을 준비하는 관광객</strong>입니다</li>
             <li>· 배 시간을 보러 하루에도 여러 번 다시 여는 화면 — <strong className="font-bold text-white">반복 노출</strong></li>
-            <li>· 한 번에 <strong className="font-bold text-white">한 업체만 단독</strong>으로 게재됩니다</li>
           </ul>
         </section>
 
@@ -166,12 +165,9 @@ export default function AdsPage() {
           >
             메일로 광고 문의하기 · {AD_MAIL}
           </a>
-          <a
-            href={`tel:${AD_PHONE}`}
-            className="block rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-center text-sm font-semibold text-slate-600 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700"
-          >
-            전화 문의 · {AD_PHONE}
-          </a>
+          <p className="text-center text-xs text-slate-400">
+            문의는 메일로 받고 있습니다. 버튼을 누르면 문의 양식이 자동으로 채워집니다.
+          </p>
         </section>
 
         <p className="pb-4 text-center text-xs text-slate-400">
