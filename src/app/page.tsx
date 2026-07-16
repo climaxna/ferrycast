@@ -4,7 +4,7 @@ import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
 import YaksanRouteSection from "@/components/YaksanRouteSection"
 import Logo from "@/components/Logo"
-import AdFitBanner from "@/components/AdFitBanner"
+import LocalAdSlot from "@/components/LocalAdSlot"
 import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
 
@@ -81,7 +81,8 @@ export default function Page() {
 
         <div className="space-y-2">
           <CoupangSection />
-          <AdFitBanner />
+          {/* 완도는 카카오 애드핏 대신 지역 광고 모집 슬롯 (다지역은 AdFitBanner 유지) */}
+          <LocalAdSlot />
         </div>
 
         <RegionNav current="" />
