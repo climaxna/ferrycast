@@ -92,7 +92,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
       // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems·부분결항 표시용 cancelled에만 남김)
       if (isCancelled(it)) {
         const cv = gk === "jeju" ? extractVia(it) : null  // 미운항편도 경유(추자도) 라벨 유지
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(cv ? { via: cv } : {}) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(cv ? { via: cv } : {}), ...(it.psnshp_nm ? { ship: it.psnshp_nm } : {}) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -170,7 +170,7 @@ export async function getWandoArrivals(): Promise<{ routes: WandoRoute[]; isLive
       // 미운항편(비운·통제·결항)은 시간표·운영사에서 제외 (상태 판정용 allItems·부분결항 표시용 cancelled에만 남김)
       if (isCancelled(it)) {
         const cv = gk === "jeju" ? extractVia(it) : null  // 미운항편도 경유(추자도) 라벨 유지
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(cv ? { via: cv } : {}) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(cv ? { via: cv } : {}), ...(it.psnshp_nm ? { ship: it.psnshp_nm } : {}) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -271,7 +271,7 @@ function collectCancelled(items: MtisItem[], keyFn: (it: MtisItem) => string | n
     if (!isCancelled(it)) continue
     const gk = keyFn(it)
     if (!gk) continue
-    ;(out[gk] ??= []).push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
+    ;(out[gk] ??= []).push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(it.psnshp_nm ? { ship: it.psnshp_nm } : {}) })
   }
   return out
 }

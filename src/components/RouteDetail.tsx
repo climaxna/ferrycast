@@ -338,6 +338,8 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                     {cx.map((c) => (
                       <span key={c.time} className="inline-flex items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 shadow-sm">
                         <span className={`text-base font-bold tabular-nums line-through decoration-2 ${c.suspended ? "text-amber-600 decoration-amber-300" : "text-rose-500 decoration-rose-300"}`}>{c.time}</span>
+                        {/* 선박명 — 교대 운항 노선에서 편별 결항 차이(한 척만 재개 등)의 이유를 드러냄 */}
+                        {c.ship && <span className="text-[11px] font-medium text-slate-400">{c.ship}</span>}
                         {c.via && <span className="text-[11px] font-semibold text-amber-600">{c.via} 경유</span>}
                         <span className={`text-[11px] font-semibold ${c.suspended ? "text-amber-600" : "text-rose-500"}`}>{c.reason ?? (c.suspended ? "비운항" : "결항")}</span>
                       </span>

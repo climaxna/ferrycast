@@ -21,16 +21,19 @@ export interface MtisItem {
   oport_nm: string      // 출발항명
   dest_nm: string       // 도착항명
   nvg_stts_nm: string   // 진행상태: "출항전" | "운항중" | "완료" | (드물게) "결항"
-  nvg_se_cd?: string    // 운항구분코드: 1=정상 2=증선 3=증회 4=비운 5=통제
-  nvg_se_nm?: string    // 운항구분명: "정상"|"증선"|"증회"|"비운"|"통제"
+  nvg_se_cd?: string    // 운항구분코드: 1=정상 2=증선 3=증회 4=비운 5=통제 6=대기/지연
+  nvg_se_nm?: string    // 운항구분명: "정상"|"증선"|"증회"|"비운"|"통제"|"대기/지연"
+                        //   6(대기/지연)은 운항 취급 — 해무 통제 해제 후 지연 재개한 배 등 (2026.07 약산 평화페리9호 실측)
   psnshp_nm: string     // 여객선명
   nvg_seawy_nm: string  // 운항항로명 (예: "제주완도"=직항, "제주추자도-완도"=추자도 경유)
   cntrl_rsn_nm?: string | null  // 통제사유 (예: "풍랑주의보") — 기상 통제(결항) 사유
   nnavi_rsn_nm?: string | null  // 미운항사유 (예: "선박검사", "선박정비") — 비운 사유
 }
 
-// 부분 결항편 1건 (시각·사유·성격·경유지)
-export type CancelledEntry = { time: string; reason?: string; suspended?: boolean; via?: string }
+// 부분 결항편 1건 (시각·사유·성격·경유지·선박명)
+// ship: 여러 척이 교대 운항하는 노선(약산↔금일 등)에서 "왜 이 편만 결항?"의 답이 선박별
+// 통제 차이일 때가 있어(해무 후 한 척만 재개 등) 상세 화면에서 선박명을 함께 보여준다.
+export type CancelledEntry = { time: string; reason?: string; suspended?: boolean; via?: string; ship?: string }
 
 // ────────────────────────────────────────────────
 // 운항 여부 판정

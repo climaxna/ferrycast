@@ -145,7 +145,7 @@ export async function getRoutesForRegion(
       const cfgG = config.routeGroups.find(g => g.key === gk)
       const via1 = extractVia(it, [...(cfgG?.depPortKeywords ?? []), ...(cfgG?.destKeywords ?? [])])
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(via1 ? { via: via1 } : {}) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(via1 ? { via: via1 } : {}), ...(it.psnshp_nm ? { ship: it.psnshp_nm } : {}) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
@@ -222,7 +222,7 @@ export async function getArrivalsForRegion(
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
       if (isCancelled(it)) {
-        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
+        grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(it.psnshp_nm ? { ship: it.psnshp_nm } : {}) })
         continue
       }
       grouped[gk].times.push(parseSailTime(it.sail_tm))
