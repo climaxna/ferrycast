@@ -151,6 +151,14 @@ function buildHtml() {
   .contact { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-top: 10px; }
   .bottomshot { text-align: center; margin: 10px 0; }
   .bottomshot img { width: 220px; border: 1px solid #e2e8f0; border-radius: 10px; }
+  .case-figs { display: flex; gap: 12px; margin: 12px 0 14px; align-items: flex-start; break-inside: avoid; }
+  .case-fig { flex: 1; text-align: center; }
+  .case-fig img { width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; }
+  .case-fig .cfc { font-size: 9.3pt; color: #475569; margin-top: 5px; line-height: 1.45; }
+  .case-fig .cfc b { color: #1d4ed8; }
+  .callout { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 13px 16px; margin: 12px 0; break-inside: avoid; }
+  .callout .k { color: #c2410c; font-weight: 800; font-size: 11pt; margin-bottom: 5px; }
+  .callout p { color: #7c2d12; margin: 0; }
   </style></head><body>
 
   <div class="cover">
@@ -196,7 +204,24 @@ function buildHtml() {
   <p>아래는 실제 서비스 화면입니다. 모든 정보는 스마트폰에서 손가락 한 번으로 확인할 수 있도록 설계했습니다.</p>
   ${gallery}
 
-  <h2 class="sec pagebreak">6. 안정적인 운영</h2>
+  <h2 class="sec pagebreak">6. 실제 사례 — 해무가 낀 날, 무엇이 벌어지나</h2>
+  <p>이 서비스가 왜 필요한지, 최근 실제로 있었던 하루로 말씀드립니다.</p>
+  <p><b>2026년 7월 19일, 완도 앞바다에 해무(바다 안개)가 꼈습니다.</b> 바람도 파도도 잔잔했지만 시야가 막혀(운항 데이터상 ‘시계제한’) 배가 뜨지 못했습니다. 해무는 이렇게 날씨가 멀쩡해 보여도 출항을 막는, 완도에서 특히 잦은 결항 원인입니다.</p>
+  <h3>같은 날, 노선마다 · 배마다 상태가 갈렸습니다</h3>
+  <div class="case-figs">
+    <div class="case-fig"><img src="data:image/png;base64,${b64("10_fog_soan_card.png")}"/><div class="cfc"><b>① 노선 전체 결항</b><br/>완도–소안·보길·노화는 이날 전편이 결항(사유: 시계제한)</div></div>
+    <div class="case-fig"><img src="data:image/png;base64,${b64("11_fog_yaksan_card.png")}"/><div class="cfc"><b>② 한 척만 운항</b><br/>약산↔금일은 한 척만 재개해 몇 편만 뜨고 나머지는 결항</div></div>
+    <div class="case-fig"><img src="data:image/png;base64,${b64("12_fog_yaksan_detail.png")}"/><div class="cfc"><b>③ 왜 이 편만?</b><br/>결항 편마다 선박명·사유(시계제한)까지 표시</div></div>
+  </div>
+  <p>이날 완도–소안·보길·노화 노선은 <b>전편이 결항</b>했습니다(사진①). 반면 약산↔금일 노선은 여러 척이 30분 간격으로 교대 운항하는데, 해무가 걷히기 시작하자 <b>한 척(평화페리9호)만 먼저 운항을 재개</b>했습니다. 이 배가 왕복하는 90분 간격으로 11:00·12:30·14:00·15:30 몇 편만 뜨고, 나머지 배(완농페리3호·풍진메이슨)가 맡은 편은 그대로 결항이었습니다(사진②).</p>
+  <p>그래서 시간표가 “결항–결항–<b>운항</b>–결항–<b>운항</b>”처럼 뒤섞여 보입니다. “11:00은 뜨는데 왜 11:30은 안 뜨지?” — 같은 시간대인데 <b>배가 다르기 때문</b>입니다. 이용자로서는 알 길이 없는 정보라, FerryCast는 결항 편에 <b>어느 배가·왜(시계제한) 묶였는지</b>까지 함께 보여줍니다(사진③).</p>
+  <div class="callout">
+    <div class="k">전화로도 확인이 안 되던 순간</div>
+    <p>이 데이터가 실제와 맞는지 확인하려고, 그날 저는 여러 곳(선사·터미널)에 직접 전화를 돌렸습니다. 그런데 <b>어떤 곳은 통화 중이거나 연결이 되지 않아, 전화로도 결항 여부를 확정하지 못하는 순간</b>이 있었습니다. 해무 낀 날은 문의가 몰려 전화가 더 닿지 않습니다. 바로 그 공백에서, 화면 하나로 편별 운항 상태를 그대로 보여주는 정보가 힘을 발휘합니다.</p>
+  </div>
+  <p>물론 최종 확인은 공식 채널의 몫입니다. 그러나 <b>전화가 닿지 않는 그 시간</b>, 터미널까지 나가기 전에 “오늘 이 배가 뜨는지”를 한 화면에서 가늠할 수 있다는 것 — 그것이 완도처럼 결항이 잦고 항로·선박이 얽힌 곳에서 FerryCast가 갖는 값입니다.</p>
+
+  <h2 class="sec pagebreak">7. 안정적인 운영</h2>
   <ul>
     <li><b>공식 공공 데이터</b> : 해양교통안전공단·기상청·국립해양조사원의 공식 API를 사용합니다.</li>
     <li><b>시간표와 결항을 함께</b> : 하나의 공식 데이터로 동시에 받아 시간표와 결항이 어긋나지 않습니다. 청산농협 차도선 같은 지역 배편까지 실시간으로 표시됩니다.</li>
@@ -205,7 +230,7 @@ function buildHtml() {
     <li><b>완도 밖에서도 검증됐습니다</b> : 완도에서 다진 이 구조를 포항(울릉도)·목포(제주·홍도·흑산도 등)·인천(백령도·연평도) 항로에도 이미 적용해 함께 운영하고 있습니다. 완도가 이 서비스의 출발점이자, 다른 지역에서도 통한다는 사실을 스스로 증명한 셈입니다.</li>
   </ul>
 
-  <h2 class="sec">7. 추진 방안과 일정</h2>
+  <h2 class="sec">8. 추진 방안과 일정</h2>
   <h3>이미 현장에 시범 부착했습니다</h3>
   <p>서비스의 효용을 직접 확인하고자, 자비로 안내물을 제작해 완도여객선터미널과 완도 진입 경로의 거점인 해남종합버스터미널에 시범 부착해 보았습니다. 실제로 공식 운항시간표 바로 옆에서 이용자들이 휴대폰으로 스캔해 배 시각과 결항을 확인합니다.</p>
   <div class="sitephotos">${sitePhotos}</div>
@@ -214,7 +239,7 @@ function buildHtml() {
   <table><tr><th style="width:20%">단계</th><th>내용</th><th style="width:26%">완도군 역할</th></tr>${stageTable}</table>
   <p>장비 설치도, 예산 투입도 없습니다. 현장 효용은 이미 확인했으니, 정식 부착 허가만으로 바로 1단계를 진행할 수 있습니다.</p>
 
-  <h2 class="sec pagebreak">8. 완도군의 기대 효과</h2>
+  <h2 class="sec pagebreak">9. 완도군의 기대 효과</h2>
   <h3>군민 편의</h3>
   <p>배편·날씨·물때를 한 번에 확인해 헛걸음을 줄입니다. 단순한 화면으로 고령층의 정보 접근성을 높입니다. 완도군은 정부가 지정한 인구감소지역으로, 이 같은 작은 정주 편의도 쌓이면 체감 격차를 줄이는 데 보탬이 됩니다.</p>
   <h3>관광객 만족</h3>
@@ -222,7 +247,7 @@ function buildHtml() {
   <h3>군의 부담 없는 협력</h3>
   <p>예산·인력 투입 없이 민간이 개발·운영합니다. 군은 허가와 홍보만으로 군민 편의 서비스를 제공하는 효과를 얻습니다.</p>
 
-  <h2 class="sec">9. 운영 방식과 지속가능성</h2>
+  <h2 class="sec">10. 운영 방식과 지속가능성</h2>
   <p>FerryCast는 무료 공익 서비스입니다. 배편·날씨 등 핵심 정보는 영구 무료이며 이용자에게 요금을 받지 않습니다.</p>
   <p>서버 유지를 위한 최소한의 비용은 두 가지로 충당합니다. 화면 맨 아래의 광고 자리는 외부 광고망 배너 대신 완도 소상공인(펜션·식당·특산물 판매점 등)을 소개하는 지역 광고 자리로 운영해, 현수막·전단보다 저렴한 비용으로 지역 가게가 관광객에게 알려지는 상생 구조를 지향합니다. 쿠팡 파트너스를 통한 완도 특산물 소개 코너는 완도산 수산물·특산품을 관광객에게 자연스럽게 알리는 효과도 함께 냅니다.</p>
   <table><tr><th style="width:26%">구분</th><th>내용</th></tr>${revenueTable}</table>
@@ -230,13 +255,13 @@ function buildHtml() {
   <div class="bottomshot"><img src="data:image/png;base64,${b64("09_region_bottom.png")}"/></div>
   <p>운영 수익은 서버 유지와 서비스 개선에 사용되며, 군의 예산 부담 없이 서비스를 안정적으로 지속하기 위한 수단입니다.</p>
 
-  <h2 class="sec pagebreak">10. 예상 우려와 대응</h2>
+  <h2 class="sec pagebreak">11. 예상 우려와 대응</h2>
   <table><tr><th style="width:26%">우려</th><th>대응</th></tr>${concernTable}</table>
 
-  <h2 class="sec">11. 완도군청에 드리는 요청</h2>
+  <h2 class="sec">12. 완도군청에 드리는 요청</h2>
   <table><tr><th style="width:8%">No</th><th style="width:22%">요청 항목</th><th>세부 내용</th></tr>${requestTable}</table>
 
-  <h2 class="sec">12. 제안자 의견</h2>
+  <h2 class="sec">13. 제안자 의견</h2>
   <p>저는 이 서비스를 직접 만들어 운영하고 있습니다. 기획서가 아니라 <b>이미 동작하는 서비스</b>를 들고 왔습니다. 지금 ${CONTACT.web}에 접속하면 오늘 완도의 배편과 날씨, 물때가 그대로 보입니다. 말로만 제안하지 않고, 자비로 안내물을 만들어 터미널 현장에 직접 시범 부착까지 해보았습니다.</p>
   <p>완도에서 시작한 이 서비스는 그 뒤 포항·목포·인천의 여객선 정보에도 같은 구조로 적용되어 함께 운영되고 있습니다. 완도가 이 모델의 출발점이며, 계속 손봐 가며 키우고 있다는 뜻입니다.</p>
   <p>저는 완도에서 태어났고, 지금도 부모님이 완도에 계십니다. 완도를 오가며 직접 겪은 불편에서 이 서비스를 시작했습니다. 완도에 대한 애정이 이 일을 계속하는 이유이고, 그래서 한때의 프로젝트로 끝내지 않고 꾸준히 운영하려 합니다.</p>
@@ -321,6 +346,30 @@ function sitePhotoRow() {
   }) })
 }
 
+// 해무 사례 3컷 (아이콘 비율 제각각 → 각 이미지 실측 비율로, 세로 가운데 정렬)
+const CASE_FIGS = [
+  ["10_fog_soan_card.png", 716, 302, "① 노선 전체 결항", "완도–소안·보길·노화는 이날 전편 결항 (사유: 시계제한)"],
+  ["11_fog_yaksan_card.png", 648, 986, "② 한 척만 운항", "약산↔금일은 한 척만 재개해 몇 편만 뜨고 나머지는 결항"],
+  ["12_fog_yaksan_detail.png", 780, 1440, "③ 왜 이 편만?", "결항 편마다 선박명·사유(시계제한)까지 표시"],
+]
+function caseFigRow() {
+  const W = 150
+  return new TableRow({ children: CASE_FIGS.map(([f, iw, ih, t, d]) => {
+    const H = Math.round(W * ih / iw)
+    return new TableCell({ width: { size: 33, type: WidthType.PERCENTAGE }, borders: noB, verticalAlign: "center", margins: { top: 40, bottom: 40, left: 30, right: 30 },
+      children: [
+        new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 60 }, children: [new ImageRun({ data: buf(f), type: "png", transformation: { width: W, height: H } })] }),
+        para(run(t, { bold: true, size: 17, color: BLUE }), { align: AlignmentType.CENTER, after: 20 }),
+        para(run(d, { size: 15, color: "475569" }), { align: AlignmentType.CENTER, after: 0 }),
+      ] })
+  }) })
+}
+function calloutBox(title, textRuns) {
+  return new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [new TableRow({ children: [new TableCell({
+    borders: cellB("FED7AA"), shading: { type: ShadingType.CLEAR, fill: "FFF7ED" }, margins: { top: 120, bottom: 120, left: 160, right: 160 },
+    children: [para(run(title, { bold: true, size: 20, color: "C2410C" }), { after: 60 }), para(textRuns, { after: 0 })] })] })] })
+}
+
 async function makeDocx() {
   const children = [
     para(run("완도 배편·날씨 통합 정보 서비스", { size: 24, bold: true, color: GRAY }), { align: AlignmentType.CENTER, before: 200, after: 60 }),
@@ -361,14 +410,28 @@ async function makeDocx() {
     body("아래는 실제 서비스 화면입니다. 모든 정보는 스마트폰에서 손가락 한 번으로 확인할 수 있도록 설계했습니다.", { after: 140 }),
     new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: GALLERY.map(([f, t, d], i) => shotRow(f, t, d, i)) }),
 
-    h1("6. 안정적인 운영", { pageBreakBefore: true }),
+    h1("6. 실제 사례 — 해무가 낀 날, 무엇이 벌어지나", { pageBreakBefore: true }),
+    body("이 서비스가 왜 필요한지, 최근 실제로 있었던 하루로 말씀드립니다."),
+    body("2026년 7월 19일, 완도 앞바다에 해무(바다 안개)가 꼈습니다. 바람도 파도도 잔잔했지만 시야가 막혀(운항 데이터상 ‘시계제한’) 배가 뜨지 못했습니다. 해무는 이렇게 날씨가 멀쩡해 보여도 출항을 막는, 완도에서 특히 잦은 결항 원인입니다."),
+    h2("같은 날, 노선마다 · 배마다 상태가 갈렸습니다"),
+    new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [caseFigRow()] }),
+    body("이날 완도–소안·보길·노화 노선은 전편이 결항했습니다(사진①). 반면 약산↔금일 노선은 여러 척이 30분 간격으로 교대 운항하는데, 해무가 걷히기 시작하자 한 척(평화페리9호)만 먼저 운항을 재개했습니다. 이 배가 왕복하는 90분 간격으로 11:00·12:30·14:00·15:30 몇 편만 뜨고, 나머지 배(완농페리3호·풍진메이슨)가 맡은 편은 그대로 결항이었습니다(사진②)."),
+    body("그래서 시간표가 “결항–결항–운항–결항–운항”처럼 뒤섞여 보입니다. “11:00은 뜨는데 왜 11:30은 안 뜨지?” — 같은 시간대인데 배가 다르기 때문입니다. 이용자로서는 알 길이 없는 정보라, FerryCast는 결항 편에 어느 배가·왜(시계제한) 묶였는지까지 함께 보여줍니다(사진③)."),
+    calloutBox("전화로도 확인이 안 되던 순간", [
+      run("이 데이터가 실제와 맞는지 확인하려고, 그날 저는 여러 곳(선사·터미널)에 직접 전화를 돌렸습니다. 그런데 ", { size: 20, color: "7C2D12" }),
+      run("어떤 곳은 통화 중이거나 연결이 되지 않아, 전화로도 결항 여부를 확정하지 못하는 순간", { size: 20, color: "7C2D12", bold: true }),
+      run("이 있었습니다. 해무 낀 날은 문의가 몰려 전화가 더 닿지 않습니다. 바로 그 공백에서, 화면 하나로 편별 운항 상태를 그대로 보여주는 정보가 힘을 발휘합니다.", { size: 20, color: "7C2D12" }),
+    ]),
+    body("물론 최종 확인은 공식 채널의 몫입니다. 그러나 전화가 닿지 않는 그 시간, 터미널까지 나가기 전에 “오늘 이 배가 뜨는지”를 한 화면에서 가늠할 수 있다는 것 — 그것이 완도처럼 결항이 잦고 항로·선박이 얽힌 곳에서 FerryCast가 갖는 값입니다.", { before: 120 }),
+
+    h1("7. 안정적인 운영", { pageBreakBefore: true }),
     bullet("공식 공공 데이터 : 해양교통안전공단·기상청·국립해양조사원의 공식 API를 사용합니다."),
     bullet("시간표와 결항을 함께 : 하나의 공식 데이터로 동시에 받아 시간표와 결항이 어긋나지 않습니다. 청산농협 차도선 같은 지역 배편까지 실시간으로 표시됩니다."),
     bullet("이용자가 늘어도 안정적 : 데이터 호출을 최소화하는 캐시 구조라 접속이 몰려도 무리가 가지 않습니다."),
     bullet("빈 화면 없는 안전망 : 일시적 장애에도 흰 화면 대신 참고 시간표를 표시합니다. 언제 열어도 무언가는 반드시 보입니다."),
     bullet("완도 밖에서도 검증됐습니다 : 완도에서 다진 이 구조를 포항(울릉도)·목포(제주·홍도·흑산도 등)·인천(백령도·연평도) 항로에도 이미 적용해 함께 운영하고 있습니다. 완도가 이 서비스의 출발점이자, 다른 지역에서도 통한다는 사실을 스스로 증명한 셈입니다."),
 
-    h1("7. 추진 방안과 일정"),
+    h1("8. 추진 방안과 일정"),
     h2("이미 현장에 시범 부착했습니다"),
     body("서비스의 효용을 직접 확인하고자, 자비로 안내물을 제작해 완도여객선터미널과 완도 진입 경로의 거점인 해남종합버스터미널에 시범 부착해 보았습니다. 실제로 공식 운항시간표 바로 옆에서 이용자들이 휴대폰으로 스캔해 배 시각과 결항을 확인합니다."),
     new Table({ width: { size: 100, type: WidthType.PERCENTAGE }, rows: [sitePhotoRow()] }),
@@ -377,7 +440,7 @@ async function makeDocx() {
     dataTable(["단계", "내용", "완도군 역할"], STAGES, [22, 52, 26]),
     body("장비 설치도, 예산 투입도 없습니다. 현장 효용은 이미 확인했으니, 정식 부착 허가만으로 바로 1단계를 진행할 수 있습니다."),
 
-    h1("8. 완도군의 기대 효과", { pageBreakBefore: true }),
+    h1("9. 완도군의 기대 효과", { pageBreakBefore: true }),
     h2("군민 편의"),
     body("배편·날씨·물때를 한 번에 확인해 헛걸음을 줄입니다. 단순한 화면으로 고령층의 정보 접근성을 높입니다. 완도군은 정부가 지정한 인구감소지역으로, 이 같은 작은 정주 편의도 쌓이면 체감 격차를 줄이는 데 보탬이 됩니다."),
     h2("관광객 만족"),
@@ -385,7 +448,7 @@ async function makeDocx() {
     h2("군의 부담 없는 협력"),
     body("예산·인력 투입 없이 민간이 개발·운영합니다. 군은 허가와 홍보만으로 군민 편의 서비스를 제공하는 효과를 얻습니다."),
 
-    h1("9. 운영 방식과 지속가능성"),
+    h1("10. 운영 방식과 지속가능성"),
     body("FerryCast는 무료 공익 서비스입니다. 배편·날씨 등 핵심 정보는 영구 무료이며 이용자에게 요금을 받지 않습니다."),
     body("서버 유지를 위한 최소한의 비용은 두 가지로 충당합니다. 화면 맨 아래의 광고 자리는 외부 광고망 배너 대신 완도 소상공인(펜션·식당·특산물 판매점 등)을 소개하는 지역 광고 자리로 운영해, 현수막·전단보다 저렴한 비용으로 지역 가게가 관광객에게 알려지는 상생 구조를 지향합니다. 쿠팡 파트너스를 통한 완도 특산물 소개 코너는 완도산 수산물·특산품을 관광객에게 자연스럽게 알리는 효과도 함께 냅니다."),
     dataTable(["구분", "내용"], REVENUE, [26, 74]),
@@ -393,13 +456,13 @@ async function makeDocx() {
     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 120 }, children: [new ImageRun({ data: buf("09_region_bottom.png"), type: "png", transformation: { width: 195, height: Math.round(195 * 1688 / 780) } })] }),
     body("운영 수익은 서버 유지와 서비스 개선에 사용되며, 군의 예산 부담 없이 서비스를 안정적으로 지속하기 위한 수단입니다."),
 
-    h1("10. 예상 우려와 대응", { pageBreakBefore: true }),
+    h1("11. 예상 우려와 대응", { pageBreakBefore: true }),
     dataTable(["우려", "대응"], CONCERNS, [26, 74]),
 
-    h1("11. 완도군청에 드리는 요청"),
+    h1("12. 완도군청에 드리는 요청"),
     dataTable(["No", "요청 항목", "세부 내용"], REQUESTS, [8, 24, 68]),
 
-    h1("12. 제안자 의견"),
+    h1("13. 제안자 의견"),
     body("저는 이 서비스를 직접 만들어 운영하고 있습니다. 기획서가 아니라 이미 동작하는 서비스를 들고 왔습니다. 지금 접속하면 오늘 완도의 배편과 날씨, 물때가 그대로 보입니다. 말로만 제안하지 않고, 자비로 안내물을 만들어 터미널 현장에 직접 시범 부착까지 해보았습니다."),
     body("완도에서 시작한 이 서비스는 그 뒤 포항·목포·인천의 여객선 정보에도 같은 구조로 적용되어 함께 운영되고 있습니다. 완도가 이 모델의 출발점이며, 계속 손봐 가며 키우고 있다는 뜻입니다."),
     body("저는 완도에서 태어났고, 지금도 부모님이 완도에 계십니다. 완도를 오가며 직접 겪은 불편에서 이 서비스를 시작했습니다. 완도에 대한 애정이 이 일을 계속하는 이유이고, 그래서 한때의 프로젝트로 끝내지 않고 꾸준히 운영하려 합니다."),
