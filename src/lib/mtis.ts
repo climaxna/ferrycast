@@ -158,17 +158,34 @@ async function fetchMtisPage(
     serviceKey: key, pageNo: String(pageNo), numOfRows: String(MTIS_PAGE_SIZE),
     dataType: "JSON", rlvtYmd: date,
   })
-  const res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 300 } })
-  if (!res.ok) return { items: [], totalCount: 0 }
+  // 각 실패 지점에 원인 로그 — fallback("참고 시간표") 전환 시 Vercel 로그에서 이유를 바로 확인
+  const empty = { items: [] as MtisItem[], totalCount: 0 }
+  let res: Response
+  try {
+    res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 300 } })
+  } catch (e) {
+    console.error(`[mtis] ${date} p${pageNo} fetch 실패(네트워크·타임아웃):`, e)
+    return empty
+  }
+  if (!res.ok) {
+    console.error(`[mtis] ${date} p${pageNo} HTTP ${res.status} ${res.statusText}`)
+    return empty
+  }
   // 쿼터 초과 시 JSON이 아닌 plain text("API token quota exceeded")를 반환 → 파싱 가드
+  const text = await res.text()
   let json: unknown
   try {
-    json = await res.json()
+    json = JSON.parse(text)
   } catch {
-    return { items: [], totalCount: 0 }
+    console.error(`[mtis] ${date} p${pageNo} JSON 파싱 실패(쿼터 초과 의심). 응답 앞부분: ${text.slice(0, 160)}`)
+    return empty
   }
-  const j = json as { response?: { header?: { resultCode?: string }; body?: { items?: { item?: unknown }; totalCount?: number } } }
-  if (j?.response?.header?.resultCode !== "200") return { items: [], totalCount: 0 }
+  const j = json as { response?: { header?: { resultCode?: string; resultMsg?: string }; body?: { items?: { item?: unknown }; totalCount?: number } } }
+  const code = j?.response?.header?.resultCode
+  if (code !== "200") {
+    console.error(`[mtis] ${date} p${pageNo} resultCode=${code ?? "없음"} msg=${j?.response?.header?.resultMsg ?? "-"}`)
+    return empty
+  }
   const body = j?.response?.body
   const raw = body?.items?.item
   const items = (Array.isArray(raw) ? raw : raw ? [raw] : []) as MtisItem[]
