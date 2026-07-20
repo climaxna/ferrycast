@@ -276,9 +276,53 @@ function collectCancelled(items: MtisItem[], keyFn: (it: MtisItem) => string | n
   return out
 }
 
+// 약산 정적 fallback — MTIS 완전 장애 시에만 노출 (원칙 #3: 흰 화면 금지)
+// 출처: docs/약산.md (완도군청 게시 시간표, 2026-07 MTIS 편별 대조 검증본)
+// 막배만 계절 변동: 생일 노선 동절기 당목 17:30 / 서성 18:00
+const YAKSAN_STATIC = {
+  geumil: {
+    island: "금일",
+    operator: "완농페리3호 · 풍진메이슨 · 평화페리9호",
+    dep: ["06:30", "07:00", "07:40", "08:10", "08:40", "09:10", "09:35", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:30", "21:00"],
+    ret: ["06:30", "07:00", "07:30", "08:10", "08:40", "09:10", "09:40", "10:05", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "20:00", "21:30"],
+  },
+  saengil: {
+    island: "생일",
+    operator: "완농페리5호 · 완농페리호",
+    dep: ["06:30", "08:00", "09:40", "11:40", "13:40", "15:40", "18:00"],
+    ret: ["07:00", "08:40", "10:10", "12:20", "14:20", "16:10", "18:30"],
+  },
+}
+
+function makeStaticYaksan(): { routes: WandoRoute[]; isLive: boolean } {
+  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+  const summer = soanSeason(kst.getUTCMonth() + 1) === "summer"
+  const routes: WandoRoute[] = Object.entries(YAKSAN_STATIC).map(([gk, cfg]) => {
+    let dep = cfg.dep, ret = cfg.ret
+    if (gk === "saengil" && !summer) {
+      dep = dep.map((t) => (t === "18:00" ? "17:30" : t))
+      ret = ret.map((t) => (t === "18:30" ? "18:00" : t))
+    }
+    return {
+      id: `yaksan-${gk}`,
+      to: cfg.island,
+      originName: "약산",
+      operator: cfg.operator,
+      times: dep,
+      status: "unknown",
+      isLive: false,
+      terminal: YAKSAN_TERMINAL,
+      noBooking: true,
+      bookingNote: `현장 매표소 발권 · 약산농협 ${YAKSAN_PHONE}`,
+      returnTrip: { label: `${cfg.island} → 약산`, times: ret },
+    }
+  })
+  return { routes, isLive: false }
+}
+
 export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive: boolean }> {
   const key = process.env.DATAGOKR_API_KEY
-  if (!key) return { routes: [], isLive: false }
+  if (!key) return makeStaticYaksan()
 
   try {
     const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
@@ -287,7 +331,7 @@ export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive:
       getMtisDay(key, date),
       getMtisDay(key, nextDay(date)).catch(() => [] as MtisItem[]),
     ])
-    if (!items.length) return { routes: [], isLive: false }
+    if (!items.length) return makeStaticYaksan()
 
     const fwdTimes = collectTimes(items, yaksanForwardKey)
     const retTimes = collectTimes(items, yaksanReturnKey)
@@ -338,9 +382,10 @@ export async function getYaksanRoutes(): Promise<{ routes: WandoRoute[]; isLive:
       })
     }
 
-    return { routes, isLive: routes.length > 0 }
+    // MTIS 응답은 있는데 약산 편이 하나도 안 잡히면 정적 안전망으로
+    return routes.length > 0 ? { routes, isLive: true } : makeStaticYaksan()
   } catch {
-    return { routes: [], isLive: false }
+    return makeStaticYaksan()
   }
 }
 
