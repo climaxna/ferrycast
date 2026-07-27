@@ -12,6 +12,7 @@ import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
 import Logo from "@/components/Logo"
 import LocalAdSlot from "@/components/LocalAdSlot"
+import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
 
@@ -157,8 +158,9 @@ export default async function RegionPage({
 
         <div className="space-y-2">
           <CoupangSection />
-          {/* 카카오 애드핏 대신 지역 광고 모집 슬롯 (완도·포항·목포·인천 공용) */}
+          {/* 지역 광고 모집 슬롯 (완도·포항·목포·인천 공용) + 그 아래 카카오 애드핏 */}
           <LocalAdSlot regionName={config.name} adsPath={`/${config.slug}/ads`} />
+          <AdFitBanner />
         </div>
 
         <RegionNav current={config.slug} />
