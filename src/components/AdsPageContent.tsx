@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { AD_MAIL, buildAdMailto } from "@/lib/adInquiry"
+import AdLabel from "./AdLabel"
 
 // 지역 광고 안내 페이지 본문 (완도 /ads, 각 지역 /[region]/ads 공용).
 // 소개·게재위치는 지역명을 넣고, 게재 예시(시안)는 지역 무관 공용 문구로 유지.
@@ -163,14 +164,5 @@ export default function AdsPageContent({
         </p>
       </div>
     </main>
-  )
-}
-
-// 배너 시안에 공통으로 붙는 "광고" 라벨
-function AdLabel() {
-  return (
-    <span className="absolute right-3 top-2.5 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-400">
-      광고
-    </span>
   )
 }
