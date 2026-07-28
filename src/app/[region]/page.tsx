@@ -100,6 +100,7 @@ async function RegionRouteSection({ region }: { region: string }) {
       arrivals={arrivals}
       regionName={config.name}
       train={train}
+      adSlot={<LocalAdSlot regionName={config.name} adsPath={`/${config.slug}/ads`} />}
     />
   )
 }
@@ -177,9 +178,8 @@ export default async function RegionPage({
         </Suspense>
 
         <div className="space-y-2">
+          {/* 지역 광고는 시간표 직후 단락으로 이동(RegionRouteTabs adSlot). 하단은 특산물+애드핏 */}
           <CoupangSection />
-          {/* 지역 광고 모집 슬롯 (완도·포항·목포·인천 공용) + 그 아래 카카오 애드핏 */}
-          <LocalAdSlot regionName={config.name} adsPath={`/${config.slug}/ads`} />
           <AdFitBanner />
         </div>
 

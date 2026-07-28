@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, type ReactNode } from "react"
 import RouteItem from "./RouteItem"
 import RouteDetail from "./RouteDetail"
 import type { WandoRoute } from "@/lib/types"
@@ -8,9 +8,11 @@ import type { WandoRoute } from "@/lib/types"
 interface Props {
   departures: { routes: WandoRoute[]; isLive: boolean }
   arrivals: { routes: WandoRoute[]; isLive: boolean }
+  // 시간표 목록 직후(약산 섹션 앞) 단락 구분점에 노출할 지역 광고 슬롯 — 서버에서 렌더해 주입.
+  adSlot?: ReactNode
 }
 
-export default function RouteTabs({ departures, arrivals }: Props) {
+export default function RouteTabs({ departures, arrivals, adSlot }: Props) {
   const [tab, setTab] = useState<"dep" | "arr">("dep")
   const [selected, setSelected] = useState<WandoRoute | null>(null)
   const [nowMinutes, setNowMinutes] = useState(0)
@@ -65,6 +67,9 @@ export default function RouteTabs({ departures, arrivals }: Props) {
           항로 정보를 불러올 수 없습니다.
         </div>
       )}
+
+      {/* 지역 광고 — 시간표 목록 직후, 약산 섹션 앞 단락 구분점 */}
+      {routes.length > 0 && adSlot && <div className="mt-3">{adSlot}</div>}
 
       {/* 상세 바텀 시트 */}
       {selected && (

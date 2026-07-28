@@ -4,7 +4,6 @@ import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
 import YaksanRouteSection from "@/components/YaksanRouteSection"
 import Logo from "@/components/Logo"
-import LocalAdSlot from "@/components/LocalAdSlot"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
@@ -81,9 +80,8 @@ export default function Page() {
         </Suspense>
 
         <div className="space-y-2">
+          {/* 지역 광고는 시간표 직후 단락으로 이동(RouteSection adSlot). 하단은 특산물+애드핏 */}
           <CoupangSection />
-          {/* 지역 광고 모집 슬롯 (완도·포항·목포·인천 공용) + 그 아래 카카오 애드핏 */}
-          <LocalAdSlot regionName="완도" adsPath="/ads" />
           <AdFitBanner />
         </div>
 
