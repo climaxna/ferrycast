@@ -138,8 +138,8 @@ export default function AdsPageContent({
             <li><strong className="font-semibold text-slate-800">4. 게재 시작</strong> — 게재 후 매월 노출·클릭 현황을 보내드립니다</li>
           </ol>
           <p className="mt-2 text-xs leading-relaxed text-slate-400">
-            비용은 부담 없는 월 단위이며, 문의 주시면 바로 안내드립니다.
-            원하실 때 언제든 중단할 수 있습니다.
+            비용은 월 5만원부터이며, 월 단위라 원하실 때 언제든 중단할 수 있습니다.
+            문의 주시면 업종·기간에 맞춰 안내드립니다.
           </p>
         </section>
 
