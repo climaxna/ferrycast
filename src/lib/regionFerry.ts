@@ -3,7 +3,7 @@ import type { RegionConfig, RouteGroupConfig } from "@/config/regions"
 import { buildArrivalLookup, findPortNames } from "./shipArrival"
 import {
   type MtisItem, type CancelledEntry,
-  getMtisDay, fetchTomorrowData,
+  getMtisDay, fetchTomorrowData, nextDay,
   isCancelled, isSuspended, cancelKindOf, cancelReason, itemReason,
   extractVia, parseSailTime, deduplicateTimes, partialCancelled, groupStatus,
 } from "./mtis"
@@ -266,5 +266,64 @@ export async function getArrivalsForRegion(
     return { routes, isLive: true }
   } catch {
     return fallback()
+  }
+}
+
+// ────────────────────────────────────────────────
+// 섬↔섬 보조 노선 (예: 울릉도 → 독도) — 순환항로라 항로명(nvg_seawy_nm)으로 매칭.
+// 본항(포항) 출발/도착 탭과 무관한 별도 섹션으로, config.islandHops가 있을 때만 동작.
+// ────────────────────────────────────────────────
+export async function getIslandHopsForRegion(config: RegionConfig): Promise<WandoRoute[]> {
+  const hops = config.islandHops
+  if (!hops?.length) return []
+  const key = process.env.DATAGOKR_API_KEY
+  if (!key) return []
+
+  try {
+    const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+    const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
+    const [items, tomorrow] = await Promise.all([
+      getMtisDay(key, date),
+      getMtisDay(key, nextDay(date)).catch(() => [] as MtisItem[]),
+    ])
+    if (!items.length) return []
+
+    const routes: WandoRoute[] = []
+    for (const h of hops) {
+      // 순환항로: 출발항이 섬(depKeyword)이고 목적지 섬은 항로명(seawayKeyword)에만 존재
+      const match = (it: MtisItem) =>
+        it.oport_nm.includes(h.depKeyword) && (it.nvg_seawy_nm || "").includes(h.seawayKeyword)
+      const all = items.filter(match)
+      if (!all.length) continue  // 오늘 MTIS에 아예 없으면 카드 생략
+
+      const times = deduplicateTimes(all.filter((it) => !isCancelled(it)).map((it) => parseSailTime(it.sail_tm)))
+      const cancelled: CancelledEntry[] = all
+        .filter(isCancelled)
+        .map((it) => ({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(it.psnshp_nm ? { ship: it.psnshp_nm } : {}) }))
+      const status = groupStatus(all)
+      const partial = status === "operating" ? partialCancelled(cancelled, times) : []
+      const ships = [...new Set(all.filter((it) => !isCancelled(it) && it.psnshp_nm).map((it) => it.psnshp_nm))]
+      const tmrwTimes = deduplicateTimes(tomorrow.filter(match).filter((it) => !isCancelled(it)).map((it) => parseSailTime(it.sail_tm)))
+
+      routes.push({
+        id: `hop-${h.key}`,
+        to: h.label,
+        originName: h.originName,
+        operator: ships.join(" · "),
+        times,
+        status,
+        isLive: true,
+        terminal: h.terminal,
+        noBooking: true,
+        ...(h.bookingNote ? { bookingNote: h.bookingNote } : {}),
+        ...(partial.length ? { cancelledTimes: partial } : {}),
+        ...(status === "cancelled" ? { cancelKind: cancelKindOf(all) } : {}),
+        ...(tmrwTimes.length ? { tomorrow: { tripCount: tmrwTimes.length, times: tmrwTimes } } : {}),
+        ...(() => { const r = cancelReason(all); return r ? { cancelReason: r } : {} })(),
+      })
+    }
+    return routes
+  } catch {
+    return []
   }
 }

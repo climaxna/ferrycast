@@ -126,14 +126,17 @@ regionFerry.ts 중복 제거) + settings/scripts 정리.
 - 약산(당목) ↔ 금일·생일 섬↔섬 (완도 본섬 미경유, 별도 섹션 `getYaksanRoutes`)
 
 **다지역**(`/[region]`, `lib/regionFerry.ts` + `config/regions.ts` — 키워드 매핑):
-- **포항** → 울릉도(도동·사동), 포항역 KTX 연계
+- **포항** → 울릉도(도동·사동), 포항역 KTX 연계, **울릉도→독도**(KTX 아래 별도 섹션, `islandHops`)
 - **목포** → 제주·홍도·흑산도·비금도초·가거도
 - **인천** → 백령도·연평도·**덕적도·대이작도**
 
-> ⚠️ **알려진 한계 — 인천 순환항로 미실시간**: 연평도·굴업도·풍도는 MTIS에 **순환항로**로 등록돼
-> `dest_nm="인천"`(섬 이름이 `nvg_seawy_nm`에만) → 현재 dest 키워드 매칭으로는 안 잡혀 **연평도는
-> 정적 fallback만 노출(실시간 아님)**. 실시간화하려면 config에 `seawayKeywords` 필드 + 항로명 매칭
-> 엔진 추가 필요(순환 특성상 도착탭 제약 동반).
+> **섬↔섬/순환항로 매칭 (`islandHops`)**: 울릉→독도처럼 순환항로는 `oport=dest=출발섬`이고 목적지 섬이
+> `nvg_seawy_nm`에만 있어(예: "울릉저동)-독도") dest 키워드로는 안 잡힌다. → config `islandHops`(depKeyword +
+> **seawayKeyword**)로 항로명 매칭하는 `getIslandHopsForRegion()`을 추가함. 본항 탭과 무관한 별도 섹션
+> (`RegionIslandHopSection`, indigo)으로 노출. 약산 섬↔섬 섹션과 동일 패턴.
+> ⚠️ **인천 연평도·굴업도·풍도**도 같은 순환항로(dest="인천") — 아직 `islandHops` 미적용이라 **연평도는
+> 정적 fallback만 노출(실시간 아님)**. 이제 엔진이 있으니 config에 islandHops만 추가하면 실시간화 가능
+> (도착탭 제약은 동반).
 
 ### MTIS 운항 스케줄 API 연동 정보 (현행)
 

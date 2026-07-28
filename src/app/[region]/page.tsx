@@ -6,10 +6,11 @@ import { REGIONS } from "@/config/regions"
 import { getWeatherForRegion } from "@/lib/regionWeather"
 import { getTidalForRegion, get5DayTidalForRegion } from "@/lib/regionTide"
 import { get5DayForecastForRegion } from "@/lib/regionForecast"
-import { getRoutesForRegion, getArrivalsForRegion } from "@/lib/regionFerry"
+import { getRoutesForRegion, getArrivalsForRegion, getIslandHopsForRegion } from "@/lib/regionFerry"
 import { getTrainsForRegion } from "@/lib/regionTrain"
 import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
+import RegionIslandHopSection from "@/components/RegionIslandHopSection"
 import Logo from "@/components/Logo"
 import LocalAdSlot from "@/components/LocalAdSlot"
 import AdFitBanner from "@/components/AdFitBanner"
@@ -103,6 +104,21 @@ async function RegionRouteSection({ region }: { region: string }) {
   )
 }
 
+// 섬↔섬 보조 노선(예: 울릉도→독도) — KTX 아래 별도 섹션. 데이터 없으면 아무것도 렌더 안 함.
+async function RegionIslandHops({ region }: { region: string }) {
+  const config = REGIONS[region]
+  if (!config.islandHops?.length) return null
+  const routes = await getIslandHopsForRegion(config)
+  if (!routes.length) return null
+  return (
+    <RegionIslandHopSection
+      routes={routes}
+      title={config.islandHopTitle ?? "섬 사이 배편"}
+      note={config.islandHopNote}
+    />
+  )
+}
+
 export default async function RegionPage({
   params,
 }: {
@@ -154,6 +170,10 @@ export default async function RegionPage({
 
         <Suspense fallback={<RouteSkeleton />}>
           <RegionRouteSection region={region} />
+        </Suspense>
+
+        <Suspense fallback={null}>
+          <RegionIslandHops region={region} />
         </Suspense>
 
         <div className="space-y-2">

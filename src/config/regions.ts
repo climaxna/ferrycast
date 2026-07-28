@@ -11,6 +11,19 @@ export interface RouteGroupConfig {
   durationMin?: number        // 예상 소요시간(분) — 있을 때 상세화면에서 도착 예상시각 표시
 }
 
+// 섬↔섬/순환 보조 노선 (본항 미경유) — 섬에서 출발해 섬(독도 등)으로 다녀오는 항로.
+// 이런 항로는 MTIS에 순환으로 등록돼 oport_nm=dest_nm(=출발섬)이고 목적지 섬은 nvg_seawy_nm
+// 에만 있어(예: "울릉저동)-독도"), dest 키워드가 아니라 항로명(seawayKeyword)으로 매칭한다.
+export interface IslandHopConfig {
+  key: string             // 노선 키 (예: "dokdo")
+  label: string           // 카드 도착지 표기 (예: "독도")
+  originName: string      // 출발 섬 표기 (예: "울릉도")
+  depKeyword: string      // oport_nm 포함 키워드 (예: "울릉")
+  seawayKeyword: string   // nvg_seawy_nm 포함 키워드 (예: "독도")
+  terminal: string        // 타는 곳 (지도 링크·표시용, 예: "울릉 저동항여객선터미널")
+  bookingNote?: string    // 예약 안내 (현장 발권 등) — noBooking 카드로 표시
+}
+
 export interface RegionConfig {
   slug: string
   name: string
@@ -20,6 +33,10 @@ export interface RegionConfig {
   mainTerminal: string
   routeGroups: RouteGroupConfig[]
   metaDescription: string
+  // 선택: 섬↔섬 보조 노선 섹션 (KTX 아래에 노출, 예: 포항→울릉 페이지의 울릉→독도)
+  islandHops?: IslandHopConfig[]
+  islandHopTitle?: string   // 섹션 헤더 (예: "독도 여객선")
+  islandHopNote?: string    // 섹션 부제
   // 선택: 기차편 섹션 (포항 등 철도 거점 지역). TAGO 열차정보 API 역 노드ID 사용
   train?: {
     stationName: string   // 표시명 (예: "포항역")
@@ -75,7 +92,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         durationMin: 810,  // 23:00→12:20 야간 기준 (13시간 20분)
       },
     ],
-    metaDescription: "포항·영일만항 울릉도(도동·사동) 여객선 시간표·운항 현황·날씨",
+    metaDescription: "포항·영일만항 울릉도(도동·사동) 여객선 시간표·운항 현황·날씨. 울릉도→독도 배편 포함",
     train: {
       stationName: "포항역",
       localName: "포항",
@@ -85,6 +102,20 @@ export const REGIONS: Record<string, RegionConfig> = {
       fareHint: 53600,
       bookingUrl: "https://www.korail.com/ticket/search/general",  // 신버전 예매 검색 폼(letskorail 레거시 폐지)
     },
+    // 울릉도 → 독도 (순환항로 — MTIS oport=dest="울릉(저동/사동)", 독도는 nvg_seawy_nm에만)
+    islandHops: [
+      {
+        key: "dokdo",
+        label: "독도",
+        originName: "울릉도",
+        depKeyword: "울릉",
+        seawayKeyword: "독도",
+        terminal: "울릉 저동항여객선터미널",
+        bookingNote: "현장 매표소·선사 발권 · 기상 영향 커 당일 확인 필수",
+      },
+    ],
+    islandHopTitle: "독도 여객선",
+    islandHopNote: "울릉도(저동·사동)에서 독도까지 · 포항↔울릉 노선과 별개로 섬에서 타는 배 · 기상 영향이 큽니다",
   },
 
   mokpo: {
