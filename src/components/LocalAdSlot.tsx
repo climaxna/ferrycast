@@ -31,9 +31,12 @@ export default function LocalAdSlot({
           <p className="pr-14 text-sm font-bold text-slate-800">
             이 자리에 사장님의 가게를 알려보세요
           </p>
+          {/* 방문자 "수"가 아니라 "질"로 설득 — 지역별 실측치(완도 100+/포항 50/목포 30/인천 20)는
+              작은 지역에서 역효과라 화면에 넣지 않는다. 숫자는 메일 회신 단계에서 캡처와 함께 제시. */}
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
-            펜션 · 식당 · 카페 · 특산물 · 렌터카 — 배편과 날씨를 보러 찾는
-            방문자에게 매일 소개됩니다. 배너 제작도 무료로 해드립니다.
+            펜션 · 식당 · 카페 · 특산물 · 렌터카 — 곧 {regionName}에서 배를 탈
+            방문자가 시간표를 확인하며 하루에도 여러 번 보는 자리입니다.
+            배너 제작도 무료로 해드립니다.
           </p>
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <a
