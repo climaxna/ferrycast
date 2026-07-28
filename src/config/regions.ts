@@ -115,7 +115,7 @@ export const REGIONS: Record<string, RegionConfig> = {
       },
     ],
     islandHopTitle: "독도 여객선",
-    islandHopNote: "울릉도(저동·사동)에서 독도까지 · 포항↔울릉 노선과 별개로 섬에서 타는 배 · 기상 영향이 큽니다",
+    islandHopNote: "울릉도(저동·사동) 출발 → 독도를 둘러보고 다시 울릉도로 돌아오는 왕복편입니다 (독도는 접안만 해 별도 '독도→울릉' 편은 없음) · 기상 영향이 큽니다",
   },
 
   mokpo: {
