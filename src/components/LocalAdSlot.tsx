@@ -27,7 +27,10 @@ export default function LocalAdSlot({
           </p>
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
             펜션 · 식당 · 카페 · 특산물 · 렌터카 — 배편과 날씨를 보러 찾는
-            방문자에게 매일 소개됩니다. 배너 제작도 무료로 해드립니다.
+            방문자에게 매일 소개됩니다.
+          </p>
+          <p className="mt-1.5 text-xs font-semibold text-blue-700">
+            월 5만원부터 · 배너 제작 무료
           </p>
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <a
