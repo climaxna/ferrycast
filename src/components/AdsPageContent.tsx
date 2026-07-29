@@ -41,6 +41,9 @@ export default function AdsPageContent({
             <br />
             손님에게 가게를 알려보세요
           </h2>
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-sm font-bold text-white ring-1 ring-white/25">
+            📢 월 5만원부터 · 배너 무료 제작
+          </div>
           <ul className="mt-4 space-y-2 text-sm leading-relaxed text-blue-50">
             <li>· {regionName} 배편·날씨·물때를 확인하러 <strong className="font-bold text-white">매일 방문</strong>합니다</li>
             <li>· 방문자 상당수가 <strong className="font-bold text-white">여행·이동을 준비하는 손님</strong>입니다</li>

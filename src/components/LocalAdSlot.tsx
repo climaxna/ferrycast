@@ -36,7 +36,9 @@ export default function LocalAdSlot({
           <p className="mt-1 text-xs leading-relaxed text-slate-500">
             펜션 · 식당 · 카페 · 특산물 · 렌터카 — 곧 {regionName}에서 배를 탈
             방문자가 시간표를 확인하며 하루에도 여러 번 보는 자리입니다.
-            배너 제작도 무료로 해드립니다.
+          </p>
+          <p className="mt-1.5 text-xs font-semibold text-blue-700">
+            월 5만원부터 · 배너 제작 무료
           </p>
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <a
