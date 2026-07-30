@@ -11,7 +11,7 @@ import { getTrainsForRegion } from "@/lib/regionTrain"
 import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
 import RegionIslandHopSection from "@/components/RegionIslandHopSection"
-import Logo from "@/components/Logo"
+import AppHeaderTitle from "@/components/AppHeaderTitle"
 import LocalAdSlot from "@/components/LocalAdSlot"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
@@ -133,15 +133,8 @@ export default async function RegionPage({
     <main className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center gap-2.5 px-4 py-3">
-          <Logo />
-          <div className="flex-1">
-            <h1 className="text-lg font-bold leading-none tracking-tight text-slate-900">
-              Ferry<span className="text-blue-600">Cast</span>
-            </h1>
-            <p className="mt-1 text-xs font-medium tracking-wide text-slate-400">
-              {config.name} 날씨 · 여객선 현황
-            </p>
-          </div>
+          {/* 로고+제목 = 새로고침 (수동 새로고침 아이콘을 없앤 뒤의 갱신 수단) */}
+          <AppHeaderTitle subtitle={`${config.name} 날씨 · 여객선 현황`} />
           <Link
             href={`/${config.slug}/qr`}
             aria-label="QR 코드"
