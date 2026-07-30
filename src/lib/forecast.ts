@@ -1,4 +1,5 @@
 import { kstDateStr, dayLabel } from "@/lib/utils"
+import { weatherIconKind, type WeatherIconKind } from "@/lib/weather"
 
 export interface DailyForecast {
   date: string       // "YYYYMMDD"
@@ -10,14 +11,11 @@ export interface DailyForecast {
   popMax: number     // 강수확률 최대 %
 }
 
-export function skyIcon(sky: number, pty: number): string {
-  if (pty === 1 || pty === 5) return "🌧️"
-  if (pty === 2 || pty === 6) return "🌨️"
-  if (pty === 3 || pty === 7) return "❄️"
-  if (pty === 4) return "⛅🌧️"
-  if (sky === 1) return "☀️"
-  if (sky === 3) return "⛅"
-  return "☁️"
+// 5일 예보용 아이콘 종류 — 판정은 weather.ts의 weatherIconKind()에 위임(현재날씨와 동일 규칙).
+// 예전엔 이곳에 이모지 매핑이 따로 있어 현재날씨와 어긋날 수 있었고, 소나기(pty=4)는
+// 이모지 2개("⛅🌧️")를 반환해 크기·정렬이 깨졌다.
+export function skyIconKind(sky: number, pty: number): WeatherIconKind {
+  return weatherIconKind(pty, sky)
 }
 
 export function skyLabel(sky: number, pty: number): string {

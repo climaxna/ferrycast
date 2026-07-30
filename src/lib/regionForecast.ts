@@ -2,7 +2,7 @@ import { kstDateStr, dayLabel } from "@/lib/utils"
 import type { DailyForecast } from "@/lib/forecast"
 
 export type { DailyForecast } from "@/lib/forecast"
-export { skyIcon, skyLabel } from "@/lib/forecast"
+export { skyIconKind, skyLabel } from "@/lib/forecast"
 
 function getVilageFcstBaseCandidates(): Array<{ baseDate: string; baseTime: string }> {
   const pad = (n: number) => String(n).padStart(2, "0")

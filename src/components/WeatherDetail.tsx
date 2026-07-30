@@ -4,6 +4,7 @@ import { windDirLabel, ptyLabel } from "@/lib/weather"
 import type { WeatherData } from "@/lib/weather"
 import type { TidalForecast, TidalEvent } from "@/lib/tide"
 import { useModalClose } from "@/hooks/useModalClose"
+import WeatherIcon from "./WeatherIcon"
 
 interface Props {
   weather: WeatherData
@@ -13,7 +14,7 @@ interface Props {
 
 export default function WeatherDetail({ weather: w, tidal, onClose }: Props) {
   useModalClose(onClose)
-  const { text: ptyText, icon: ptyIcon } = ptyLabel(w.pty)
+  const { text: ptyText, kind: ptyKind } = ptyLabel(w.pty)
   const baseStr = `${w.baseDate.slice(0, 4)}.${w.baseDate.slice(4, 6)}.${w.baseDate.slice(6)} ${w.baseTime.slice(0, 2)}:${w.baseTime.slice(2)} 기준`
 
   return (
@@ -43,7 +44,7 @@ export default function WeatherDetail({ weather: w, tidal, onClose }: Props) {
           <div className="overflow-hidden rounded-2xl bg-gradient-to-b from-[#2563eb] to-[#1d4ed8] p-5 text-white shadow-sm">
             <div className="flex items-center gap-3">
               <span className="text-5xl font-bold tracking-tight">{Math.round(w.temp)}°</span>
-              <span className="text-4xl">{ptyIcon}</span>
+              <WeatherIcon kind={ptyKind} size={40} className="text-white" />
               <span className="text-xl font-medium text-white/90">{ptyText}</span>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3 border-t border-white/25 pt-4">

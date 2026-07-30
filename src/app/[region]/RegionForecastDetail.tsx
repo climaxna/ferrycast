@@ -1,6 +1,7 @@
 "use client"
 
-import { skyIcon, skyLabel } from "@/lib/forecast"
+import { skyIconKind, skyLabel } from "@/lib/forecast"
+import WeatherIcon, { weatherIconTone } from "@/components/WeatherIcon"
 import type { DailyForecast } from "@/lib/forecast"
 import { useModalClose } from "@/hooks/useModalClose"
 
@@ -53,7 +54,10 @@ export default function RegionForecastDetail({ forecast, regionName, onClose }: 
                   </p>
                 </div>
                 <div className="flex w-20 shrink-0 flex-col items-center gap-0.5">
-                  <span className="text-3xl">{skyIcon(day.sky, day.pty)}</span>
+                  {(() => {
+                    const kind = skyIconKind(day.sky, day.pty)
+                    return <WeatherIcon kind={kind} size={30} className={weatherIconTone(kind)} />
+                  })()}
                   <span className="text-xs text-slate-500">{skyLabel(day.sky, day.pty)}</span>
                 </div>
                 <div className="flex flex-1 items-center justify-center gap-3">

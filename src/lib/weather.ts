@@ -44,23 +44,43 @@ export function waveLabel(h: number): { text: string; color: string } {
   return              { text: "매우 거침", color: "text-red-300" }
 }
 
+// 날씨 아이콘 종류 — components/WeatherIcon.tsx가 이 값으로 SVG를 그린다.
+// (예전엔 이모지 문자를 직접 넘겼는데 OS·폰트마다 모양이 달라 톤·정렬이 흔들렸다)
+export type WeatherIconKind =
+  | "sun" | "partly" | "cloud" | "rain" | "drizzle" | "sleet" | "snow" | "fog"
+
+// 강수형태(PTY)·하늘상태(SKY) 코드 → 아이콘 종류. 현재날씨·5일예보 공용 단일 소스.
+//   PTY: 0=없음 1=비 2=비/눈 3=눈 4=소나기(단기예보) 5=빗방울 6=빗방울·눈날림 7=눈날림
+//   SKY: 1=맑음 3=구름많음 4=흐림
+export function weatherIconKind(pty: number, sky = 1): WeatherIconKind {
+  if (pty === 1 || pty === 4) return "rain"     // 비·소나기
+  if (pty === 5) return "drizzle"               // 빗방울(약한 비)
+  if (pty === 2 || pty === 6) return "sleet"    // 비/눈 혼합
+  if (pty === 3 || pty === 7) return "snow"     // 눈·눈날림
+  if (pty > 0) return "fog"                     // 미지 코드 → 안개형으로 안전 처리
+  if (sky === 4) return "cloud"
+  if (sky === 3) return "partly"
+  return "sun"
+}
+
 // sky: 1=맑음 3=구름많음 4=흐림 (초단기예보 SKY 코드)
-export function ptyLabel(pty: number, sky = 1): { text: string; icon: string } {
+export function ptyLabel(pty: number, sky = 1): { text: string; kind: WeatherIconKind } {
+  const kind = weatherIconKind(pty, sky)
   if (pty > 0) {
-    const map: Record<number, { text: string; icon: string }> = {
-      1: { text: "비", icon: "🌧️" },
-      2: { text: "비/눈", icon: "🌨️" },
-      3: { text: "눈", icon: "❄️" },
-      5: { text: "빗방울", icon: "🌦️" },
-      6: { text: "빗방울·눈날림", icon: "🌨️" },
-      7: { text: "눈날림", icon: "❄️" },
+    const text: Record<number, string> = {
+      1: "비",
+      2: "비/눈",
+      3: "눈",
+      5: "빗방울",
+      6: "빗방울·눈날림",
+      7: "눈날림",
     }
-    return map[pty] ?? { text: "알 수 없음", icon: "🌫️" }
+    return { text: text[pty] ?? "알 수 없음", kind }
   }
   // PTY=0: 강수 없음 → SKY 코드로 날씨 판단
-  if (sky === 4) return { text: "흐림",     icon: "☁️" }
-  if (sky === 3) return { text: "구름많음", icon: "⛅" }
-  return               { text: "맑음",     icon: "☀️" }
+  if (sky === 4) return { text: "흐림",     kind }
+  if (sky === 3) return { text: "구름많음", kind }
+  return               { text: "맑음",     kind }
 }
 
 function getVilageFcstBase(): { baseDate: string; baseTime: string } {

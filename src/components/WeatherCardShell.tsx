@@ -4,6 +4,7 @@ import { nextTidalEvent } from "@/lib/tide"
 import type { WeatherData } from "@/lib/weather"
 import type { TidalForecast } from "@/lib/tide"
 import RefreshButton from "./RefreshButton"
+import WeatherIcon from "./WeatherIcon"
 
 // 날씨·조석 카드의 시각 표현 전담 — 완도(WeatherCardClient)·다지역(RegionWeatherCardClient) 공용.
 // 두 파일에 동일 마크업이 복제돼 있어 한쪽만 고치면 어긋나던 것을 여기로 합쳤다.
@@ -25,7 +26,7 @@ export default function WeatherCardShell({
   onWeather: () => void
   onTidal: () => void
 }) {
-  const { text: ptyText, icon: ptyIcon } = ptyLabel(w.pty, w.sky)
+  const { text: ptyText, kind: ptyKind } = ptyLabel(w.pty, w.sky)
   const timeStr = `${w.baseDate.slice(4, 6)}/${w.baseDate.slice(6)} ${w.baseTime.slice(0, 2)}:${w.baseTime.slice(2)}`
   const now = new Date()
   const nowMin = now.getHours() * 60 + now.getMinutes()
@@ -51,7 +52,7 @@ export default function WeatherCardShell({
         <div className="pr-10">
           <div className="flex items-center gap-2.5">
             <span className="shrink-0 text-3xl font-bold tabular-nums leading-none">{Math.round(w.temp)}°</span>
-            <span className="shrink-0 text-xl leading-none">{ptyIcon}</span>
+            <WeatherIcon kind={ptyKind} size={26} className="text-white" />
             <span className="truncate text-sm font-medium text-white/90">{ptyText}</span>
           </div>
           <p className="mt-1 text-[11px] leading-none text-white/60">{timeStr} 기준</p>
