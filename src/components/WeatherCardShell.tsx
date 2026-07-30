@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import { windDirLabel, ptyLabel, waveLabel } from "@/lib/weather"
 import { nextTidalEvent } from "@/lib/tide"
+import { kstDateStr } from "@/lib/utils"
 import type { WeatherData } from "@/lib/weather"
 import type { TidalForecast } from "@/lib/tide"
 import RefreshButton from "./RefreshButton"
@@ -27,7 +28,13 @@ export default function WeatherCardShell({
   onTidal: () => void
 }) {
   const { text: ptyText, kind: ptyKind } = ptyLabel(w.pty, w.sky)
-  const timeStr = `${w.baseDate.slice(4, 6)}/${w.baseDate.slice(6)} ${w.baseTime.slice(0, 2)}:${w.baseTime.slice(2)}`
+  // 관측시각 — 오늘 관측이면 시각만 표시(현재 날씨 카드에서 오늘 날짜는 군더더기이고,
+  // 히어로 한 줄에 넣을 공간을 벌어 날씨 라벨이 잘리지 않는다).
+  // 단 API 실패로 직전값(최대 6시간, weather.ts의 _lastGood*)이 다른 날짜면 날짜까지 밝혀 오해를 막는다.
+  const hhmm = `${w.baseTime.slice(0, 2)}:${w.baseTime.slice(2)}`
+  const timeStr = w.baseDate === kstDateStr()
+    ? hhmm
+    : `${w.baseDate.slice(4, 6)}/${w.baseDate.slice(6)} ${hhmm}`
   const now = new Date()
   const nowMin = now.getHours() * 60 + now.getMinutes()
   const nextTide = tidal ? nextTidalEvent(tidal.events, nowMin) : null
@@ -47,15 +54,15 @@ export default function WeatherCardShell({
         aria-label="단기 날씨 예보 보기"
         className="relative w-full px-4 pb-2.5 pt-3 text-left transition-colors hover:bg-white/5 active:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/70"
       >
-        {/* 히어로 — 기온·날씨 + 관측시각(메타는 바로 아래 붙여 한 덩어리로).
-            pr-10은 우상단 새로고침 자리 확보 */}
-        <div className="pr-10">
-          <div className="flex items-center gap-2.5">
-            <span className="shrink-0 text-3xl font-bold tabular-nums leading-none">{Math.round(w.temp)}°</span>
-            <WeatherIcon kind={ptyKind} size={26} className="text-white" />
-            <span className="truncate text-sm font-medium text-white/90">{ptyText}</span>
-          </div>
-          <p className="mt-1 text-[11px] leading-none text-white/60">{timeStr} 기준</p>
+        {/* 히어로 — 기온·날씨·관측시각을 한 줄로 (세로 한 줄 절약).
+            pr-10은 우상단 새로고침 자리 확보 — 관측시각을 오른쪽 끝으로 밀지 않고
+            날씨 텍스트 바로 뒤에 붙여, 새로고침 버튼과 나란히 붙어 보이는 것을 피한다.
+            긴 라벨("빗방울·눈날림")일 때는 관측시각(shrink-0) 대신 라벨이 줄어든다. */}
+        <div className="flex items-center gap-2.5 pr-10">
+          <span className="shrink-0 text-3xl font-bold tabular-nums leading-none">{Math.round(w.temp)}°</span>
+          <WeatherIcon kind={ptyKind} size={26} className="text-white" />
+          <span className="truncate text-sm font-medium text-white/90">{ptyText}</span>
+          <span className="shrink-0 text-[11px] leading-none text-white/60">{timeStr} 기준</span>
         </div>
 
         {/* 지표 행 — 그리드(파고 유무로 3열/2열, Tailwind JIT용 완전 리터럴) + 열기(+)를 같은 행에
