@@ -71,6 +71,8 @@ export default function Page() {
           <WeatherCard />
         </Suspense>
 
+        <RegionNav current="" />
+
         <Suspense fallback={<RouteSkeleton />}>
           <RouteSection />
         </Suspense>
@@ -84,8 +86,6 @@ export default function Page() {
           <CoupangSection />
           <AdFitBanner />
         </div>
-
-        <RegionNav current="" />
 
         <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-500">

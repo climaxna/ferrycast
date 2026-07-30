@@ -169,6 +169,8 @@ export default async function RegionPage({
           <RegionWeatherCard region={region} />
         </Suspense>
 
+        <RegionNav current={config.slug} />
+
         <Suspense fallback={<RouteSkeleton />}>
           <RegionRouteSection region={region} />
         </Suspense>
@@ -182,8 +184,6 @@ export default async function RegionPage({
           <CoupangSection />
           <AdFitBanner />
         </div>
-
-        <RegionNav current={config.slug} />
 
         <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-500">

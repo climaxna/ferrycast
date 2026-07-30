@@ -11,11 +11,8 @@ export default function RegionNav({ current }: { current: string }) {
   return (
     <nav
       aria-label="지역 이동"
-      className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm"
+      className="rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
     >
-      <p className="mb-2.5 text-xs font-semibold text-slate-400">
-        다른 지역 날씨 · 항로 보기
-      </p>
       {/* 지역 칩 — 카드 폭을 균등 분할한 세그먼트 정렬 (지역 ≤6개까지 안전, 더 늘면 재조정) */}
       <div
         className="grid gap-2"
