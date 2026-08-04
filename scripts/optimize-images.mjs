@@ -5,7 +5,9 @@
  *
  * 사용법:
  *   node scripts/optimize-images.mjs [입력폴더] [출력폴더] [옵션]
- *   npm run optimize                         # 기본 폴더(photos-in → photos-out)
+ *   npm run optimize                         # 기본 폴더
+ *                                            #   내PC\Pictures\블로그\photo_in
+ *                                            # → 내PC\Pictures\블로그\photo_out
  *   npm run optimize -- ~/사진 ~/블로그업로드   # 폴더 직접 지정
  *
  * 옵션:
@@ -24,7 +26,7 @@
 
 import { readdir, mkdir, stat } from "node:fs/promises";
 import { join, extname, basename, relative, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { homedir } from "node:os";
 
 let sharp;
 try {
@@ -90,9 +92,12 @@ if (!Number.isFinite(opts.quality) || opts.quality < 1 || opts.quality > 100) {
   process.exit(1);
 }
 
-const projectRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const inputDir = positional[0] || join(projectRoot, "photos-in");
-const outputDir = positional[1] || join(projectRoot, "photos-out");
+// 기본 폴더는 저장소 밖(내 사진 폴더)에 둔다 — 사진을 프로젝트 안에 두지 않아 실수로 커밋될 일이 없고,
+// 탐색기에서 바로 열어 쓰기 편하다. 홈 디렉터리 기준이라 Windows에서 C:\Users\<사용자>\Pictures\블로그\... 로 잡힌다
+// (사용자명을 코드에 박지 않으므로 다른 PC·계정에서도 그대로 동작).
+const BLOG_DIR = join(homedir(), "Pictures", "블로그");
+const inputDir = positional[0] || join(BLOG_DIR, "photo_in");
+const outputDir = positional[1] || join(BLOG_DIR, "photo_out");
 
 // ---- 파일 수집 -------------------------------------------------------------
 /** @returns {Promise<string[]>} 처리할 이미지 파일 경로 목록 */
@@ -149,10 +154,13 @@ async function main() {
     }\n`
   );
 
+  // 입력 폴더가 없으면 만들어 둔다 — 첫 실행에서 "폴더에 사진을 넣으세요" 안내가 바로 실행 가능해진다
+  await mkdir(inputDir, { recursive: true });
+
   const files = await collectImages(inputDir);
   if (files.length === 0) {
     console.log(
-      `⚠️  처리할 이미지가 없습니다.\n   '${inputDir}' 폴더에 사진을 넣고 다시 실행하세요.\n`
+      `⚠️  처리할 이미지가 없습니다.\n   아래 폴더에 사진을 넣고 다시 실행하세요.\n   ${inputDir}\n`
     );
     return;
   }

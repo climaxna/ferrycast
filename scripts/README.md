@@ -16,7 +16,8 @@ npm install        # sharp 라이브러리 설치
 1. (최초 1회) 컴퓨터에 [Node.js LTS](https://nodejs.org)를 설치합니다.
 2. `블로그-이미지-최적화.bat` 를 **더블클릭**합니다.
    - 처음 실행하면 필요한 라이브러리(sharp)를 자동으로 설치합니다.
-   - `photos-in` 폴더의 사진을 최적화해서 `photos-out` 폴더에 저장합니다.
+   - `내 PC\Pictures\블로그\photo_in` 폴더의 사진을 최적화해서
+     `내 PC\Pictures\블로그\photo_out` 폴더에 저장합니다. (폴더는 처음 실행할 때 자동으로 생성됩니다)
 3. **또는** 사진이 든 폴더를 `블로그-이미지-최적화.bat` **파일 위로 끌어다 놓으면**(드래그 앤 드롭),
    그 폴더를 최적화해서 바로 옆에 `폴더이름-최적화` 폴더로 저장합니다.
 
@@ -27,8 +28,8 @@ npm install        # sharp 라이브러리 설치
 가장 간단하게 — 기본 폴더 사용:
 
 ```bash
-# 1) 프로젝트 안에 photos-in 폴더를 만들고 사진을 넣습니다
-# 2) 실행하면 photos-out 폴더에 최적화된 이미지가 생깁니다
+# 1) 내 PC\Pictures\블로그\photo_in 폴더에 사진을 넣습니다 (없으면 자동 생성)
+# 2) 실행하면 내 PC\Pictures\블로그\photo_out 폴더에 최적화된 이미지가 생깁니다
 npm run optimize
 ```
 
@@ -73,4 +74,5 @@ npm run optimize -- --format webp
 
 지원 입력 포맷: JPG, PNG, WebP, TIFF, HEIC/HEIF, GIF, BMP
 
-> 참고: `photos-in/`, `photos-out/` 폴더는 `.gitignore`에 등록되어 있어 사진이 저장소에 올라가지 않습니다.
+> 참고: 기본 폴더가 **저장소 밖**(`내 PC\Pictures\블로그\`)이라 사진이 실수로 커밋될 일이 없습니다.
+> 저장소 안의 `photos-in/`, `photos-out/`도 `.gitignore`에 남겨 두어(폴더를 직접 지정해 쓰는 경우 대비) 안전합니다.

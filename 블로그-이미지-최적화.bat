@@ -42,10 +42,11 @@ if not "%~1"=="" (
   )
 )
 
-REM --- 기본 동작: photos-in 폴더의 사진을 photos-out 폴더로 ---
-if not exist "photos-in" mkdir "photos-in"
-echo photos-in 폴더의 사진을 최적화해서 photos-out 폴더에 저장합니다.
-echo (사진을 photos-in 폴더에 넣거나, 사진 폴더를 이 파일 위로 끌어다 놓으세요.)
+REM --- 기본 동작: 내 사진 폴더의 photo_in → photo_out (폴더는 스크립트가 알아서 생성) ---
+echo 입력 폴더 : %USERPROFILE%\Pictures\블로그\photo_in
+echo 출력 폴더 : %USERPROFILE%\Pictures\블로그\photo_out
+echo.
+echo (사진을 위 photo_in 폴더에 넣거나, 다른 사진 폴더를 이 파일 위로 끌어다 놓으세요.)
 echo.
 node scripts\optimize-images.mjs
 
