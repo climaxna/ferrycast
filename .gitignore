@@ -58,3 +58,7 @@ cookies.json
 
 # 생성된 블로그 초안 (로컬 산출물)
 drafts/
+
+# blog image optimizer (local photo folders — 사진은 커밋하지 않음)
+/photos-in/
+/photos-out/
