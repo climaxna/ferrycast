@@ -235,28 +235,42 @@ export function statusSummary(
   keyFn: (it: MtisItem) => string | null,
   labelOf: (key: string) => string,
 ): StatusSummary {
+  const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
+  const fmt = (min: number) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`
+
   let normal = 0, done = 0
-  const raw: StatusAlert[] = []
+  const opByKey = new Map<string, number[]>()   // 그룹별 운항편(정상·완료) 출항 분
+  const cxByKey = new Map<string, { min: number; label: string; reason?: string; suspended: boolean }[]>()
   for (const it of items) {
     const gk = keyFn(it)
     if (!gk) continue
+    const min = toMin(parseSailTime(it.sail_tm))
     if (isCancelled(it)) {
-      raw.push({ label: labelOf(gk), time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
-    } else if (it.nvg_stts_nm === "완료") {
-      done++
+      let arr = cxByKey.get(gk); if (!arr) { arr = []; cxByKey.set(gk, arr) }
+      arr.push({ min, label: labelOf(gk), reason: itemReason(it), suspended: isSuspended(it) })
     } else {
-      normal++
+      let arr = opByKey.get(gk); if (!arr) { arr = []; opByKey.set(gk, arr) }
+      arr.push(min)
+      if (it.nvg_stts_nm === "완료") done++
+      else normal++
     }
   }
-  // 같은 노선 5분 이내 중복편(예: 청산 18:00/18:01 서로 다른 배)은 하나로 병합 — 시간표 표시와 동일 정책
-  raw.sort((a, b) => a.time.localeCompare(b.time))
-  const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
+  // 결항 알림 — 상세 화면 partialCancelled와 동일 규칙:
+  //   ① 같은 노선 5분 이내 '운항편'이 있으면 그 슬롯은 다른 배로 뜨는 것 → 결항 알림 제외
+  //      (예: 18:00 운항 + 18:01 선박검사 → 18:01은 감춤. 시간표에도 안 뜸)
+  //   ② 남은 결항편끼리도 5분 병합
   const alerts: StatusAlert[] = []
-  for (const a of raw) {
-    const am = toMin(a.time)
-    if (alerts.some((m) => m.label === a.label && Math.abs(toMin(m.time) - am) < 5)) continue
-    alerts.push(a)
+  for (const [gk, cxs] of cxByKey) {
+    const ops = opByKey.get(gk) ?? []
+    const kept: number[] = []
+    for (const c of [...cxs].sort((a, b) => a.min - b.min)) {
+      if (ops.some((o) => Math.abs(o - c.min) < 5)) continue
+      if (kept.some((k) => Math.abs(k - c.min) < 5)) continue
+      kept.push(c.min)
+      alerts.push({ label: c.label, time: fmt(c.min), reason: c.reason, suspended: c.suspended })
+    }
   }
+  alerts.sort((a, b) => a.time.localeCompare(b.time))
   return { normal, cancelled: alerts.length, done, alerts }
 }
 
