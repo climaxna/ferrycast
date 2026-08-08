@@ -171,10 +171,21 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
 
           {/* 시간표 */}
           <div>
-            <div className="mb-3 flex items-baseline justify-between">
-              <p className="text-sm font-bold uppercase tracking-wider text-slate-400">
-                {timeHeading}
-              </p>
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-bold uppercase tracking-wider text-slate-400">
+                  {timeHeading}
+                </p>
+                {/* 내일 시간표 — 별도 박스 대신 헤딩 옆 버튼으로 (오늘 결항 시에도 노출) */}
+                {route.tomorrow && route.tomorrow.tripCount > 0 && (
+                  <button
+                    onClick={() => setShowTomorrow(true)}
+                    className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 transition-opacity active:opacity-70"
+                  >
+                    내일 {route.tomorrow.tripCount}편 →
+                  </button>
+                )}
+              </div>
               {!isCancelled && (nextTime || futureTimes.length > 0) && (
                 activeAlarms.size > 0 ? (
                   <button
@@ -321,24 +332,7 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               </p>
             )}
             {!isCancelled && nextTime === null && route.times.length > 0 && (
-              <p className="mt-3 text-sm text-slate-400">오늘 모든 편 출발 완료</p>
-            )}
-            {route.tomorrow && route.tomorrow.tripCount > 0 && (
-              <button
-                onClick={() => setShowTomorrow(true)}
-                className="mt-3 flex w-full items-center justify-between rounded-xl bg-emerald-50 px-3 py-2.5 transition-opacity active:opacity-70"
-              >
-                <div className="flex items-center gap-2">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-emerald-600" aria-hidden="true">
-                    <rect x="3" y="4" width="18" height="18" rx="2" />
-                    <path d="M3 10h18M8 2v4M16 2v4" strokeLinecap="round" />
-                  </svg>
-                  <span className="text-sm font-medium text-emerald-700">
-                    내일 <strong className="font-bold">{route.tomorrow.tripCount}편</strong> 운항 예정
-                  </span>
-                </div>
-                <span className="text-xs font-medium text-emerald-600">시간표 보기 →</span>
-              </button>
+              <p className="mt-3 text-sm text-slate-400">오늘 모든 편 출발 완료 · 위 “내일” 버튼에서 내일 시간표 확인</p>
             )}
           </div>
 
