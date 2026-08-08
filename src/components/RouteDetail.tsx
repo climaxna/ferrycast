@@ -217,18 +217,23 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                 </p>
               </div>
             ) : route.times.length > 0 ? (
-              hasArrival ? (
-                /* 도착 예정시각 — 수직 리스트 (출발 왼쪽 · 도착 예정 오른쪽 끝) */
-                <div className="space-y-2">
+              /* 4열 그리드 — 도착 예정시각(있으면) 각 칸 아래 작게 표시 */
+              <>
+                <div className="grid grid-cols-4 gap-2">
                   {pastTimes.map((t) => {
                     const arr = arrOf(t)
                     return (
-                      <div key={t} className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 opacity-50">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg font-bold tabular-nums text-slate-400">{t}</span>
-                          {route.via?.[t] && <span className="text-[10px] font-semibold text-amber-500">{route.via[t]} 경유</span>}
-                        </div>
-                        {arr && <span className="text-xs text-slate-400"><span className="font-bold tabular-nums">{arr}</span> 도착 예정</span>}
+                      <div
+                        key={t}
+                        className="flex flex-col items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-400 shadow-sm"
+                      >
+                        {t}
+                        {route.via?.[t] && (
+                          <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
+                        )}
+                        {arr && (
+                          <span className="text-[10px] font-medium leading-tight tabular-nums opacity-60">↓{arr}</span>
+                        )}
                       </div>
                     )
                   })}
@@ -236,18 +241,19 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                     const arr = arrOf(nextTime)
                     return (
                       <button
+                        key={nextTime}
                         onClick={() => setAlarmTime(nextTime)}
-                        className="flex w-full items-center justify-between rounded-xl bg-blue-500 px-4 py-3 shadow-md active:opacity-80"
+                        className={`flex flex-col items-center justify-center rounded-xl py-3 shadow-md active:opacity-80 ${theme.nextChip}`}
                       >
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg font-bold tabular-nums text-white">{nextTime}</span>
-                          <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-bold text-white">다음</span>
-                          {route.via?.[nextTime] && <span className="text-[11px] font-semibold text-amber-200">{route.via[nextTime]} 경유</span>}
-                        </div>
-                        {arr ? (
-                          <span className="text-sm text-blue-50"><span className="font-bold tabular-nums">{arr}</span> 도착 예정</span>
+                        <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
+                        {route.via?.[nextTime] ? (
+                          <span className="text-[11px] font-semibold leading-tight text-amber-200">{route.via[nextTime]} 경유</span>
+                        ) : arr ? (
+                          <span className="text-[10px] font-semibold leading-tight tabular-nums text-white/80">↓{arr}</span>
                         ) : (
-                          <span className="text-[11px] text-blue-100">{relativeTime(nextTime, nowMinutes)}</span>
+                          <span className={`text-[11px] font-semibold leading-tight ${theme.nextSub}`}>
+                            {relativeTime(nextTime, nowMinutes)}
+                          </span>
                         )}
                       </button>
                     )
@@ -258,64 +264,25 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                       <button
                         key={t}
                         onClick={() => setAlarmTime(t)}
-                        className="flex w-full items-center justify-between rounded-xl bg-blue-50 px-4 py-3 active:opacity-70"
+                        className={`flex flex-col items-center justify-center rounded-xl py-3 text-base font-bold tabular-nums shadow-sm active:opacity-70 ${theme.detailFuture}`}
                       >
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg font-bold tabular-nums text-blue-700">{t}</span>
-                          {route.via?.[t] && <span className="text-[10px] font-semibold text-amber-500">{route.via[t]} 경유</span>}
-                        </div>
-                        {arr && <span className="text-xs text-blue-500"><span className="font-bold tabular-nums">{arr}</span> 도착 예정</span>}
+                        {t}
+                        {route.via?.[t] && (
+                          <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
+                        )}
+                        {arr && (
+                          <span className="text-[10px] font-medium leading-tight tabular-nums opacity-70">↓{arr}</span>
+                        )}
                       </button>
                     )
                   })}
-                  <p className="mt-1 text-xs text-slate-400">
-                    * 도착 예정시간 — 기상·운항 사정에 따라 달라질 수 있습니다
+                </div>
+                {hasArrival && (
+                  <p className="mt-2 text-xs text-slate-400">
+                    * ↓ 도착 예정시각 — 기상·운항 사정에 따라 달라질 수 있습니다
                   </p>
-                </div>
-              ) : (
-                /* 기존 4열 그리드 */
-                <div className="grid grid-cols-4 gap-2">
-                  {pastTimes.map((t) => (
-                    <div
-                      key={t}
-                      className="flex flex-col items-center justify-center rounded-xl bg-slate-50 py-3 text-base font-bold tabular-nums text-slate-400 shadow-sm"
-                    >
-                      {t}
-                      {route.via?.[t] && (
-                        <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
-                      )}
-                    </div>
-                  ))}
-                  {nextTime && (
-                    <button
-                      key={nextTime}
-                      onClick={() => setAlarmTime(nextTime)}
-                      className={`flex flex-col items-center justify-center rounded-xl py-3 shadow-md active:opacity-80 ${theme.nextChip}`}
-                    >
-                      <span className="text-base font-bold tabular-nums text-white">{nextTime}</span>
-                      {route.via?.[nextTime] ? (
-                        <span className="text-[11px] font-semibold leading-tight text-amber-200">{route.via[nextTime]} 경유</span>
-                      ) : (
-                        <span className={`text-[11px] font-semibold leading-tight ${theme.nextSub}`}>
-                          {relativeTime(nextTime, nowMinutes)}
-                        </span>
-                      )}
-                    </button>
-                  )}
-                  {futureTimes.map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setAlarmTime(t)}
-                      className={`flex flex-col items-center justify-center rounded-xl py-3 text-base font-bold tabular-nums shadow-sm active:opacity-70 ${theme.detailFuture}`}
-                    >
-                      {t}
-                      {route.via?.[t] && (
-                        <span className="text-[10px] font-semibold leading-tight text-amber-500">{route.via[t]} 경유</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )
+                )}
+              </>
             ) : (
               <p className="text-base text-slate-400">시간표 정보 없음</p>
             )}
