@@ -225,6 +225,8 @@ export interface StatusSummary {
   done: number      // 완료(오늘 이미 다녀온 편)
   alerts: StatusAlert[]  // 결항편 목록(시각순) — 티커 회전용
 }
+// 출발/도착 각 방향 요약 (요약 바가 출발/도착 탭에 따라 전환)
+export interface DirSummary { dep: StatusSummary | null; arr: StatusSummary | null }
 
 // 지역 출발편 기준 상태 집계. keyFn: item→노선 groupKey|null(해당 지역 출발편이면 non-null),
 // labelOf: groupKey→표시 라벨. 추가 API 호출 없이 이미 받은 items를 집계한다.

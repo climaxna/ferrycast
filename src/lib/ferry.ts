@@ -1,7 +1,7 @@
 import type { WandoRoute } from "./types"
 import { buildArrivalLookup } from "./shipArrival"
 import {
-  type MtisItem, type CancelledEntry, type StatusSummary,
+  type MtisItem, type CancelledEntry, type DirSummary,
   getMtisDay, fetchTomorrowData, statusSummary,
   isCancelled, isSuspended, cancelKindOf, cancelReason, itemReason,
   extractVia, parseSailTime, deduplicateTimes, partialCancelled, groupStatus, nextDay,
@@ -63,25 +63,33 @@ function arrGroupKey(item: MtisItem): string | null {
   return arrGroupOf(item.oport_nm, item.dest_nm)
 }
 
-// 메인화면 요약 바 — 완도 출발편 기준 정상/결항/종료 집계 + 결항 알림 목록
-export async function getWandoStatusSummary(): Promise<StatusSummary | null> {
+// 메인 요약 바 — 완도 출발/도착 각 방향 집계 (출발/도착 탭에 따라 전환). 본섬+약산 합산.
+export async function getWandoStatusSummaries(): Promise<DirSummary> {
   const key = process.env.DATAGOKR_API_KEY
-  if (!key) return null
+  if (!key) return { dep: null, arr: null }
   try {
     const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
     const items = await getMtisDay(key, date)
-    if (!items.length) return null
-    // 완도 본섬(제주·청산·소안) + 약산 섬↔섬 출발편 합산. 라벨은 출발지가 달라 전체 노선명으로.
-    const keyFn = (it: MtisItem) => depGroupKey(it) ?? yaksanForwardKey(it)
-    const labelOf = (k: string) => {
+    if (!items.length) return { dep: null, arr: null }
+    const depKey = (it: MtisItem) => depGroupKey(it) ?? yaksanForwardKey(it)
+    const depLabel = (k: string) => {
       if (DEP_CFG[k]) return `완도 → ${DEP_CFG[k].label}`
       const yg = YAKSAN_GROUPS.find((g) => g.key === k)
       return yg ? `약산 → ${yg.island}` : k
     }
-    return statusSummary(items, keyFn, labelOf)
+    const arrKey = (it: MtisItem) => arrGroupKey(it) ?? yaksanReturnKey(it)
+    const arrLabel = (k: string) => {
+      if (ARR_CFG[k]) return `${ARR_CFG[k].label} → 완도`
+      const yg = YAKSAN_GROUPS.find((g) => g.key === k)
+      return yg ? `${yg.island} → 약산` : k
+    }
+    return {
+      dep: statusSummary(items, depKey, depLabel),
+      arr: statusSummary(items, arrKey, arrLabel),
+    }
   } catch {
-    return null
+    return { dep: null, arr: null }
   }
 }
 

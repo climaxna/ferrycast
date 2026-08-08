@@ -3,20 +3,23 @@
 import { useState, useEffect, type ReactNode } from "react"
 import RouteItem from "@/components/RouteItem"
 import RouteDetail from "@/components/RouteDetail"
+import StatusBar from "@/components/StatusBar"
 import type { WandoRoute } from "@/lib/types"
+import type { DirSummary } from "@/lib/mtis"
 import type { RegionTrainData } from "@/lib/regionTrain"
 import RegionTrainBlock from "./RegionTrainBlock"
 
 interface Props {
   departures: { routes: WandoRoute[]; isLive: boolean }
   arrivals: { routes: WandoRoute[]; isLive: boolean }
+  summaries: DirSummary   // 출발/도착 운항 요약 — 탭에 따라 전환
   regionName: string
   train?: RegionTrainData | null
   // 시간표 목록 직후(다음 섹션 앞) 단락 구분점에 노출할 지역 광고 슬롯 — 서버에서 렌더해 주입.
   adSlot?: ReactNode
 }
 
-export default function RegionRouteTabs({ departures, arrivals, regionName, train, adSlot }: Props) {
+export default function RegionRouteTabs({ departures, arrivals, summaries, regionName, train, adSlot }: Props) {
   const [tab, setTab] = useState<"dep" | "arr">("dep")
   const [selected, setSelected] = useState<WandoRoute | null>(null)
   const [nowMinutes, setNowMinutes] = useState(0)
@@ -36,6 +39,11 @@ export default function RegionRouteTabs({ departures, arrivals, regionName, trai
 
   return (
     <section>
+      {/* 운항 요약 바 — 출발/도착 탭에 따라 전환 */}
+      <div className="mb-3">
+        <StatusBar summary={isDeparture ? summaries.dep : summaries.arr} />
+      </div>
+
       <div className={`mb-3 flex items-center gap-1 rounded-xl p-1 transition-colors ${
         isDeparture ? "bg-blue-50" : "bg-teal-50"
       }`}>

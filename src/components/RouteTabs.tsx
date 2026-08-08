@@ -3,16 +3,19 @@
 import { useState, useEffect, type ReactNode } from "react"
 import RouteItem from "./RouteItem"
 import RouteDetail from "./RouteDetail"
+import StatusBar from "./StatusBar"
 import type { WandoRoute } from "@/lib/types"
+import type { DirSummary } from "@/lib/mtis"
 
 interface Props {
   departures: { routes: WandoRoute[]; isLive: boolean }
   arrivals: { routes: WandoRoute[]; isLive: boolean }
+  summaries: DirSummary   // 출발/도착 운항 요약 — 탭에 따라 전환
   // 시간표 목록 직후(약산 섹션 앞) 단락 구분점에 노출할 지역 광고 슬롯 — 서버에서 렌더해 주입.
   adSlot?: ReactNode
 }
 
-export default function RouteTabs({ departures, arrivals, adSlot }: Props) {
+export default function RouteTabs({ departures, arrivals, summaries, adSlot }: Props) {
   const [tab, setTab] = useState<"dep" | "arr">("dep")
   const [selected, setSelected] = useState<WandoRoute | null>(null)
   const [nowMinutes, setNowMinutes] = useState(0)
@@ -32,6 +35,11 @@ export default function RouteTabs({ departures, arrivals, adSlot }: Props) {
 
   return (
     <section>
+      {/* 운항 요약 바 — 출발/도착 탭에 따라 전환 */}
+      <div className="mb-3">
+        <StatusBar summary={isDeparture ? summaries.dep : summaries.arr} />
+      </div>
+
       {/* 탭 헤더 — 출발(파랑) / 도착(초록) 색 분리 */}
       <div className={`mb-3 flex items-center gap-1 rounded-xl p-1 transition-colors ${
         isDeparture ? "bg-blue-50" : "bg-teal-50"

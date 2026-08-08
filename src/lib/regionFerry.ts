@@ -2,7 +2,7 @@ import type { WandoRoute, RouteStatus } from "./types"
 import type { RegionConfig, RouteGroupConfig } from "@/config/regions"
 import { buildArrivalLookup, findPortNames } from "./shipArrival"
 import {
-  type MtisItem, type CancelledEntry, type StatusSummary,
+  type MtisItem, type CancelledEntry, type DirSummary,
   getMtisDay, fetchTomorrowData, nextDay, statusSummary,
   isCancelled, isSuspended, cancelKindOf, cancelReason, itemReason,
   extractVia, parseSailTime, deduplicateTimes, partialCancelled, groupStatus,
@@ -112,23 +112,26 @@ function makeStaticArr(config: RegionConfig): WandoRoute[] {
     }))
 }
 
-// 메인화면 요약 바 — 지역 출발편 기준 정상/결항/종료 집계 + 결항 알림 목록
-export async function getRegionStatusSummary(config: RegionConfig): Promise<StatusSummary | null> {
+// 메인 요약 바 — 지역 출발/도착 각 방향 집계 (출발/도착 탭에 따라 전환)
+export async function getRegionStatusSummaries(config: RegionConfig): Promise<DirSummary> {
   const key = process.env.DATAGOKR_API_KEY
-  if (!key) return null
+  if (!key) return { dep: null, arr: null }
   try {
     const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
     const items = await getMtisDay(key, date)
-    if (!items.length) return null
-    const keyFn = makeDepGroupKey(config.routeGroups)
-    const labelOf = (k: string) => {
-      const g = config.routeGroups.find((gg) => gg.key === k)
-      return g ? `${config.name} → ${g.label}` : k
+    if (!items.length) return { dep: null, arr: null }
+    const depKey = makeDepGroupKey(config.routeGroups)
+    const arrKey = makeArrGroupKey(config.routeGroups)
+    const grp = (k: string) => config.routeGroups.find((gg) => gg.key === k)
+    const depLabel = (k: string) => { const g = grp(k); return g ? `${config.name} → ${g.label}` : k }
+    const arrLabel = (k: string) => { const g = grp(k); return g ? `${g.label} → ${config.name}` : k }
+    return {
+      dep: statusSummary(items, depKey, depLabel),
+      arr: statusSummary(items, arrKey, arrLabel),
     }
-    return statusSummary(items, keyFn, labelOf)
   } catch {
-    return null
+    return { dep: null, arr: null }
   }
 }
 
