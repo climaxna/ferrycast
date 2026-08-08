@@ -331,9 +331,6 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                 <span className="font-semibold text-amber-500">경유</span> 표시 편은 해당 기항지를 들렀다 가며 소요 시간이 더 깁니다. 그 외는 직항입니다.
               </p>
             )}
-            {!isCancelled && nextTime === null && route.times.length > 0 && (
-              <p className="mt-3 text-sm text-slate-400">오늘 모든 편 출발 완료 · 위 “내일” 버튼에서 내일 시간표 확인</p>
-            )}
           </div>
 
           {/* 돌아오는 배 — 섬↔섬(약산권) 복편 시간표 (읽기 전용, 초록 계열) */}
