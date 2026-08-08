@@ -8,7 +8,6 @@ import type { TidalForecast, TidalDayForecast } from "@/lib/tide"
 import type { DailyForecast } from "@/lib/forecast"
 import { useModalClose } from "@/hooks/useModalClose"
 import WeatherIcon, { weatherIconTone } from "./WeatherIcon"
-import TideCurve from "./TideCurve"
 
 // 날씨 + 물때 통합 상세 (완도·다지역 공용). 컴팩트 카드 클릭 시 전체화면으로:
 //   ① 지금 실황(기온·바람·습도·파고 + 다음 조석) ② 5일 날씨 예보 ③ 5일 조석 예보(조석 지역만)
@@ -36,6 +35,7 @@ export default function WeatherTideDetail({
   const todayStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`
   const nextTide = tidal ? nextTidalEvent(tidal.events, nowMin) : null
   const hasTidal = tidal5.length > 0
+  const tidalByDate = new Map(tidal5.map((d) => [d.date, d]))
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: "100dvh" }}>
@@ -88,49 +88,27 @@ export default function WeatherTideDetail({
             </div>
           </section>
 
-          {/* ② 5일 날씨 예보 */}
+          {/* ② 날짜별 날씨 + 물때 — 각 날짜 카드에 날씨 행 + (조석 지역이면) 물때 박스 */}
           <section>
-            <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-400">단기 날씨 예보</h3>
+            <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-400">
+              날짜별 날씨{hasTidal ? " · 물때" : ""} 예보
+            </h3>
             {forecast5.length === 0 ? (
               <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-400">날씨 예보를 불러올 수 없습니다</p>
             ) : (
-              <div className="divide-y divide-slate-100 rounded-2xl border border-slate-100">
+              <div className="space-y-2">
                 {forecast5.map((day) => (
-                  <div key={day.date} className="flex items-center gap-3 px-4 py-3.5">
-                    <div className="w-12 shrink-0">
-                      <p className={`text-sm font-bold ${day.dateLabel === "오늘" ? "text-blue-600" : "text-slate-800"}`}>{day.dateLabel}</p>
-                      <p className="text-[11px] text-slate-400">{day.date.slice(4, 6)}/{day.date.slice(6)}</p>
-                    </div>
-                    <div className="flex w-16 shrink-0 flex-col items-center gap-0.5">
-                      {(() => { const kind = skyIconKind(day.sky, day.pty); return <WeatherIcon kind={kind} size={26} className={weatherIconTone(kind)} /> })()}
-                      <span className="text-[11px] text-slate-500">{skyLabel(day.sky, day.pty)}</span>
-                    </div>
-                    <div className="flex flex-1 items-center justify-center gap-2.5">
-                      <span className="text-lg font-bold text-blue-700">{day.tempMin !== undefined ? `${Math.round(day.tempMin)}°` : "–"}</span>
-                      <span className="text-slate-300">/</span>
-                      <span className="text-lg font-bold text-rose-600">{day.tempMax !== undefined ? `${Math.round(day.tempMax)}°` : "–"}</span>
-                    </div>
-                    <div className="w-11 shrink-0 text-right">
-                      <p className="text-[11px] text-slate-400">강수</p>
-                      <p className={`text-sm font-bold ${day.popMax >= 60 ? "text-blue-600" : day.popMax >= 30 ? "text-slate-600" : "text-slate-400"}`}>{day.popMax}%</p>
-                    </div>
-                  </div>
+                  <DayCombined
+                    key={day.date}
+                    day={day}
+                    tidal={tidalByDate.get(day.date) ?? null}
+                    isToday={day.date === todayStr}
+                    nowMin={day.date === todayStr ? nowMin : -1}
+                  />
                 ))}
               </div>
             )}
           </section>
-
-          {/* ③ 5일 조석 예보 — 조석 관측소 있는 지역만 */}
-          {hasTidal && (
-            <section>
-              <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-400">조석(물때) 예보</h3>
-              <div className="divide-y divide-slate-100 rounded-2xl border border-slate-100">
-                {tidal5.map((day) => (
-                  <DayTidal key={day.date} day={day} isToday={day.date === todayStr} nowMin={day.date === todayStr ? nowMin : -1} />
-                ))}
-              </div>
-            </section>
-          )}
 
           <p className="pb-6 text-xs leading-relaxed text-slate-400">
             기상청 단기예보·국립해양조사원(KHOA) 예보 기준이며 기상 상황에 따라 변동될 수 있습니다.
@@ -153,39 +131,61 @@ function Sub({ children, small = false }: { children: React.ReactNode; small?: b
   return <span className={`font-normal text-white/80 ${small ? "text-[10px]" : "text-[11px]"}`}>{children}</span>
 }
 
-function DayTidal({ day, isToday, nowMin }: { day: TidalDayForecast; isToday: boolean; nowMin: number }) {
-  const nextIdx = isToday
-    ? day.events.findIndex((e) => { const [h, m] = e.time.split(":").map(Number); return h * 60 + m > nowMin })
+// 하루 카드 — 날씨 행(위) + 물때 박스(아래, 조석 지역만). 그래프 없이 만조/간조 칩만.
+function DayCombined({
+  day,
+  tidal,
+  isToday,
+  nowMin,
+}: {
+  day: DailyForecast
+  tidal: TidalDayForecast | null
+  isToday: boolean
+  nowMin: number
+}) {
+  const nextIdx = tidal && isToday
+    ? tidal.events.findIndex((e) => { const [h, m] = e.time.split(":").map(Number); return h * 60 + m > nowMin })
     : -1
+  const kind = skyIconKind(day.sky, day.pty)
   return (
-    <div className="px-4 py-4">
-      <div className="mb-2 flex items-center gap-2">
-        <span className={`text-sm font-bold ${isToday ? "text-blue-600" : "text-slate-800"}`}>{day.dateLabel}</span>
-        <span className="text-xs text-slate-400">{day.date.slice(4, 6)}/{day.date.slice(6)}</span>
-        {isToday && <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-bold text-blue-600">TODAY</span>}
+    <div className="overflow-hidden rounded-2xl border border-slate-100">
+      {/* 날씨 행 */}
+      <div className="flex items-center gap-3 px-4 py-3">
+        <div className="w-12 shrink-0">
+          <p className={`text-sm font-bold ${isToday ? "text-blue-600" : "text-slate-800"}`}>{day.dateLabel}</p>
+          <p className="text-[11px] text-slate-400">{day.date.slice(4, 6)}/{day.date.slice(6)}</p>
+        </div>
+        <div className="flex w-16 shrink-0 flex-col items-center gap-0.5">
+          <WeatherIcon kind={kind} size={26} className={weatherIconTone(kind)} />
+          <span className="text-[11px] text-slate-500">{skyLabel(day.sky, day.pty)}</span>
+        </div>
+        <div className="flex flex-1 items-center justify-center gap-2.5">
+          <span className="text-lg font-bold text-blue-700">{day.tempMin !== undefined ? `${Math.round(day.tempMin)}°` : "–"}</span>
+          <span className="text-slate-300">/</span>
+          <span className="text-lg font-bold text-rose-600">{day.tempMax !== undefined ? `${Math.round(day.tempMax)}°` : "–"}</span>
+        </div>
+        <div className="w-11 shrink-0 text-right">
+          <p className="text-[11px] text-slate-400">강수</p>
+          <p className={`text-sm font-bold ${day.popMax >= 60 ? "text-blue-600" : day.popMax >= 30 ? "text-slate-600" : "text-slate-400"}`}>{day.popMax}%</p>
+        </div>
       </div>
-      {day.events.length === 0 ? (
-        <p className="text-sm text-slate-400">정보 없음</p>
-      ) : (
-        <>
-          <div className="rounded-2xl bg-slate-50/70 px-1 py-2">
-            <TideCurve events={day.events} nowMin={isToday ? nowMin : -1} gradientId={`tide-${day.date}`} />
-          </div>
-          <div className="mt-2.5 grid grid-cols-4 gap-1.5">
-            {day.events.map((event, i) => {
-              const isHigh = event.type === "high"
-              const isPast = isToday && i < nextIdx
-              const isNext = i === nextIdx
-              return (
-                <div key={i} className={`flex flex-col items-center rounded-xl px-1 py-2 ${isNext ? "bg-blue-50 ring-1 ring-blue-200" : "bg-slate-50"} ${isPast ? "opacity-45" : ""}`}>
-                  <span className={`text-[11px] font-bold ${isHigh ? "text-blue-600" : "text-slate-500"}`}>{isHigh ? "▲ 만조" : "▼ 간조"}</span>
-                  <span className="mt-0.5 text-sm font-bold tabular-nums text-slate-800">{event.time}</span>
-                  <span className="text-[11px] tabular-nums text-slate-400">{event.height}cm</span>
-                </div>
-              )
-            })}
-          </div>
-        </>
+
+      {/* 물때 박스 — 만조/간조 칩 (그래프 없음) */}
+      {tidal && tidal.events.length > 0 && (
+        <div className="grid grid-cols-4 gap-1.5 border-t border-slate-100 bg-slate-50/60 px-3 py-2.5">
+          {tidal.events.map((event, i) => {
+            const isHigh = event.type === "high"
+            const isPast = isToday && i < nextIdx
+            const isNext = i === nextIdx
+            return (
+              <div key={i} className={`flex flex-col items-center rounded-lg px-1 py-1.5 ${isNext ? "bg-blue-50 ring-1 ring-blue-200" : "bg-white"} ${isPast ? "opacity-45" : ""}`}>
+                <span className={`text-[10px] font-bold ${isHigh ? "text-blue-600" : "text-slate-500"}`}>{isHigh ? "▲ 만조" : "▼ 간조"}</span>
+                <span className="text-xs font-bold tabular-nums text-slate-800">{event.time}</span>
+                <span className="text-[10px] tabular-nums text-slate-400">{event.height}cm</span>
+              </div>
+            )
+          })}
+        </div>
       )}
     </div>
   )
