@@ -7,6 +7,8 @@ import AppHeaderTitle from "@/components/AppHeaderTitle"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
+import StatusBar from "@/components/StatusBar"
+import { getWandoStatusSummary } from "@/lib/ferry"
 
 export const revalidate = 60
 
@@ -17,6 +19,16 @@ export const metadata = {
 
 function WeatherSkeleton() {
   return <div className="h-36 animate-pulse rounded-2xl bg-slate-100" />
+}
+
+function StatusBarSkeleton() {
+  return <div className="h-[104px] animate-pulse rounded-2xl bg-slate-100" />
+}
+
+// 요약 바 — 완도 출발편 정상/결항/종료 + 결항 알림 (getMtisDay 캐시 재사용, 추가 호출 없음)
+async function WandoStatusBar() {
+  const summary = await getWandoStatusSummary()
+  return <StatusBar summary={summary} regionName="완도" />
 }
 
 function RouteSkeleton() {
@@ -64,7 +76,12 @@ export default function Page() {
           <WeatherCard />
         </Suspense>
 
-        <RegionNav current="" />
+        <div className="space-y-2">
+          <RegionNav current="" />
+          <Suspense fallback={<StatusBarSkeleton />}>
+            <WandoStatusBar />
+          </Suspense>
+        </div>
 
         <Suspense fallback={<RouteSkeleton />}>
           <RouteSection />

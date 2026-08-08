@@ -6,11 +6,12 @@ import { REGIONS } from "@/config/regions"
 import { getWeatherForRegion } from "@/lib/regionWeather"
 import { getTidalForRegion, get5DayTidalForRegion } from "@/lib/regionTide"
 import { get5DayForecastForRegion } from "@/lib/regionForecast"
-import { getRoutesForRegion, getArrivalsForRegion, getIslandHopsForRegion } from "@/lib/regionFerry"
+import { getRoutesForRegion, getArrivalsForRegion, getIslandHopsForRegion, getRegionStatusSummary } from "@/lib/regionFerry"
 import { getTrainsForRegion } from "@/lib/regionTrain"
 import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
 import RegionIslandHopSection from "@/components/RegionIslandHopSection"
+import StatusBar from "@/components/StatusBar"
 import AppHeaderTitle from "@/components/AppHeaderTitle"
 import LocalAdSlot from "@/components/LocalAdSlot"
 import AdFitBanner from "@/components/AdFitBanner"
@@ -50,6 +51,17 @@ export async function generateMetadata({
 
 function WeatherSkeleton() {
   return <div className="h-36 animate-pulse rounded-2xl bg-slate-100" />
+}
+
+function StatusBarSkeleton() {
+  return <div className="h-[104px] animate-pulse rounded-2xl bg-slate-100" />
+}
+
+// 요약 바 — 지역 출발편 정상/결항/종료 + 결항 알림
+async function RegionStatusBar({ region }: { region: string }) {
+  const config = REGIONS[region]
+  const summary = await getRegionStatusSummary(config)
+  return <StatusBar summary={summary} regionName={config.name} />
 }
 
 function RouteSkeleton() {
@@ -162,7 +174,12 @@ export default async function RegionPage({
           <RegionWeatherCard region={region} />
         </Suspense>
 
-        <RegionNav current={config.slug} />
+        <div className="space-y-2">
+          <RegionNav current={config.slug} />
+          <Suspense fallback={<StatusBarSkeleton />}>
+            <RegionStatusBar region={region} />
+          </Suspense>
+        </div>
 
         <Suspense fallback={<RouteSkeleton />}>
           <RegionRouteSection region={region} />

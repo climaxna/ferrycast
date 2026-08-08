@@ -9,3 +9,12 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+
+/* 결항 알림 티커 회전 시 부드러운 페이드 (StatusBar) */
+@keyframes fadein {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadein {
+  animation: fadein 0.35s ease-out;
+}

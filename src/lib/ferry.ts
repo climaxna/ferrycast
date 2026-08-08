@@ -1,8 +1,8 @@
 import type { WandoRoute } from "./types"
 import { buildArrivalLookup } from "./shipArrival"
 import {
-  type MtisItem, type CancelledEntry,
-  getMtisDay, fetchTomorrowData,
+  type MtisItem, type CancelledEntry, type StatusSummary,
+  getMtisDay, fetchTomorrowData, statusSummary,
   isCancelled, isSuspended, cancelKindOf, cancelReason, itemReason,
   extractVia, parseSailTime, deduplicateTimes, partialCancelled, groupStatus, nextDay,
 } from "./mtis"
@@ -61,6 +61,21 @@ function arrGroupOf(o: string, d: string): string | null {
 }
 function arrGroupKey(item: MtisItem): string | null {
   return arrGroupOf(item.oport_nm, item.dest_nm)
+}
+
+// 메인화면 요약 바 — 완도 출발편 기준 정상/결항/종료 집계 + 결항 알림 목록
+export async function getWandoStatusSummary(): Promise<StatusSummary | null> {
+  const key = process.env.DATAGOKR_API_KEY
+  if (!key) return null
+  try {
+    const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
+    const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
+    const items = await getMtisDay(key, date)
+    if (!items.length) return null
+    return statusSummary(items, depGroupKey, (k) => DEP_CFG[k]?.label ?? k)
+  } catch {
+    return null
+  }
 }
 
 // ────────────────────────────────────────────────

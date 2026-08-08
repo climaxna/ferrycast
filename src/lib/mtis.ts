@@ -215,6 +215,42 @@ async function fetchMtisAll(key: string, date: string): Promise<MtisItem[]> {
 // 요청 간(=사용자 간) Data Cache도 적용됨. ⚠️ fetchMtisAll 직접 호출 금지, getMtisDay 사용.
 export const getMtisDay = cache((key: string, date: string): Promise<MtisItem[]> => fetchMtisAll(key, date))
 
+// ────────────────────────────────────────────────
+// 지역 상태 집계 (메인화면 요약 바 + 결항 알림 티커용)
+// ────────────────────────────────────────────────
+export interface StatusAlert { label: string; time: string; reason?: string; suspended: boolean }
+export interface StatusSummary {
+  normal: number    // 출항전·운항중 정상편 (아직 안 뜬/뜨는 중)
+  cancelled: number // 결항·비운항편
+  done: number      // 완료(오늘 이미 다녀온 편)
+  alerts: StatusAlert[]  // 결항편 목록(시각순) — 티커 회전용
+}
+
+// 지역 출발편 기준 상태 집계. keyFn: item→노선 groupKey|null(해당 지역 출발편이면 non-null),
+// labelOf: groupKey→표시 라벨. 추가 API 호출 없이 이미 받은 items를 집계한다.
+export function statusSummary(
+  items: MtisItem[],
+  keyFn: (it: MtisItem) => string | null,
+  labelOf: (key: string) => string,
+): StatusSummary {
+  let normal = 0, cancelled = 0, done = 0
+  const alerts: StatusAlert[] = []
+  for (const it of items) {
+    const gk = keyFn(it)
+    if (!gk) continue
+    if (isCancelled(it)) {
+      cancelled++
+      alerts.push({ label: labelOf(gk), time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
+    } else if (it.nvg_stts_nm === "완료") {
+      done++
+    } else {
+      normal++
+    }
+  }
+  alerts.sort((a, b) => a.time.localeCompare(b.time))
+  return { normal, cancelled, done, alerts }
+}
+
 // 내일 스케줄을 groupKey별 times + 편수로 집계 (결항 편 제외, 5분 이내 중복 병합)
 export async function fetchTomorrowData(
   key: string,
