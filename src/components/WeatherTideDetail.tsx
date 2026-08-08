@@ -172,13 +172,13 @@ function DayCombined({
 
       {/* 물때 박스 — 만조/간조 칩 (그래프 없음) */}
       {tidal && tidal.events.length > 0 && (
-        <div className="grid grid-cols-4 gap-1.5 border-t border-slate-100 bg-slate-50/60 px-3 py-2.5">
+        <div className="grid grid-cols-4 gap-1.5 border-t border-blue-100 bg-blue-50/80 px-3 py-2.5">
           {tidal.events.map((event, i) => {
             const isHigh = event.type === "high"
             const isPast = isToday && i < nextIdx
             const isNext = i === nextIdx
             return (
-              <div key={i} className={`flex flex-col items-center rounded-lg px-1 py-1.5 ${isNext ? "bg-blue-50 ring-1 ring-blue-200" : "bg-white"} ${isPast ? "opacity-45" : ""}`}>
+              <div key={i} className={`flex flex-col items-center rounded-lg px-1 py-1.5 ${isNext ? "bg-blue-100 ring-1 ring-blue-300" : "bg-white"} ${isPast ? "opacity-45" : ""}`}>
                 <span className={`text-[10px] font-bold ${isHigh ? "text-blue-600" : "text-slate-500"}`}>{isHigh ? "▲ 만조" : "▼ 간조"}</span>
                 <span className="text-xs font-bold tabular-nums text-slate-800">{event.time}</span>
                 <span className="text-[10px] tabular-nums text-slate-400">{event.height}cm</span>
