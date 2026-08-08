@@ -159,7 +159,7 @@ export default async function RegionPage({
         </div>
       </header>
 
-      <div className="mx-auto max-w-lg space-y-3 px-4 py-4">
+      <div className="mx-auto max-w-lg space-y-3 px-4 pb-4 pt-2">
         <Suspense fallback={<WeatherSkeleton />}>
           <RegionWeatherCard region={region} />
         </Suspense>
