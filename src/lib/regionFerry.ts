@@ -122,7 +122,10 @@ export async function getRegionStatusSummary(config: RegionConfig): Promise<Stat
     const items = await getMtisDay(key, date)
     if (!items.length) return null
     const keyFn = makeDepGroupKey(config.routeGroups)
-    const labelOf = (k: string) => config.routeGroups.find((g) => g.key === k)?.label ?? k
+    const labelOf = (k: string) => {
+      const g = config.routeGroups.find((gg) => gg.key === k)
+      return g ? `${config.name} → ${g.label}` : k
+    }
     return statusSummary(items, keyFn, labelOf)
   } catch {
     return null

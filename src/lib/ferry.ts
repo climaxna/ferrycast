@@ -72,7 +72,14 @@ export async function getWandoStatusSummary(): Promise<StatusSummary | null> {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
     const items = await getMtisDay(key, date)
     if (!items.length) return null
-    return statusSummary(items, depGroupKey, (k) => DEP_CFG[k]?.label ?? k)
+    // 완도 본섬(제주·청산·소안) + 약산 섬↔섬 출발편 합산. 라벨은 출발지가 달라 전체 노선명으로.
+    const keyFn = (it: MtisItem) => depGroupKey(it) ?? yaksanForwardKey(it)
+    const labelOf = (k: string) => {
+      if (DEP_CFG[k]) return `완도 → ${DEP_CFG[k].label}`
+      const yg = YAKSAN_GROUPS.find((g) => g.key === k)
+      return yg ? `약산 → ${yg.island}` : k
+    }
+    return statusSummary(items, keyFn, labelOf)
   } catch {
     return null
   }

@@ -28,7 +28,7 @@ function StatusBarSkeleton() {
 // 요약 바 — 완도 출발편 정상/결항/종료 + 결항 알림 (getMtisDay 캐시 재사용, 추가 호출 없음)
 async function WandoStatusBar() {
   const summary = await getWandoStatusSummary()
-  return <StatusBar summary={summary} regionName="완도" />
+  return <StatusBar summary={summary} />
 }
 
 function RouteSkeleton() {

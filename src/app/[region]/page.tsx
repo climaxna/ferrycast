@@ -61,7 +61,7 @@ function StatusBarSkeleton() {
 async function RegionStatusBar({ region }: { region: string }) {
   const config = REGIONS[region]
   const summary = await getRegionStatusSummary(config)
-  return <StatusBar summary={summary} regionName={config.name} />
+  return <StatusBar summary={summary} />
 }
 
 function RouteSkeleton() {

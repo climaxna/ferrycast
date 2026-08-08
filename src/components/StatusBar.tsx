@@ -7,10 +7,8 @@ import type { StatusSummary } from "@/lib/mtis"
 // 지연은 데이터 확보가 어려워 제외. summary가 null이면(API 장애) 아무것도 렌더 안 함.
 export default function StatusBar({
   summary,
-  regionName,
 }: {
   summary: StatusSummary | null
-  regionName: string
 }) {
   const alerts = summary?.alerts ?? []
   const [idx, setIdx] = useState(0)
@@ -44,7 +42,7 @@ export default function StatusBar({
               결항 알림 {alerts.length > 1 && <span className="text-rose-400">· {idx % alerts.length + 1}/{alerts.length}</span>}
             </p>
             <p key={`${cur.time}-${cur.label}`} className="animate-fadein truncate text-sm font-medium text-rose-700">
-              {regionName} → {cur.label} <span className="font-bold tabular-nums">{cur.time}</span>{" "}
+              {cur.label} <span className="font-bold tabular-nums">{cur.time}</span>{" "}
               {cur.suspended ? "비운항" : "결항"}
               {cur.reason && <span className="text-rose-500"> ({cur.reason})</span>}
             </p>

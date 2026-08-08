@@ -233,22 +233,29 @@ export function statusSummary(
   keyFn: (it: MtisItem) => string | null,
   labelOf: (key: string) => string,
 ): StatusSummary {
-  let normal = 0, cancelled = 0, done = 0
-  const alerts: StatusAlert[] = []
+  let normal = 0, done = 0
+  const raw: StatusAlert[] = []
   for (const it of items) {
     const gk = keyFn(it)
     if (!gk) continue
     if (isCancelled(it)) {
-      cancelled++
-      alerts.push({ label: labelOf(gk), time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
+      raw.push({ label: labelOf(gk), time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it) })
     } else if (it.nvg_stts_nm === "완료") {
       done++
     } else {
       normal++
     }
   }
-  alerts.sort((a, b) => a.time.localeCompare(b.time))
-  return { normal, cancelled, done, alerts }
+  // 같은 노선 5분 이내 중복편(예: 청산 18:00/18:01 서로 다른 배)은 하나로 병합 — 시간표 표시와 동일 정책
+  raw.sort((a, b) => a.time.localeCompare(b.time))
+  const toMin = (t: string) => { const [h, m] = t.split(":").map(Number); return h * 60 + m }
+  const alerts: StatusAlert[] = []
+  for (const a of raw) {
+    const am = toMin(a.time)
+    if (alerts.some((m) => m.label === a.label && Math.abs(toMin(m.time) - am) < 5)) continue
+    alerts.push(a)
+  }
+  return { normal, cancelled: alerts.length, done, alerts }
 }
 
 // 내일 스케줄을 groupKey별 times + 편수로 집계 (결항 편 제외, 5분 이내 중복 병합)
