@@ -8,7 +8,9 @@ import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
 
-export const revalidate = 60
+// ISR 재생성 주기 — 데이터가 어차피 5~10분 캐시라 60초는 낭비(동일 결과 반복 write).
+// Vercel ISR Writes 절감을 위해 600초(10분)로. 상대시간 카운트다운은 클라이언트가 60초마다 갱신.
+export const revalidate = 600
 
 export const metadata = {
   title: "FerryCast — 완도 날씨·항로 현황",

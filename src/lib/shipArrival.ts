@@ -91,7 +91,7 @@ const getNodeDepartures = cache(async (nodeId: string, date: string): Promise<Ta
       serviceKey: key, pageNo: "1", numOfRows: "200", _type: "json",
       depNodeId: nodeId, depPlandTime: date,
     })
-    const res = await fetch(`${TAGO_BASE}/GetShipOpratInfoList?${params}`, { next: { revalidate: 300 } })
+    const res = await fetch(`${TAGO_BASE}/GetShipOpratInfoList?${params}`, { next: { revalidate: 600 } })
     if (!res.ok) return []
     let json: unknown
     try { json = await res.json() } catch { return [] }

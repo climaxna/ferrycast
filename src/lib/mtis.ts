@@ -162,7 +162,7 @@ async function fetchMtisPage(
   const empty = { items: [] as MtisItem[], totalCount: 0 }
   let res: Response
   try {
-    res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 300 } })
+    res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 600 } })
   } catch (e) {
     console.error(`[mtis] ${date} p${pageNo} fetch 실패(네트워크·타임아웃):`, e)
     return empty
