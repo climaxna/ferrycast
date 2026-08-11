@@ -64,5 +64,8 @@ export const PREVIEW_AD: LocalAd = {
   imageW: 1200,
   imageH: 400,
   alt: "완도전복 생산자협동조합 — 완도전복의 자존심, 명품 활·참전복 선물세트. 문의 061-555-6700",
+  // href가 있으면 tel보다 우선. 배너를 누르면 새 탭으로 스마트스토어가 열린다.
+  // tel은 남겨둔다 — 배너 문구에 전화번호가 있어 광고주 정보로서 의미가 있고, 링크가 죽으면 대체 수단이 된다.
+  href: "https://smartstore.naver.com/abalonecoops",
   tel: "061-555-6700",
 }

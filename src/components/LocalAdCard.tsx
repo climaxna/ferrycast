@@ -1,6 +1,21 @@
+"use client"
+
 import Image from "next/image"
 import AdLabel from "./AdLabel"
 import { AD_SLOT_RATIO, type LocalAd } from "@/config/localAds"
+
+// 광고 클릭을 GA4로 보낸다 — 광고주에게 "이만큼 눌렸습니다"를 숫자로 보고하기 위한 유일한 근거.
+// 이벤트명은 고정(ad_click), 광고 구분은 파라미터로. GA4에서 일/주 단위로 집계된다.
+//
+// 새 탭(target=_blank)으로 열리므로 현재 페이지가 살아 있고, 전송이 중간에 끊기지 않는다.
+// ⚠️ 광고 차단기를 쓰는 방문자는 gtag 자체가 로드되지 않아 집계에서 빠진다(실제보다 적게 잡힘).
+function trackAdClick(ad: LocalAd) {
+  window.gtag?.("event", "ad_click", {
+    ad_id: ad.id,
+    ad_region: ad.region,
+    ad_dest: ad.href ? "site" : "tel",
+  })
+}
 
 // 실제 게재되는 지역 광고 배너 — 시안 A(기본형)/B(사진형)/C(혜택형) 대응.
 // 모집 슬롯(LocalAdSlot, 회색 점선)과 달리 이건 "실제 광고"라 배편 카드와 같은
@@ -22,6 +37,7 @@ export default function LocalAdCard({ ad }: { ad: LocalAd }) {
       <a
         href={href}
         {...(ad.href ? { target: "_blank", rel: "noopener noreferrer sponsored" } : {})}
+        onClick={() => trackAdClick(ad)}
         className="relative block overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition-shadow hover:shadow-md"
         style={{ aspectRatio: String(ad.displayRatio ?? AD_SLOT_RATIO) }}
       >
