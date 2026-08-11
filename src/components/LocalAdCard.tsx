@@ -7,28 +7,39 @@ import type { LocalAd } from "@/config/localAds"
 // 흰 카드 + 그림자를 쓴다. 대신 우상단 "광고" 라벨로 정보와 구분한다(표시 의무).
 //
 // 광고주가 없으면 아예 렌더되지 않는다 — 호출부에서 목록이 비면 LocalAdSlot으로 대체.
+// 전면 이미지형 광고 슬롯의 기본 가로/세로 비. 390px 화면에서 약 130px 높이.
+// 배편 카드 한 장(약 200px)보다 낮게 잡아, 광고가 정보를 압도하지 않으면서도
+// 아래로 여러 개를 쌓을 수 있게 한다. 업체 배너 제작 규격도 이 값(1200x400) 기준으로 안내한다.
+const AD_RATIO = 3
+
 export default function LocalAdCard({ ad }: { ad: LocalAd }) {
   const isBenefit = ad.variant === "benefit"
   const href = ad.href ?? (ad.tel ? `tel:${ad.tel.replace(/[^0-9+]/g, "")}` : undefined)
 
   // D. 전면 이미지형 — 업체가 완성한 배너 한 장을 그대로 노출.
   // 문구·연락처가 그림 안에 있으므로 alt로 대체 텍스트를 제공하고, 탭하면 바로 전화가 걸리게 한다.
+  //
+  // 높이는 원본 비율이 아니라 `displayRatio`(기본 AD_RATIO)로 **코드가 정한다**.
+  // 이유: 광고가 여러 개 쌓여도 배편 시간표를 화면 밖으로 밀어내면 안 된다(핵심 원칙 #1 "클릭 없이 바로").
+  // 업체가 어떤 비율로 보내오든 슬롯 높이는 일정하게 유지되고, 넘치는 부분은 잘린다.
   if (ad.variant === "image" && ad.imageSrc) {
     return (
       <a
         href={href}
         {...(ad.href ? { target: "_blank", rel: "noopener noreferrer sponsored" } : {})}
         className="relative block overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition-shadow hover:shadow-md"
+        style={{ aspectRatio: String(ad.displayRatio ?? AD_RATIO) }}
       >
-        <AdLabel tone="onImage" />
+        {/* Image(fill)도 absolute라 DOM 순서가 곧 쌓임 순서 — 라벨을 뒤에 두고 z-10으로 올린다 */}
         <Image
           src={ad.imageSrc}
           alt={ad.alt ?? ad.title}
-          width={ad.imageW ?? 1200}
-          height={ad.imageH ?? 675}
-          className="h-auto w-full"
+          fill
+          className="object-cover"
+          style={ad.imagePos ? { objectPosition: ad.imagePos } : undefined}
           sizes="(max-width: 512px) 100vw, 512px"
         />
+        <AdLabel tone="onImage" />
       </a>
     )
   }

@@ -27,6 +27,10 @@ export interface LocalAd {
   imageSrc?: string       // photo(썸네일) · image(전면 배너) 시안용 — public/ 기준 경로
   imageW?: number         // image 시안 — 원본 가로(px). 비율 고정으로 레이아웃 흔들림(CLS) 방지
   imageH?: number         // image 시안 — 원본 세로(px)
+  displayRatio?: number   // image 시안 — 슬롯의 가로/세로 비(예: 3 = 3:1). 원본이 더 세로로 길면 잘린다.
+                          // 광고가 여러 개 쌓여도 배편 정보를 밀어내지 않도록 높이를 코드로 못박는 장치.
+  imagePos?: string       // image 시안 — 잘릴 때 살릴 초점(CSS object-position, 예: "50% 65%").
+                          // 규격(3:1)에 맞는 배너면 불필요. 세로가 긴 배너를 받았을 때 상호·연락처를 지키는 용도.
   alt?: string            // image 시안 필수 — 그림 안 문구를 텍스트로 (낭독기·이미지 차단 환경 대비)
   tel?: string            // 표시용 전화번호 — tel: 링크로 연결
   href?: string           // 홈페이지·네이버플레이스
@@ -51,6 +55,9 @@ export const PREVIEW_AD: LocalAd = {
   imageSrc: "/ads/wando-abalone-coop.jpg",
   imageW: 1200,
   imageH: 675,
+  // 받은 원본이 16:9라 3:1 슬롯에서 위아래가 잘린다. 상호와 전화번호를 살리도록 초점을 아래로 내림.
+  // → 업체에 3:1(1200x400) 규격 배너를 요청해 둔 상태. 새 파일이 오면 이 줄을 지운다.
+  imagePos: "50% 65%",
   alt: "완도전복 생산자협동조합 — 완도전복의 자존심, 명품 활·참전복 선물세트. 문의 061-555-6700",
   tel: "061-555-6700",
 }

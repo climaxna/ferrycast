@@ -12,7 +12,8 @@ export default function AdLabel({
 }) {
   const style =
     tone === "onImage"
-      ? "bg-white/90 text-slate-600 ring-1 ring-black/10 backdrop-blur-sm"
+      // z-10 — 배너가 next/image fill(absolute)이라 DOM 순서상 라벨을 덮는다. 명시적으로 위로 올린다.
+      ? "z-10 bg-white/90 text-slate-600 ring-1 ring-black/10 backdrop-blur-sm"
       : "bg-slate-100 text-slate-400"
   return (
     <span className={`absolute right-3 top-2.5 rounded px-1.5 py-0.5 text-[10px] font-medium ${style}`}>
