@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react"
 import WeatherCardShell from "@/components/WeatherCardShell"
 import RouteTabs from "@/components/RouteTabs"
-import AdSlotFrame from "@/components/AdSlotFrame"
+import LocalAdCard from "@/components/LocalAdCard"
 import LocalAdSlot from "@/components/LocalAdSlot"
 import Logo from "@/components/Logo"
 import type { WeatherData } from "@/lib/weather"
 import type { WandoRoute } from "@/lib/types"
 import type { DirSummary } from "@/lib/mtis"
+import { PREVIEW_AD } from "@/config/localAds"
 
 // 광고주에게 "배너가 실제로 이렇게 들어갑니다"를 보여주는 미리보기.
 //
@@ -161,7 +162,7 @@ export default function PreviewClient() {
                 <p className="mb-1.5 text-[11px] font-bold text-amber-700">
                   ↓ 광고가 들어가는 자리 (배편 시간표 바로 아래)
                 </p>
-                <AdSlotFrame note="1350 × 300 px 배너가 이 크기로 들어갑니다" />
+                <LocalAdCard ad={PREVIEW_AD} />
               </div>
             ) : (
               <LocalAdSlot regionName="완도" adsPath="/ads" />
