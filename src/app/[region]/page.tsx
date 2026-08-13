@@ -12,7 +12,7 @@ import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
 import RegionIslandHopSection from "@/components/RegionIslandHopSection"
 import AppHeaderTitle from "@/components/AppHeaderTitle"
-import LocalAdSlot from "@/components/LocalAdSlot"
+import AdArea from "@/components/AdArea"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
@@ -102,7 +102,7 @@ async function RegionRouteSection({ region }: { region: string }) {
       summaries={summaries}
       regionName={config.name}
       train={train}
-      adSlot={<LocalAdSlot regionName={config.name} adsPath={`/${config.slug}/ads`} />}
+      adSlot={<AdArea region={config.slug} regionName={config.name} adsPath={`/${config.slug}/ads`} />}
     />
   )
 }

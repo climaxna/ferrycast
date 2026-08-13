@@ -50,7 +50,7 @@ export default function LocalAdCard({ ad }: { ad: LocalAd }) {
           style={ad.imagePos ? { objectPosition: ad.imagePos } : undefined}
           sizes="(max-width: 512px) 100vw, 512px"
         />
-        <AdLabel tone="onImage" />
+        <AdLabel tone="onImage" pos={ad.labelPos} />
       </a>
     )
   }

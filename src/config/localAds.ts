@@ -14,6 +14,9 @@
 //     타입으로 강제한다. 만료 판정은 문자열 비교(kstDateStr)라 타임존 버그가 없다.
 //   - `id`는 리포트 연속성을 위해 한 번 정하면 바꾸지 않는다.
 
+import { kstDateStr } from "@/lib/utils"
+import type { AdLabelPos } from "@/components/AdLabel"
+
 // 전면 이미지 광고 슬롯의 가로/세로 비. 390px 화면(카드 폭 358px)에서 약 119px 높이.
 // 배편 카드 한 장(약 200px)보다 낮아 정보를 압도하지 않으면서, 상호·전화번호·제품 사진이
 // 함께 들어갈 최소 높이. 광고를 아래로 여러 개 쌓아도 시간표를 화면 밖으로 밀지 않는다.
@@ -35,6 +38,8 @@ export interface LocalAd {
   imageH?: number         // image 시안 — 원본 세로(px)
   displayRatio?: number   // image 시안 — 슬롯의 가로/세로 비(예: 3 = 3:1). 원본이 더 세로로 길면 잘린다.
                           // 광고가 여러 개 쌓여도 배편 정보를 밀어내지 않도록 높이를 코드로 못박는 장치.
+  labelPos?: AdLabelPos   // image 시안 — "광고" 라벨을 놓을 모서리(기본 우상단).
+                          // 배너 문구를 가리면 광고주가 돈 낸 영역을 훼손하는 것이라 비어 있는 쪽으로 옮긴다.
   imagePos?: string       // image 시안 — 잘릴 때 살릴 초점(CSS object-position, 예: "50% 65%").
                           // 규격(3:1)에 맞는 배너면 불필요. 세로가 긴 배너를 받았을 때 상호·연락처를 지키는 용도.
   alt?: string            // image 시안 필수 — 그림 안 문구를 텍스트로 (낭독기·이미지 차단 환경 대비)
@@ -45,7 +50,35 @@ export interface LocalAd {
 }
 
 // 실제 게재 중인 광고. 빈 배열이면 모집 슬롯(LocalAdSlot)이 그대로 노출된다.
-export const LOCAL_ADS: LocalAd[] = []
+export const LOCAL_ADS: LocalAd[] = [
+  {
+    id: "incheon-36stay",
+    variant: "image",
+    region: "incheon",
+    // ⚠️ 계약 종료일 — 이 날짜가 지나면 배너가 자동으로 내려가고 모집 슬롯으로 돌아간다.
+    // 월 단위 계약 기준 1개월로 잡아둠. 실제 계약 조건에 맞게 반드시 확인할 것.
+    until: "20260913",
+    title: "36스테이",
+    desc: "대형카페 · 수영장 · 키즈카페 · 편의점 · 갯벌체험",
+    imageSrc: "/ads/36stay-3x1.jpg",
+    imageW: 1200,
+    imageH: 400,
+    alt: "36스테이 — 대형카페·수영장·키즈카페·편의점·갯벌체험. 예약 문의 0507-1361-3484",
+    // 우상단은 시설 안내 문구("갯벌체험")와 겹친다 -> 비어 있는 우하단(바다)으로
+    labelPos: "br",
+    href: "https://m.place.naver.com/accommodation/2060185439/home?entry=pll&bk_query=36%EC%8A%A4%ED%85%8C%EC%9D%B4&businessCategory=pension",
+    tel: "0507-1361-3484",
+  },
+]
+
+// 오늘 기준으로 아직 유효한 해당 지역 광고만 추린다.
+// `until`이 지난 광고는 코드를 고치지 않아도 자동으로 사라진다 — 게재 기간이 끝났는데
+// 계속 걸려 있는 사고(돈 안 받고 노출)를 막는 안전장치.
+// 날짜 비교는 "YYYYMMDD" 문자열 사전순 비교라 타임존·파싱 버그가 없다.
+export function getActiveAds(region: string): LocalAd[] {
+  const today = kstDateStr()
+  return LOCAL_ADS.filter((ad) => ad.region === region && ad.until >= today)
+}
 
 // ── 미리보기 전용 ────────────────────────────────────────────
 // /ads/preview 에서 광고주에게 "이렇게 들어갑니다"를 보여줄 때 쓰는 샘플.

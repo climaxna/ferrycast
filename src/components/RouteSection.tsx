@@ -1,6 +1,6 @@
 import { getWandoRoutes, getWandoArrivals, getWandoStatusSummaries } from "@/lib/ferry"
 import RouteTabs from "./RouteTabs"
-import LocalAdSlot from "./LocalAdSlot"
+import AdArea from "./AdArea"
 
 export default async function RouteSection() {
   const [departures, arrivals, summaries] = await Promise.all([
@@ -14,7 +14,7 @@ export default async function RouteSection() {
       departures={departures}
       arrivals={arrivals}
       summaries={summaries}
-      adSlot={<LocalAdSlot regionName="완도" adsPath="/ads" />}
+      adSlot={<AdArea region="wando" regionName="완도" adsPath="/ads" />}
     />
   )
 }
