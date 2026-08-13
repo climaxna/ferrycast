@@ -201,15 +201,9 @@ export const REGIONS: Record<string, RegionConfig> = {
         fallbackDep: ["08:00"],
         fallbackArr: ["19:00"],
       },
-      {
-        key: "yeonpyeongdo",
-        label: "연평도",
-        depPortKeywords: ["인천"],
-        destKeywords: ["연평"],
-        islandTerminal: "연평항",
-        fallbackDep: ["08:30"],
-        fallbackArr: ["14:00"],
-      },
+      // 연평도는 순환항로(oport=dest="인천", 목적지가 nvg_seawy_nm에만 존재)라 destKeywords로는
+      // 영영 안 잡힌다 → 정적 fallback만 노출돼 결항이 나도 "운항"으로 보이는 상태였다.
+      // islandHops(항로명 매칭)로 옮겨 실시간화함. 여기에 되돌리지 말 것.
       {
         // 덕적도 — 인천연안여객터미널 출발. MTIS dest_nm="덕적" (직항 + 자월·승봉·이작 경유 혼재)
         key: "deokjeokdo",
@@ -231,6 +225,64 @@ export const REGIONS: Record<string, RegionConfig> = {
         fallbackArr: ["14:30", "15:10"],
       },
     ],
-    metaDescription: "인천 백령도·연평도·덕적도·대이작도 여객선 시간표·운항 현황·날씨·조석 예보",
+    // 본항(인천연안여객터미널) 직항 목록에 안 잡히는 항로들 — 광고 아래 별도 섹션.
+    //  · 장봉도: 출발항이 삼목항(영종도)이라 depPortKeywords "인천"에 안 걸린다. 하루 14편으로 인천 최다
+    //  · 연평·굴업·풍도: 순환항로(oport=dest="인천") — 목적지가 nvg_seawy_nm에만 있다
+    //  · 울도: 덕적도 진리항 출발 섬↔섬 (덕적군도 내부 항로)
+    // 항로명은 날짜에 따라 바뀌므로(예: "인천굴업(홀수일)"/"(짝수일)") 섬 이름만 키워드로 쓴다.
+    islandHops: [
+      {
+        key: "jangbongdo",
+        label: "장봉도",
+        originName: "영종도 삼목항",
+        depKeyword: "삼목",
+        seawayKeyword: "장봉",
+        terminal: "삼목여객터미널",
+      },
+      {
+        // 돌아오는 편 — islandHops는 도착 탭에 안 실려서, 별도 카드로 넣어야 왕복이 보인다
+        key: "jangbongdo-return",
+        label: "삼목항(영종도)",
+        originName: "장봉도",
+        depKeyword: "장봉",
+        seawayKeyword: "삼목",
+        terminal: "장봉도 옹암선착장",
+      },
+      {
+        key: "yeonpyeongdo",
+        label: "연평도",
+        originName: "인천",
+        depKeyword: "인천",
+        seawayKeyword: "연평",  // "인천연평(순환)" + "인천대연평-소연평(순환)" 모두 매칭
+        terminal: "인천연안여객터미널",
+      },
+      {
+        key: "gulupdo",
+        label: "굴업도",
+        originName: "인천",
+        depKeyword: "인천",
+        seawayKeyword: "굴업",
+        terminal: "인천연안여객터미널",
+      },
+      {
+        key: "pungdo",
+        label: "풍도",
+        originName: "인천",
+        depKeyword: "인천",
+        seawayKeyword: "풍도",  // 홀수일 "인천풍도-대부" / 짝수일 "인천대부-풍도"
+        terminal: "인천연안여객터미널",
+      },
+      {
+        key: "uldo",
+        label: "울도",
+        originName: "덕적도 진리항",
+        depKeyword: "진리",
+        seawayKeyword: "울도",
+        terminal: "덕적도 진리항",
+      },
+    ],
+    islandHopTitle: "그 밖의 인천 섬 배편",
+    islandHopNote: "출발 항구가 다르거나 순환 항로로 운항하는 배편입니다. 격일 운항이 있어 출발 전 확인을 권합니다.",
+    metaDescription: "인천 백령도·연평도·덕적도·대이작도·장봉도·굴업도·풍도 여객선 시간표·운항 현황·날씨·조석 예보",
   },
 }
