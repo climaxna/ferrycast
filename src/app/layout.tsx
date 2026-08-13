@@ -30,7 +30,9 @@ export const metadata: Metadata = {
     url: "https://ferrycast.kr",
     locale: "ko_KR",
     // og:image 고정 — 미지정 시 카카오·네이버가 페이지의 광고 배너 등 큰 이미지를 임의로 긁어감
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FerryCast — 오늘, 배 뜨나요?" }],
+    // 파일명에 -v2: 카카오·네이버는 og:image를 URL 단위로 캐시한다. 같은 경로에 덮어쓰면
+    // 이미 공유된 링크는 물론 새 공유도 한동안 옛 썸네일이 나온다. 교체 시 반드시 새 파일명으로.
+    images: [{ url: "/og-v2.jpg", width: 1200, height: 630, alt: "FerryCast — 실시간 운항·결항 정보" }],
   },
   appleWebApp: {
     capable: true,
