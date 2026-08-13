@@ -29,6 +29,8 @@ export const metadata: Metadata = {
     description: "완도 날씨·조석·항로 시간표·운항 현황을 한 화면에",
     url: "https://ferrycast.kr",
     locale: "ko_KR",
+    // og:image 고정 — 미지정 시 카카오·네이버가 페이지의 광고 배너 등 큰 이미지를 임의로 긁어감
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "FerryCast — 오늘, 배 뜨나요?" }],
   },
   appleWebApp: {
     capable: true,

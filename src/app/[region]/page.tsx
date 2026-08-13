@@ -44,6 +44,8 @@ export async function generateMetadata({
       description: config.metaDescription,
       url,
       locale: "ko_KR",
+      // og:image 고정 — 미지정 시 카카오·네이버가 페이지의 광고 배너를 썸네일로 긁어가는 문제 방지
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: "FerryCast — 오늘, 배 뜨나요?" }],
     },
   }
 }
