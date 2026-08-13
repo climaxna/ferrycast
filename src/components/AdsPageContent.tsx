@@ -1,6 +1,18 @@
 import Link from "next/link"
+import Image from "next/image"
 import { AD_MAIL, buildAdMailto } from "@/lib/adInquiry"
+import { AD_SLOT_RATIO } from "@/config/localAds"
 import AdLabel from "./AdLabel"
+
+// 게재 예시 배너 — 전부 가상의 업체다(실제 광고주 아님).
+// 실물과 같은 형태로 보여주려고 실제 게재 배너와 동일한 규격·비율로 만들었다.
+// 업종은 영업 우선순위 순: 특산물 -> 펜션 -> 식당 -> 카페.
+const SAMPLE_ADS = [
+  { src: "/ads/samples/seafood.jpg", label: "특산물 · 건어물", alt: "예시 배너 — 섬마을 건어물, 완도 특산물 직송, 멸치·미역·오징어·다시마, 택배 가능" },
+  { src: "/ads/samples/pension.jpg", label: "펜션 · 숙박", alt: "예시 배너 — 바다향기 펜션, 전 객실 오션뷰, 선착장 5분, 가족여행 추천" },
+  { src: "/ads/samples/restaurant.jpg", label: "식당", alt: "예시 배너 — 청해식당, 완도 현지인이 찾는 맛집, 전복죽·생선구이·해산물 정식, 단체 식사 가능" },
+  { src: "/ads/samples/cafe.jpg", label: "카페", alt: "예시 배너 — 카페 파도, 완도 바다 앞 감성카페, 커피·에이드·수제디저트, 포장 가능" },
+]
 
 // 지역 광고 안내 페이지 본문 (완도 /ads, 각 지역 /[region]/ads 공용).
 // 소개·게재위치는 지역명을 넣고, 게재 예시(시안)는 지역 무관 공용 문구로 유지.
@@ -55,80 +67,46 @@ export default function AdsPageContent({
         <section>
           <h3 className="mb-2 text-sm font-bold text-slate-700">게재 위치</h3>
           <p className="rounded-2xl border border-slate-100 bg-white p-4 text-sm leading-relaxed text-slate-500 shadow-sm">
-            {regionName} 메인 화면 하단, 배편 시간표를 모두 확인한 뒤 자연스럽게
-            눈이 닿는 자리입니다. 아래 예시와 같은 형태로 게재됩니다.
+            {regionName} 메인 화면의 <strong className="font-semibold text-slate-700">배편 시간표 바로 아래</strong>,
+            출발 시각을 확인한 뒤 자연스럽게 눈이 닿는 자리입니다.
+            아래 예시와 같은 형태로 게재됩니다.
           </p>
         </section>
 
-        {/* 시안 — 지역 무관 공용 예시 (지역명 없음) */}
+        {/* 게재 예시 — 지역 무관 공용 (지역명 없음). 실제 게재와 같은 비율·같은 컴포넌트 모양 */}
         <section className="space-y-4">
-          <h3 className="text-sm font-bold text-slate-700">게재 예시 (시안)</h3>
-
-          {/* 시안 A — 텍스트형 */}
           <div>
-            <p className="mb-1.5 text-xs font-semibold text-blue-600">A. 기본형 — 모든 업종</p>
-            <div className="relative rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm">
-              <AdLabel />
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 text-2xl" aria-hidden="true">🏠</span>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">○○펜션 · 오션뷰 객실</p>
-                  <p className="mt-0.5 text-xs text-slate-500">선착장에서 5분 · 전 객실 바다 전망</p>
-                  <p className="mt-1.5 text-xs font-semibold text-blue-600">
-                    예약 000-0000-0000 · 자세히 보기 →
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 시안 B — 사진 카드형 */}
-          <div>
-            <p className="mb-1.5 text-xs font-semibold text-blue-600">B. 사진형 — 펜션·식당·카페</p>
-            <div className="relative rounded-2xl border border-slate-200 bg-white px-4 py-3.5 shadow-sm">
-              <AdLabel />
-              <div className="flex items-center gap-3">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-2xl" aria-hidden="true">
-                  🐚
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-slate-800">○○횟집 · 활전복·해산물 전문</p>
-                  <p className="mt-0.5 text-xs text-slate-500">터미널 도보 3분 · 포장 가능</p>
-                  <p className="mt-1.5 text-xs font-semibold text-blue-600">
-                    ☎ 000-0000-0000 · 메뉴 보기 →
-                  </p>
-                </div>
-              </div>
-            </div>
-            <p className="mt-1 text-[11px] text-slate-400">
-              * 사진 자리에는 사장님이 보내주신 가게·음식 사진이 들어갑니다.
+            <h3 className="text-sm font-bold text-slate-700">게재 예시</h3>
+            <p className="mt-1 text-xs leading-relaxed text-slate-400">
+              화면에 보이는 실제 크기 그대로입니다. 아래 업체는 모두 예시로 만든 가상의 가게입니다.
             </p>
           </div>
 
-          {/* 시안 C — 혜택 강조형 */}
-          <div>
-            <p className="mb-1.5 text-xs font-semibold text-blue-600">C. 혜택형 — 할인·이벤트 업체 (추천)</p>
-            <div className="relative rounded-2xl border border-amber-200 bg-amber-50/60 px-4 py-3.5 shadow-sm">
-              <AdLabel />
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 text-2xl" aria-hidden="true">🎁</span>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">
-                    &ldquo;페리캐스트 보고 왔어요&rdquo; 하면
-                  </p>
-                  <p className="mt-0.5 text-sm font-bold text-amber-700">
-                    ○○카페 아메리카노 500원 할인
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    터미널 맞은편 · 07:00 첫 배부터 영업
-                  </p>
-                </div>
+          {SAMPLE_ADS.map((s) => (
+            <div key={s.src}>
+              <p className="mb-1.5 text-xs font-semibold text-blue-600">{s.label}</p>
+              {/* 실제 게재 배너(LocalAdCard)와 같은 껍데기 — 흰 카드 + 그림자 + 우상단 광고 라벨 */}
+              <div
+                className="relative overflow-hidden rounded-2xl border border-slate-200 shadow-sm"
+                style={{ aspectRatio: String(AD_SLOT_RATIO) }}
+              >
+                <Image
+                  src={s.src}
+                  alt={s.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 512px) 100vw, 512px"
+                />
+                <AdLabel tone="onImage" />
               </div>
             </div>
-            <p className="mt-1 text-[11px] text-slate-400">
-              * 손님이 직접 말하고 오는 방식이라 광고 효과를 가게에서 바로 확인할 수 있습니다.
-            </p>
-          </div>
+          ))}
+
+          <p className="text-[11px] leading-relaxed text-slate-400">
+            * 배너는 사장님이 보내주신 사진과 소개 문구로{" "}
+            <strong className="font-semibold text-slate-500">무료 제작</strong>해 드립니다.
+            마음에 드실 때까지 수정해 드리며, 배너를 누르면 전화·홈페이지·스마트스토어로 바로 연결됩니다.
+          </p>
         </section>
 
         {/* 진행 절차 */}
