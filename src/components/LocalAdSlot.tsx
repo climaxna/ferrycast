@@ -8,9 +8,11 @@ import AdLabel from "./AdLabel"
 export default function LocalAdSlot({
   regionName,
   adsPath,
+  hasAds = false,   // 위에 이미 게재 광고가 있으면 "한 자리 더" 모집 문구로
 }: {
   regionName: string
   adsPath: string
+  hasAds?: boolean
 }) {
   const mailto = buildAdMailto({ regionName, adsPath })
   return (
@@ -29,7 +31,7 @@ export default function LocalAdSlot({
         <div className="min-w-0 flex-1">
           {/* pr-14 — 우상단 "광고 자리" 라벨과 겹치지 않게 */}
           <p className="pr-14 text-sm font-bold text-slate-800">
-            이 자리에 사장님의 가게를 알려보세요
+            {hasAds ? "광고 한 자리 더 모집합니다" : "이 자리에 사장님의 가게를 알려보세요"}
           </p>
           {/* 방문자 "수"가 아니라 "질"로 설득 — 지역별 실측치(완도 100+/포항 50/목포 30/인천 20)는
               작은 지역에서 역효과라 화면에 넣지 않는다. 숫자는 메일 회신 단계에서 캡처와 함께 제시. */}
