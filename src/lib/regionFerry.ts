@@ -121,10 +121,25 @@ export async function getRegionStatusSummaries(config: RegionConfig): Promise<Di
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
     const items = await getMtisDay(key, date)
     if (!items.length) return { dep: null, arr: null }
-    const depKey = makeDepGroupKey(config.routeGroups)
+    const depGroupKey = makeDepGroupKey(config.routeGroups)
     const arrKey = makeArrGroupKey(config.routeGroups)
     const grp = (k: string) => config.routeGroups.find((gg) => gg.key === k)
-    const depLabel = (k: string) => { const g = grp(k); return g ? `${config.name} → ${g.label}` : k }
+    // islandHops(연평·굴업·장봉 등)도 요약에 포함 — 순환항로/타 항구라 별도 매칭.
+    // 이들은 모두 '출발편' 성격이라 출발(dep) 요약에만 넣는다. (도착 탭 요약은 본항 직항만)
+    const hops = config.islandHops ?? []
+    const hopKey = (it: MtisItem) => {
+      for (const h of hops) {
+        if (it.oport_nm.includes(h.depKeyword) && (it.nvg_seawy_nm || "").includes(h.seawayKeyword)) return `hop-${h.key}`
+      }
+      return null
+    }
+    const hopOf = (k: string) => hops.find((h) => `hop-${h.key}` === k)
+    const depKey = (it: MtisItem) => depGroupKey(it) ?? hopKey(it)
+    const depLabel = (k: string) => {
+      const g = grp(k); if (g) return `${config.name} → ${g.label}`
+      const h = hopOf(k); if (h) return `${h.originName} → ${h.label}`
+      return k
+    }
     const arrLabel = (k: string) => { const g = grp(k); return g ? `${g.label} → ${config.name}` : k }
     return {
       dep: statusSummary(items, depKey, depLabel),
