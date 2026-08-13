@@ -5,7 +5,6 @@ import RouteSection from "@/components/RouteSection"
 import YaksanRouteSection from "@/components/YaksanRouteSection"
 import AppHeaderTitle from "@/components/AppHeaderTitle"
 import AdFitBanner from "@/components/AdFitBanner"
-import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
 
 // ISR 재생성 주기 — 데이터가 어차피 5~10분 캐시라 60초는 낭비(동일 결과 반복 write).
@@ -77,8 +76,8 @@ export default function Page() {
         </Suspense>
 
         <div className="space-y-2">
-          {/* 지역 광고는 시간표 직후 단락으로 이동(RouteSection adSlot). 하단은 특산물+애드핏 */}
-          <CoupangSection />
+          {/* 지역 광고는 시간표 직후 단락으로 이동(RouteSection adSlot). 하단은 애드핏.
+              쿠팡 섹션은 완도 지역광고 컨택 중이라 잠시 숨김(<CoupangSection />). */}
           <AdFitBanner />
         </div>
 
