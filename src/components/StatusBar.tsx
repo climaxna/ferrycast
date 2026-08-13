@@ -48,6 +48,13 @@ export default function StatusBar({
             </p>
           </div>
         </div>
+      ) : summary.normal === 0 && summary.done > 0 ? (
+        // 남은 편이 없으면 "정상 운항 중"은 사실과 다르다 — 오늘은 더 탈 배가 없다는 뜻이므로
+        // 중립 톤(slate)으로 종료를 알린다. 초록으로 두면 배가 있는 줄 알고 터미널에 나갈 수 있다.
+        <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-100/70 px-3.5 py-2.5">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-400 text-[11px] font-bold text-white">✓</span>
+          <p className="text-sm font-medium text-slate-600">오늘 운항이 모두 종료되었습니다</p>
+        </div>
       ) : (
         <div className="flex items-center gap-2.5 rounded-xl border border-emerald-100 bg-emerald-50/70 px-3.5 py-2.5">
           <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-[11px] font-bold text-white">✓</span>

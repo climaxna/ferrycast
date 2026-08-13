@@ -251,7 +251,11 @@ export function statusSummary(
     } else {
       let arr = opByKey.get(gk); if (!arr) { arr = []; opByKey.set(gk, arr) }
       arr.push(min)
-      if (it.nvg_stts_nm === "완료") done++
+      // "정상"은 **아직 출발하지 않은 편**만 센다. `운항중`(이미 떠서 항해 중)을 정상으로 세면
+      // 시간표 카드는 "오늘 출발 종료"인데 요약 바만 "정상 1"로 남아 서로 어긋난다.
+      // 완도→제주처럼 5시간짜리 항로는 그 어긋남이 몇 시간씩 이어진다.
+      // 사용자가 요약 바에서 알고 싶은 건 "지금부터 탈 수 있는 배가 몇 편인가"다.
+      if (it.nvg_stts_nm === "완료" || it.nvg_stts_nm === "운항중") done++
       else normal++
     }
   }
