@@ -11,11 +11,12 @@ import AdLabel from "./AdLabel"
 // ⚠️ 이 페이지는 완도·포항·목포·인천이 공용으로 쓴다(/ads, /[region]/ads).
 // 따라서 배너 문구에 특정 지역명을 넣지 않는다 — 포항 광고주에게 "완도 특산물 직송"이
 // 보이면 그 자리에서 신뢰를 잃는다. 문구는 어느 항구도시에서도 성립하는 표현으로.
+// 파일명 -v2: 같은 경로에 덮어쓰면 CDN·이미지 최적화 캐시가 옛 배너(지역명 박힌 것)를 계속 내보낸다.
 const SAMPLE_ADS = [
-  { src: "/ads/samples/seafood.jpg", label: "특산물 · 건어물", alt: "예시 배너 — 섬마을 건어물, 산지에서 바로 직송, 멸치·미역·오징어·다시마, 택배 가능" },
-  { src: "/ads/samples/pension.jpg", label: "펜션 · 숙박", alt: "예시 배너 — 바다향기 펜션, 전 객실 오션뷰, 선착장 5분, 가족여행 추천" },
-  { src: "/ads/samples/restaurant.jpg", label: "식당", alt: "예시 배너 — 청해식당, 현지인이 찾는 맛집, 전복죽·생선구이·해산물 정식, 단체 식사 가능" },
-  { src: "/ads/samples/cafe.jpg", label: "카페", alt: "예시 배너 — 카페 파도, 바다 앞 감성카페, 커피·에이드·수제디저트, 포장 가능" },
+  { src: "/ads/samples/seafood-v2.jpg", label: "특산물 · 건어물", alt: "예시 배너 — 청해 건어물, 특산물 직송, 멸치·미역·오징어·다시마, 택배 가능" },
+  { src: "/ads/samples/pension-v2.jpg", label: "펜션 · 숙박", alt: "예시 배너 — 바다쉼표 펜션, 바다 앞 힐링 스테이, 전 객실 오션뷰·선착장 5분, 가족여행 추천" },
+  { src: "/ads/samples/restaurant-v2.jpg", label: "식당", alt: "예시 배너 — 청해 식당, 현지인이 찾는 맛집, 전복죽·생선구이·해산물 정식, 단체 식사 가능" },
+  { src: "/ads/samples/cafe-v2.jpg", label: "카페", alt: "예시 배너 — 카페 파도, 바다 앞 감성카페, 커피·에이드·수제디저트, 포장 가능" },
 ]
 
 // 지역 광고 안내 페이지 본문 (완도 /ads, 각 지역 /[region]/ads 공용).
