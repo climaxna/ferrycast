@@ -39,6 +39,9 @@ export interface Guide {
   description: string    // meta description (검색 스니펫)
   keywords: string[]     // 검색 의도 키워드(문장에 자연스럽게 반영)
   liveHref: string       // 실시간 화면 경로 ("/" 또는 "/incheon")
+  // 실시간 위젯 매칭용 MTIS 그룹키. 실시간 route.id = `dep-${liveGroupKey}`.
+  // 없으면(예: 약산 섬↔섬 집계) 인라인 위젯 대신 실시간 화면 링크만 노출.
+  liveGroupKey?: string
   updated: string        // 콘텐츠 최신화 시점 "2026-08"
   intro: string[]        // 도입 문단(검색 스니펫·본문)
   facts: GuideFact[]     // 소요시간·선사·터미널·요금 등 요약
@@ -60,6 +63,7 @@ const WANDO_GUIDES: Guide[] = [
     regionSlug: "",
     regionName: "완도",
     destination: "청산도",
+    liveGroupKey: "cheongsando",
     title: "완도에서 청산도 가는 법 — 배 시간표·요금·소요시간",
     description:
       "완도항에서 청산도(슬로시티) 가는 여객선 시간표, 요금, 소요시간(약 50분), 매표소 연락처 안내. 오늘 운항·결항 여부는 실시간으로 확인하세요.",
@@ -133,6 +137,7 @@ const WANDO_GUIDES: Guide[] = [
     regionSlug: "",
     regionName: "완도",
     destination: "소안도·보길도·노화도",
+    liveGroupKey: "hwaheungpo-route",
     title: "완도(화흥포)에서 소안도·보길도·노화도 가는 법 — 배 시간표·요금",
     description:
       "완도 화흥포항에서 노화도(동천)·소안도 가는 여객선 시간표, 요금, 매표소 연락처. 보길도는 노화도에서 연도교로 연결됩니다. 오늘 운항 여부는 실시간으로 확인하세요.",
@@ -289,6 +294,7 @@ function regionGuidesFrom(config: RegionConfig): Guide[] {
       regionSlug: config.slug,
       regionName: config.name,
       destination: g.label,
+      liveGroupKey: g.key,
       title: `${config.name}에서 ${g.label} 가는 법 — 배 시간표·운항 현황`,
       description: `${config.name}에서 ${g.label} 가는 여객선 출발 터미널·대표 시간·예매 안내. 오늘 실제 운항·결항 여부는 FerryCast 실시간 화면에서 확인하세요.`,
       keywords: [
