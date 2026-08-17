@@ -90,6 +90,12 @@ export default function Page() {
             기상 악화·조류 등으로 예고 없이 결항될 수 있습니다.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
+            <Link
+              href="/guide"
+              className="inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1"
+            >
+              항로 가이드
+            </Link>
             <a
               href="https://www.wando.go.kr"
               target="_blank"
