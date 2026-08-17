@@ -1,10 +1,13 @@
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { GUIDES, getGuide, type Guide } from "@/content/guides"
+import GuideLiveBox from "@/components/GuideLiveBox"
 
-// 가이드 상세는 순수 정적 콘텐츠 — 하루 한 번 재생성으로 충분(검색 색인용).
-export const revalidate = 86400
+// 정적 콘텐츠지만 상단 실시간 박스(오늘 운항/결항)를 위해 10분 주기로 재생성.
+// 정적 HTML은 그대로 색인되므로 SEO에는 영향 없다(메인·지역 페이지와 동일 캐시 정책).
+export const revalidate = 600
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }))
@@ -105,19 +108,22 @@ export default async function GuidePage({
           </div>
         </div>
 
-        {/* 실시간 확인 CTA — 검색으로 들어온 사용자를 실시간 앱으로 */}
-        <Link
-          href={guide.liveHref}
-          className="flex items-center justify-between rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 px-5 py-4 text-white shadow-lg shadow-blue-900/10 transition-transform active:scale-[0.99]"
+        {/* 실시간 박스 — 검색으로 착지한 사용자가 클릭 없이 오늘 운항/결항을 바로 봄 */}
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-between rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 px-5 py-4 text-white shadow-lg shadow-blue-900/10">
+              <div>
+                <p className="text-sm font-bold">오늘 {guide.destination} 배 뜨나요?</p>
+                <p className="mt-0.5 text-xs text-blue-100">실시간 운항 현황 불러오는 중…</p>
+              </div>
+              <span className="text-2xl" aria-hidden="true">
+                ⛴️
+              </span>
+            </div>
+          }
         >
-          <div>
-            <p className="text-sm font-bold">오늘 {guide.destination} 배 뜨나요?</p>
-            <p className="mt-0.5 text-xs text-blue-100">실시간 운항·결항·날씨 바로 확인 →</p>
-          </div>
-          <span className="text-2xl" aria-hidden="true">
-            ⛴️
-          </span>
-        </Link>
+          <GuideLiveBox guide={guide} />
+        </Suspense>
 
         {/* 요약 정보 */}
         <section>
