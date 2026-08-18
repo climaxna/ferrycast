@@ -339,6 +339,8 @@ export const REGIONS: Record<string, RegionConfig> = {
         terminal: "덕적도 진리항",
       },
     ],
+    // 백령도 아래 — 인천 최대 노선 바로 다음. 유료 광고(36스테이)가 걸린 지역이라 노출을 앞으로 당긴다.
+    adAfterKey: "baengnyeongdo",
     islandHopTitle: "그 밖의 인천 섬 배편",
     islandHopNote: "출발 항구가 다르거나 순환 항로로 운항하는 배편입니다. 격일 운항이 있어 출발 전 확인을 권합니다.",
     metaDescription: "인천 백령도·연평도·덕적도·대이작도·장봉도·굴업도·풍도 여객선 시간표·운항 현황·날씨·조석 예보",
