@@ -34,12 +34,28 @@ const DEP_CFG: Record<string, DepGroupCfg> = {
   "jeju":             { label: "제주",             priority: 1, terminal: TERMINAL_MAIN, fareUrl: FARE_URL_MAP["jeju"] },
   "cheongsando":      { label: "청산도",            priority: 2, terminal: TERMINAL_MAIN, fareUrl: FARE_URL_MAP["cheongsando"], durationMin: CHEONGSANDO_DURATION_MIN },
   "hwaheungpo-route": { label: "소안도·보길도·노화", priority: 3, terminal: TERMINAL_HWAHEUNGPO, fareUrl: FARE_URL_MAP["hwaheungpo-route"] },
+  // 완도항 출발 생활 항로(섬사랑호 공영여객선) — 주민 이용이 대부분이고 편수가 적다.
+  // 편수가 적을수록 결항 한 번의 타격이 커서, 이 앱이 가장 필요한 노선이기도 하다.
+  // 운임 링크는 걸지 않는다 — 공영여객선은 현장 발권이라 해운조합 예매 페이지에 없다.
+  "yeoseodo":         { label: "여서도",           priority: 4, terminal: TERMINAL_MAIN },
+  "modo":             { label: "모도",             priority: 5, terminal: TERMINAL_MAIN },
+  "deokwoo":          { label: "덕우도·황제도",      priority: 6, terminal: TERMINAL_MAIN },
 }
+
+// 완도항 출발인데 MTIS에 순환(완도→완도)으로 등록돼 dest로는 목적지를 알 수 없는 노선.
+// 목적지가 nvg_seawy_nm에만 있다(예: "완도모도(순환)"). 출발편에만 쓴다 —
+// 순환은 왕복이 한 편이라 도착 탭에 또 실으면 같은 배가 두 번 나온다.
+const WANDO_CIRCULAR: Array<{ key: string; seaway: string }> = [
+  { key: "modo",    seaway: "모도" },
+  { key: "deokwoo", seaway: "덕우" },
+]
 
 const ARR_CFG: Record<string, ArrGroupCfg> = {
   "jeju":             { label: "제주",   priority: 1, terminal: TERMINAL_MAIN,       islandTerminal: "제주항 연안여객터미널", fareUrl: FARE_URL_MAP["jeju"] },
   "cheongsando":      { label: "청산도", priority: 2, terminal: TERMINAL_MAIN,       islandTerminal: "도청항", fareUrl: FARE_URL_MAP["cheongsando"], durationMin: CHEONGSANDO_DURATION_MIN },
   "hwaheungpo-route": { label: "소안도·보길도·노화", priority: 3, terminal: TERMINAL_HWAHEUNGPO, islandTerminal: "소안항여객터미널", fareUrl: FARE_URL_MAP["hwaheungpo-route"] },
+  // 여서도만 도착편이 따로 있다(여서→완도 07:00). 모도·덕우도는 순환이라 도착편이 존재하지 않는다.
+  "yeoseodo":         { label: "여서도", priority: 4, terminal: TERMINAL_MAIN, islandTerminal: "여서도 선착장" },
 }
 
 // 출발항·도착항 이름 한 쌍 → 노선 groupKey (MTIS·TAGO 공용)
@@ -47,16 +63,23 @@ function depGroupOf(o: string, d: string): string | null {
   if (o.includes("완도") && d.includes("제주")) return "jeju"
   if (o.includes("완도") && d.includes("청산")) return "cheongsando"
   if (o.includes("화흥") && (d.includes("소안") || d.includes("보길") || d.includes("노화"))) return "hwaheungpo-route"
+  if (o.includes("완도") && d.includes("여서")) return "yeoseodo"
   return null
 }
 function depGroupKey(item: MtisItem): string | null {
-  return depGroupOf(item.oport_nm, item.dest_nm)
+  const byPort = depGroupOf(item.oport_nm, item.dest_nm)
+  if (byPort) return byPort
+  // 항구 이름으로 안 잡히면 순환항로인지 본다 (완도 출발분에 한정)
+  if (!item.oport_nm.includes("완도")) return null
+  const way = item.nvg_seawy_nm || ""
+  return WANDO_CIRCULAR.find((g) => way.includes(g.seaway))?.key ?? null
 }
 
 function arrGroupOf(o: string, d: string): string | null {
   if (o.includes("제주") && (d.includes("완도") || d.includes("화흥"))) return "jeju"
   if (o.includes("청산") && (d.includes("완도") || d.includes("화흥"))) return "cheongsando"
   if ((o.includes("소안") || o.includes("보길") || o.includes("노화")) && (d.includes("완도") || d.includes("화흥"))) return "hwaheungpo-route"
+  if (o.includes("여서") && d.includes("완도")) return "yeoseodo"
   return null
 }
 function arrGroupKey(item: MtisItem): string | null {
