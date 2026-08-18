@@ -17,8 +17,13 @@ function makeDepGroupKey(groups: RouteGroupConfig[]) {
   return (item: MtisItem): string | null => {
     for (const g of groups) {
       const depMatch = g.depPortKeywords.some((k) => item.oport_nm.includes(k))
+      if (!depMatch) continue
       const destMatch = g.destKeywords.some((k) => item.dest_nm.includes(k))
-      if (depMatch && destMatch) return g.key
+      // 순환항로(oport=dest=본항)는 dest로 목적지를 알 수 없어 항로명으로 보조 매칭한다.
+      // 예: 목포->목포 "목포가거도(소흑산)" — dest는 "목포"라 destKeywords로는 안 걸리는 가거도행.
+      // 이 보조 매칭이 없으면 같은 섬인데 일부 편만 표시되는 누락이 생긴다.
+      const seawayMatch = g.seawayKeywords?.some((k) => (item.nvg_seawy_nm || "").includes(k)) ?? false
+      if (destMatch || seawayMatch) return g.key
     }
     return null
   }
@@ -181,7 +186,7 @@ export async function getRoutesForRegion(
       if (!grouped[gk]) grouped[gk] = { times: [], ships: new Set(), allItems: [], via: {}, cancelled: [] }
       grouped[gk].allItems.push(it)
       const cfgG = config.routeGroups.find(g => g.key === gk)
-      const via1 = extractVia(it, [...(cfgG?.depPortKeywords ?? []), ...(cfgG?.destKeywords ?? [])])
+      const via1 = extractVia(it, [...(cfgG?.depPortKeywords ?? []), ...(cfgG?.destKeywords ?? []), ...(cfgG?.seawayKeywords ?? [])])
       if (isCancelled(it)) {
         grouped[gk].cancelled.push({ time: parseSailTime(it.sail_tm), reason: itemReason(it), suspended: isSuspended(it), ...(via1 ? { via: via1 } : {}), ...(it.psnshp_nm ? { ship: it.psnshp_nm } : {}) })
         continue

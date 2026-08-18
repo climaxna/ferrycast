@@ -3,6 +3,13 @@ export interface RouteGroupConfig {
   label: string
   depPortKeywords: string[]   // MTIS oport_nm 포함 키워드 (출발편 필터)
   destKeywords: string[]      // MTIS dest_nm 포함 키워드 (출발편 필터)
+  // 순환항로 대응 — oport_nm=dest_nm(=본항)이라 dest로는 목적지를 알 수 없는 노선용.
+  // 목적지가 nvg_seawy_nm에만 있다(예: 목포->목포 "목포외달(장좌)" = 외달도행).
+  // 지정하면 출발편 매칭이 `dest 일치 OR 항로명 일치`로 넓어져, 같은 섬의 일반편과 한 카드로 합쳐진다.
+  // ⚠️ 도착편에는 적용하지 않는다 — 순환항로는 왕복이 한 편이라 도착 탭에 또 실으면 중복이 된다.
+  // ⚠️ 다른 그룹의 섬 이름이 항로명에 섞여 있을 수 있으므로(예: "목포가거도(소흑산)"에 '흑산')
+  //    꼭 필요한 그룹에만 지정하고, 지정한 그룹을 routeGroups 배열에서 더 앞에 둘 것.
+  seawayKeywords?: string[]
   depTerminal?: string        // 이 항로의 본항측 출발 터미널 (없으면 region.mainTerminal). 한 도시 여러 항 대응
   islandTerminal?: string     // 도착 탭 — 섬에서 타는 터미널
   fareUrl?: string
@@ -175,13 +182,60 @@ export const REGIONS: Record<string, RegionConfig> = {
         label: "가거도",
         depPortKeywords: ["목포"],
         destKeywords: ["가거"],
+        // 뉴엔젤호는 목포->목포 순환으로 등록돼(항로명 "목포가거도(소흑산)") dest로는 안 걸렸다.
+        // 그래서 하루 2편인 가거도가 1편만 표시되던 누락을 이 키워드로 해소한다.
+        seawayKeywords: ["가거"],
         islandTerminal: "가거도항",
         fareUrl: "https://island.theksa.co.kr/page/booking",
         fallbackDep: ["14:00"],
         fallbackArr: ["07:00"],
       },
+      {
+        // 목포-달리도-율도-외달도 순회 (신진해운 슬로아일랜드호, 하루 4편, 약 50분).
+        // 전 구간이 목포->목포 순환이라 dest로는 전혀 안 잡히던 노선 — 항로명 "목포외달(장좌)"로 매칭.
+        // 해수욕장이 있어 목포 시민·관광객 수요가 큰데 그동안 통째로 빠져 있었다.
+        key: "oedaldo",
+        label: "외달도·달리도",
+        depPortKeywords: ["목포"],
+        destKeywords: ["외달"],
+        seawayKeywords: ["외달"],
+        islandTerminal: "외달도 선착장",
+        fareUrl: "https://island.theksa.co.kr/page/booking",
+        fallbackDep: ["07:00", "10:30", "13:30", "16:30"],
+        durationMin: 50,
+      },
     ],
-    metaDescription: "목포 제주·홍도·흑산도·비금도초·가거도 여객선 시간표·운항 현황·날씨·조석 예보",
+    // 신안 생활 항로 — 관광 섬(위 목록)과 목적이 달라 광고 아래 별도 섹션으로 분리한다.
+    // 대부분 순환이거나 경유가 많아 목적지를 항로명으로만 알 수 있다.
+    islandHops: [
+      {
+        key: "jangsan-haui",
+        label: "장산·하의·신의(웅곡)",
+        originName: "목포",
+        depKeyword: "목포",
+        seawayKeyword: "웅곡",
+        terminal: "목포연안여객선터미널",
+      },
+      {
+        key: "sangtaedo",
+        label: "상태도(동리)",
+        originName: "목포",
+        depKeyword: "목포",
+        seawayKeyword: "동리",
+        terminal: "목포연안여객선터미널",
+      },
+      {
+        key: "seogeocha",
+        label: "율목·서거차",
+        originName: "목포",
+        depKeyword: "목포",
+        seawayKeyword: "서거차",
+        terminal: "목포연안여객선터미널",
+      },
+    ],
+    islandHopTitle: "신안·진도 생활 항로",
+    islandHopNote: "섬 주민이 주로 이용하는 노선입니다. 경유지가 많고 편수가 적어 출발 전 확인을 권합니다.",
+    metaDescription: "목포 제주·홍도·흑산도·비금도초·가거도·외달도 여객선 시간표·운항 현황·날씨·조석 예보",
   },
 
   incheon: {
