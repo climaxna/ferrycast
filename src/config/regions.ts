@@ -39,6 +39,9 @@ export interface RegionConfig {
   tidalObsCode: string | null   // null이면 조석 섹션 비표시
   mainTerminal: string
   routeGroups: RouteGroupConfig[]
+  // 광고를 이 그룹키 카드 바로 아래에 배치(미지정 시 목록 맨 뒤).
+  // 목록 맨 뒤는 스크롤이 끝난 자리라 광고 가치가 낮고, 노선을 추가할수록 계속 밀린다.
+  adAfterKey?: string
   metaDescription: string
   // 선택: 섬↔섬 보조 노선 섹션 (KTX 아래에 노출, 예: 포항→울릉 페이지의 울릉→독도)
   islandHops?: IslandHopConfig[]
@@ -233,6 +236,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         terminal: "목포연안여객선터미널",
       },
     ],
+    adAfterKey: "heuksando",   // 제주·홍도·흑산 = 목포 3대 관광 노선이 끝나는 단락 구분점
     islandHopTitle: "신안·진도 생활 항로",
     islandHopNote: "섬 주민이 주로 이용하는 노선입니다. 경유지가 많고 편수가 적어 출발 전 확인을 권합니다.",
     metaDescription: "목포 제주·홍도·흑산도·비금도초·가거도·외달도 여객선 시간표·운항 현황·날씨·조석 예보",

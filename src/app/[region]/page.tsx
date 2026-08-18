@@ -105,6 +105,7 @@ async function RegionRouteSection({ region }: { region: string }) {
       regionName={config.name}
       train={train}
       adSlot={<AdArea region={config.slug} regionName={config.name} adsPath={`/${config.slug}/ads`} />}
+      adAfterKey={config.adAfterKey}
     />
   )
 }

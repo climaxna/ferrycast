@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, type ReactNode } from "react"
+import { useState, useEffect, Fragment, type ReactNode } from "react"
 import RouteItem from "./RouteItem"
 import RouteDetail from "./RouteDetail"
 import StatusBar from "./StatusBar"
@@ -13,9 +13,14 @@ interface Props {
   summaries: DirSummary   // 출발/도착 운항 요약 — 탭에 따라 전환
   // 시간표 목록 직후(약산 섹션 앞) 단락 구분점에 노출할 지역 광고 슬롯 — 서버에서 렌더해 주입.
   adSlot?: ReactNode
+  // 광고를 이 그룹키 카드 **바로 아래**에 끼워 넣는다(예: "hwaheungpo-route").
+  // 목록 맨 끝은 스크롤이 끝난 자리라 눈에 잘 안 닿고, 노선이 늘어날수록 광고가 계속 아래로 밀린다.
+  // dep-/arr- 접두사는 떼고 비교하므로 출발·도착 두 탭 모두에서 같은 자리에 붙는다.
+  // 키를 못 찾으면 기존처럼 목록 맨 뒤에 붙는다(안전한 기본값).
+  adAfterKey?: string
 }
 
-export default function RouteTabs({ departures, arrivals, summaries, adSlot }: Props) {
+export default function RouteTabs({ departures, arrivals, summaries, adSlot, adAfterKey }: Props) {
   const [tab, setTab] = useState<"dep" | "arr">("dep")
   const [selected, setSelected] = useState<WandoRoute | null>(null)
   const [nowMinutes, setNowMinutes] = useState(0)
@@ -32,6 +37,9 @@ export default function RouteTabs({ departures, arrivals, summaries, adSlot }: P
 
   const isDeparture = tab === "dep"
   const { routes, isLive } = isDeparture ? departures : arrivals
+  const adIdx = adAfterKey
+    ? routes.findIndex((r) => r.id.replace(/^(dep|arr)-/, "") === adAfterKey)
+    : -1
 
   return (
     <section>
@@ -60,14 +68,16 @@ export default function RouteTabs({ departures, arrivals, summaries, adSlot }: P
       {/* 항로 목록 */}
       {routes.length > 0 ? (
         <div className="space-y-2.5">
-          {routes.map((route) => (
-            <RouteItem
-              key={route.id}
-              route={route}
-              nowMinutes={nowMinutes}
-              isArrival={!isDeparture}
-              onClick={() => setSelected(route)}
-            />
+          {routes.map((route, i) => (
+            <Fragment key={route.id}>
+              <RouteItem
+                route={route}
+                nowMinutes={nowMinutes}
+                isArrival={!isDeparture}
+                onClick={() => setSelected(route)}
+              />
+              {i === adIdx && adSlot}
+            </Fragment>
           ))}
         </div>
       ) : (
@@ -76,8 +86,8 @@ export default function RouteTabs({ departures, arrivals, summaries, adSlot }: P
         </div>
       )}
 
-      {/* 지역 광고 — 시간표 목록 직후, 약산 섹션 앞 단락 구분점 */}
-      {routes.length > 0 && adSlot && <div className="mt-3">{adSlot}</div>}
+      {/* 지역 광고 — adAfterKey를 못 찾았을 때의 대체 위치(목록 맨 뒤) */}
+      {routes.length > 0 && adSlot && adIdx < 0 && <div className="mt-3">{adSlot}</div>}
 
       {/* 상세 바텀 시트 */}
       {selected && (
