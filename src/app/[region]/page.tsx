@@ -106,6 +106,7 @@ async function RegionRouteSection({ region }: { region: string }) {
       train={train}
       adSlot={<AdArea region={config.slug} regionName={config.name} adsPath={`/${config.slug}/ads`} />}
       adAfterKey={config.adAfterKey}
+      inbound={config.inbound}
     />
   )
 }
@@ -168,6 +169,15 @@ export default async function RegionPage({
         </Suspense>
 
         <RegionNav current={config.slug} />
+
+        {/* 목적지 허브(제주)는 도착지 날씨만 보여준다. 결항을 가르는 건 항로 전 구간 기상이라
+            "제주는 맑은데 배는 결항"이 흔하다 — 오해하지 않도록 명시한다. */}
+        {config.inbound && (
+          <p className="rounded-xl border border-amber-100 bg-amber-50/70 px-3.5 py-2.5 text-xs leading-relaxed text-amber-700">
+            위 날씨는 <strong className="font-semibold">{config.name} 기준</strong>입니다. 결항은 출발지와 항로
+            전 구간의 기상으로 결정되므로, 출발지 날씨는 해당 지역 탭에서 함께 확인하세요.
+          </p>
+        )}
 
         <Suspense fallback={<RouteSkeleton />}>
           <RegionRouteSection region={region} />

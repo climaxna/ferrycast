@@ -22,9 +22,12 @@ interface Props {
   // dep-/arr- 접두사는 떼고 비교하므로 출발·도착 두 탭 모두에서 같은 자리에 붙는다.
   // 키를 못 찾으면 기존처럼 목록 맨 뒤에 붙는다(안전한 기본값).
   adAfterKey?: string
+  // 목적지 허브 지역(제주) — 탭 문구를 "제주 출발/도착"이 아니라
+  // "제주 가는 배 / 제주 나오는 배"로 바꾼다. 어느 쪽이 육지행인지 헷갈리지 않게.
+  inbound?: boolean
 }
 
-export default function RegionRouteTabs({ departures, arrivals, summaries, regionName, train, adSlot, adAfterKey }: Props) {
+export default function RegionRouteTabs({ departures, arrivals, summaries, regionName, train, adSlot, adAfterKey, inbound }: Props) {
   const [tab, setTab] = useState<"dep" | "arr">("dep")
   const [selected, setSelected] = useState<WandoRoute | null>(null)
   const [nowMinutes, setNowMinutes] = useState(0)
@@ -56,10 +59,10 @@ export default function RegionRouteTabs({ departures, arrivals, summaries, regio
         isDeparture ? "bg-blue-50" : "bg-teal-50"
       }`}>
         <TabButton active={tab === "dep"} variant="dep" onClick={() => setTab("dep")}>
-          {regionName} 출발
+          {inbound ? `${regionName} 가는 배` : `${regionName} 출발`}
         </TabButton>
         <TabButton active={tab === "arr"} variant="arr" onClick={() => setTab("arr")}>
-          {regionName} 도착
+          {inbound ? `${regionName} 나오는 배` : `${regionName} 도착`}
         </TabButton>
         {!isLive && (
           <span className="mr-1.5 shrink-0 text-[11px] font-medium text-amber-500">

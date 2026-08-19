@@ -39,6 +39,11 @@ export interface RegionConfig {
   tidalObsCode: string | null   // null이면 조석 섹션 비표시
   mainTerminal: string
   routeGroups: RouteGroupConfig[]
+  // 목적지 허브 지역(제주 등) — 이 지역이 "출발지"가 아니라 "도착지"다.
+  // 다른 지역은 본항 1곳 → 섬 여러 곳이지만, 제주는 출발항 여러 곳 → 제주 1곳이다.
+  // routeGroup의 label이 목적지가 아니라 **출발지**를 뜻하게 되므로 카드의 from/to와
+  // 요약 바 라벨, 탭 문구를 모두 뒤집는다.
+  inbound?: boolean
   // 광고를 이 그룹키 카드 바로 아래에 배치(미지정 시 목록 맨 뒤).
   // 목록 맨 뒤는 스크롤이 끝난 자리라 광고 가치가 낮고, 노선을 추가할수록 계속 밀린다.
   adAfterKey?: string
@@ -344,5 +349,72 @@ export const REGIONS: Record<string, RegionConfig> = {
     islandHopTitle: "그 밖의 인천 섬 배편",
     islandHopNote: "출발 항구가 다르거나 순환 항로로 운항하는 배편입니다. 격일 운항이 있어 출발 전 확인을 권합니다.",
     metaDescription: "인천 백령도·연평도·덕적도·대이작도·장봉도·굴업도·풍도 여객선 시간표·운항 현황·날씨·조석 예보",
+  },
+
+  // ── 목적지 허브 탭 ──────────────────────────────────────────
+  // 다른 지역과 방향이 반대다: 출발항 5곳 → 제주 1곳(inbound: true).
+  // routeGroup의 label은 목적지가 아니라 **출발지**를 뜻한다.
+  // 완도·목포 탭에서 제주를 빼지 않는다 — 완도→제주는 완도 최대 노선이라
+  // 거기서 없애면 원칙 #1("클릭 없이 바로")에 어긋난다. 두 탭은 묻는 질문이 다르다.
+  jeju: {
+    slug: "jeju",
+    name: "제주",
+    weatherGrid: { nx: 53, ny: 38 },   // 제주시 (초단기실황 수신 검증)
+    seaGrids: [{ nx: 52, ny: 39 }, { nx: 51, ny: 39 }, { nx: 53, ny: 39 }],  // 제주해협 — 육지↔제주 항로가 지나는 바다 (WAV 수신 검증)
+    tidalObsCode: "DT_0004",   // KHOA 제주 (obsvtrNm="제주" 검증)
+    mainTerminal: "제주항 연안여객터미널",
+    inbound: true,
+    // 편수 많은 순. depTerminal=육지측 승선 터미널, islandTerminal=제주항(도착 탭에서 '타는 곳')
+    routeGroups: [
+      {
+        key: "from-mokpo",
+        label: "목포",
+        depPortKeywords: ["목포"],
+        destKeywords: ["제주"],
+        depTerminal: "목포항국제여객터미널",
+        islandTerminal: "제주항 연안여객터미널",
+        fareUrl: "https://www.seaferry.co.kr",       // 씨월드고속훼리 (퀸제누비아·퀸메리)
+      },
+      {
+        key: "from-wando",
+        label: "완도",
+        depPortKeywords: ["완도"],
+        destKeywords: ["제주"],
+        depTerminal: "완도여객선터미널",
+        islandTerminal: "제주항 연안여객터미널",
+        fareUrl: "https://www.hanilexpress.co.kr",   // 한일고속 (골드스텔라·실버클라우드)
+      },
+      {
+        key: "from-jindo",
+        label: "진도",
+        depPortKeywords: ["진도"],
+        destKeywords: ["제주"],
+        depTerminal: "진도항여객선터미널",             // 구 팽목항
+        islandTerminal: "제주항 연안여객터미널",
+        fareUrl: "https://www.seaferry.co.kr",       // 씨월드고속훼리 (산타모니카 — 육지↔제주 유일 쾌속선)
+        durationMin: 90,
+      },
+      {
+        key: "from-nokdong",
+        label: "녹동(고흥)",
+        depPortKeywords: ["녹동"],
+        destKeywords: ["제주"],
+        depTerminal: "녹동신항여객선터미널",
+        islandTerminal: "제주항 연안여객터미널",
+        // 아리온제주 선사 예매 링크 미확인 → 잘못된 링크를 거느니 비워둔다
+      },
+      {
+        key: "from-samcheonpo",
+        label: "삼천포(사천)",
+        depPortKeywords: ["삼천포"],
+        destKeywords: ["제주"],
+        depTerminal: "삼천포신항여객선터미널",
+        islandTerminal: "제주항 연안여객터미널",
+        fareUrl: "https://www.oceanvista.co.kr",     // 현성MCT (오션비스타제주)
+        durationMin: 390,
+      },
+    ],
+    adAfterKey: "from-wando",   // 목포·완도 = 편수 상위 2개 뒤 단락 구분점
+    metaDescription: "제주도 배편 총정리 — 목포·완도·진도·녹동·삼천포 출발 제주행 여객선 시간표·결항 현황·날씨",
   },
 }

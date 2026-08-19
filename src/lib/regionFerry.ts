@@ -141,11 +141,15 @@ export async function getRegionStatusSummaries(config: RegionConfig): Promise<Di
     const hopOf = (k: string) => hops.find((h) => `hop-${h.key}` === k)
     const depKey = (it: MtisItem) => depGroupKey(it) ?? hopKey(it)
     const depLabel = (k: string) => {
-      const g = grp(k); if (g) return `${config.name} → ${g.label}`
+      const g = grp(k); if (g) return config.inbound ? `${g.label} → ${config.name}` : `${config.name} → ${g.label}`
       const h = hopOf(k); if (h) return `${h.originName} → ${h.label}`
       return k
     }
-    const arrLabel = (k: string) => { const g = grp(k); return g ? `${g.label} → ${config.name}` : k }
+    const arrLabel = (k: string) => {
+      const g = grp(k)
+      if (!g) return k
+      return config.inbound ? `${config.name} → ${g.label}` : `${g.label} → ${config.name}`
+    }
     return {
       dep: statusSummary(items, depKey, depLabel),
       arr: statusSummary(items, arrKey, arrLabel),
@@ -210,7 +214,9 @@ export async function getRoutesForRegion(
         const partial = status === "operating" ? partialCancelled(cancelled, dedup) : []
         return {
           id: `dep-${gk}`,
-          to: cfg.label,
+          // inbound(제주 등): cfg.label이 출발지다 → "완도 → 제주"로 그려야 한다.
+          // RouteItem은 from이 있으면 `from → to`로 렌더하므로 필드만 맞춰주면 된다.
+          ...(config.inbound ? { to: config.name, from: cfg.label } : { to: cfg.label }),
           operator: [...ships].join(" · "),
           times: dedup,
           status,
@@ -286,8 +292,8 @@ export async function getArrivalsForRegion(
         const partial = status === "operating" ? partialCancelled(cancelled, dedup) : []
         return {
           id: `arr-${gk}`,
-          to: config.name,
-          from: cfg.label,
+          // inbound면 "제주 → 완도" (제주에서 나오는 배)
+          ...(config.inbound ? { to: cfg.label, from: config.name } : { to: config.name, from: cfg.label }),
           operator: [...ships].join(" · "),
           times: dedup,
           status,
