@@ -392,28 +392,6 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
             )
           })()}
 
-          {/* 운임 요금 — 공식 링크 */}
-          {route.fareUrl && (
-            <a
-              href={route.fareUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-4 transition-opacity active:opacity-70"
-            >
-              <div className="flex items-center gap-3">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-slate-400" aria-hidden="true">
-                  <rect x="2" y="5" width="20" height="14" rx="2" />
-                  <path d="M2 10h20" />
-                </svg>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">운임 요금</p>
-                  <p className="text-base font-bold text-slate-800">공식 요금표 확인하기</p>
-                </div>
-              </div>
-              <span className="text-slate-400">→</span>
-            </a>
-          )}
-
           {/* 안내 문구 */}
           <p className="text-sm text-slate-400">
             {route.isLive
@@ -421,8 +399,39 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               : "참고용 시간표 · 실제 운항 여부는 공식 채널에서 확인하세요"}
           </p>
 
-          {/* 예약 버튼 — 온라인 예매 노선만. 약산권 등 현장 발권 노선은 매표소 안내로 대체 */}
-          {route.noBooking ? (
+          {/* 보조 액션(운임·예약) — 이 화면의 주인공은 시간표다.
+              이전에는 운임 카드(py-4)와 예약 버튼(그라디언트 py-4 text-base)이 화면에서 가장 굵어
+              시선이 시간표를 지나 아래로 끌려갔다. 한 줄로 합치고 무게를 낮춘다.
+              예약은 여전히 주 동선이라 solid를 유지하되 크기만 줄이고, 운임은 외곽선으로 한 단계 아래에 둔다. */}
+          {(route.fareUrl || !route.noBooking) && (
+            <div className="flex gap-2">
+              {route.fareUrl && (
+                <a
+                  href={route.fareUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 active:opacity-70"
+                >
+                  운임 요금표
+                  <span aria-hidden="true">→</span>
+                </a>
+              )}
+              {!route.noBooking && (
+                <a
+                  href="https://island.theksa.co.kr/page/booking"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 active:opacity-80"
+                >
+                  해운조합 예약
+                  <span aria-hidden="true">→</span>
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* 현장 발권 노선(약산권 등) — 예약 버튼 대신 매표소 연락처 안내 */}
+          {route.noBooking && (
             route.bookingNote && (
               <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-4">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 text-slate-400" aria-hidden="true">
@@ -434,15 +443,6 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                 </div>
               </div>
             )
-          ) : (
-            <a
-              href="https://island.theksa.co.kr/page/booking"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full rounded-2xl bg-gradient-to-r from-blue-600 to-blue-700 py-4 text-center text-base font-bold text-white shadow-sm transition-opacity hover:opacity-90 active:opacity-80"
-            >
-              해운조합 승선 예약하기
-            </a>
           )}
         </div>
       </div>
