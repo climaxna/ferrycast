@@ -21,6 +21,7 @@ const FARE_URL_MAP: Record<string, string> = {
 // ────────────────────────────────────────────────
 interface DepGroupCfg {
   label: string; priority: number; terminal: string
+  note?: string   // 상세 화면 안내 (순환항로 등 노선 성격 설명)
   fareUrl?: string
   durationMin?: number  // TAGO 미등록 노선(청산농협 등) 도착시각 fallback용 소요시간(분)
 }
@@ -38,8 +39,10 @@ const DEP_CFG: Record<string, DepGroupCfg> = {
   // 편수가 적을수록 결항 한 번의 타격이 커서, 이 앱이 가장 필요한 노선이기도 하다.
   // 운임 링크는 걸지 않는다 — 공영여객선은 현장 발권이라 해운조합 예매 페이지에 없다.
   "yeoseodo":         { label: "여서도",           priority: 4, terminal: TERMINAL_MAIN },
-  "modo":             { label: "모도",             priority: 5, terminal: TERMINAL_MAIN },
-  "deokwoo":          { label: "덕우도·황제도",      priority: 6, terminal: TERMINAL_MAIN },
+  "modo":             { label: "모도",             priority: 5, terminal: TERMINAL_MAIN,
+    note: "완도항에서 출발해 모도를 다녀오는 순환 항로입니다. 같은 배로 되돌아오기 때문에 '모도 → 완도' 편이 따로 없습니다." },
+  "deokwoo":          { label: "덕우도·황제도",      priority: 6, terminal: TERMINAL_MAIN,
+    note: "완도항에서 출발해 덕우도·황제도를 돌아오는 순환 항로입니다. 같은 배로 되돌아오기 때문에 돌아오는 편이 따로 없습니다." },
 }
 
 // 완도항 출발인데 MTIS에 순환(완도→완도)으로 등록돼 dest로는 목적지를 알 수 없는 노선.
@@ -171,6 +174,7 @@ export async function getWandoRoutes(): Promise<{ routes: WandoRoute[]; isLive: 
         const partial = status === "operating" ? partialCancelled(cancelled, dedup) : []
         return {
           id: `dep-${gk}`,
+          ...(cfg?.note ? { routeNote: cfg.note } : {}),
           to: cfg.label,
           operator: [...ships].join(" · "),
           times: dedup,

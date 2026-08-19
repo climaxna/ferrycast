@@ -169,6 +169,18 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
             </a>
           )}
 
+          {/* 노선 성격 안내 — 순환항로처럼 "돌아오는 편이 왜 없는지" 설명이 필요한 노선.
+              시간표 바로 위에 둬야 시간표를 보며 생기는 의문을 그 자리에서 해소한다. */}
+          {route.routeNote && (
+            <div className="flex gap-2.5 rounded-2xl bg-slate-50 px-4 py-3">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="mt-0.5 shrink-0 text-slate-400" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 16v-4M12 8h.01" />
+              </svg>
+              <p className="text-xs leading-relaxed text-slate-500">{route.routeNote}</p>
+            </div>
+          )}
+
           {/* 시간표 */}
           <div>
             <div className="mb-3 flex items-center justify-between gap-2">

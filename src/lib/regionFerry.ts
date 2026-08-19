@@ -214,6 +214,7 @@ export async function getRoutesForRegion(
         const partial = status === "operating" ? partialCancelled(cancelled, dedup) : []
         return {
           id: `dep-${gk}`,
+          ...(cfg.note ? { routeNote: cfg.note } : {}),
           // inbound(제주 등): cfg.label이 출발지다 → "완도 → 제주"로 그려야 한다.
           // RouteItem은 from이 있으면 `from → to`로 렌더하므로 필드만 맞춰주면 된다.
           ...(config.inbound ? { to: config.name, from: cfg.label } : { to: cfg.label }),

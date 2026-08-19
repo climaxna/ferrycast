@@ -34,5 +34,8 @@ export interface WandoRoute {
     tomorrow?: { tripCount: number; times: string[] }
   }
   noBooking?: boolean           // 온라인 예매 없음(현장 매표소 발권) → 해운조합 예약 버튼 숨김
+  // 노선 성격 안내 — 상세 화면 상단에 표시. 순환항로처럼 "돌아오는 편이 왜 없는지"를
+  // 설명해야 오해가 없는 노선에 쓴다(모도·덕우도·외달도 등).
+  routeNote?: string
   bookingNote?: string          // 예약 버튼 대체 안내 (예: "현장 매표소 발권 · 약산농협 061-553-9088")
 }

@@ -12,6 +12,7 @@ export interface RouteGroupConfig {
   seawayKeywords?: string[]
   depTerminal?: string        // 이 항로의 본항측 출발 터미널 (없으면 region.mainTerminal). 한 도시 여러 항 대응
   islandTerminal?: string     // 도착 탭 — 섬에서 타는 터미널
+  note?: string               // 상세 화면 안내 (순환항로 등 노선 성격 설명)
   fareUrl?: string
   fallbackDep?: string[]      // API 장애 시 정적 출발 시각
   fallbackArr?: string[]      // API 장애 시 정적 도착 시각
@@ -204,6 +205,7 @@ export const REGIONS: Record<string, RegionConfig> = {
         // 해수욕장이 있어 목포 시민·관광객 수요가 큰데 그동안 통째로 빠져 있었다.
         key: "oedaldo",
         label: "외달도·달리도",
+        note: "목포항에서 달리도·율도·외달도를 거쳐 다시 목포항으로 돌아오는 순회 항로입니다. 같은 배로 되돌아오기 때문에 돌아오는 편이 따로 없습니다.",
         depPortKeywords: ["목포"],
         destKeywords: ["외달"],
         seawayKeywords: ["외달"],
