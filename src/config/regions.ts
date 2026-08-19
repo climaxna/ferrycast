@@ -73,42 +73,63 @@ export interface RegionConfig {
 // ✅ MTIS depPortKeywords: 3개 지역 모두 실시간(LIVE) 매칭 확인
 // ──────────────────────────────────────────────────────────────
 export const REGIONS: Record<string, RegionConfig> = {
-  pohang: {
-    slug: "pohang",
-    name: "포항",
-    weatherGrid: { nx: 102, ny: 94 },  // 포항시 KMA 격자 (LCC 변환 검증)
-    seaGrids: [{ nx: 103, ny: 95 }, { nx: 104, ny: 94 }, { nx: 104, ny: 95 }],  // 동해 WAV 수신 셀(검증)
-    tidalObsCode: null,  // 포항 전용 KHOA 관측소 없음 + 동해안 조차 미미 → 조석 비표시
-    mainTerminal: "포항여객선터미널",
-    // ⚠️ 포항권은 출발항이 둘 — MTIS oport_nm: "포항"(주간 도동) / "영일만신항"(야간 사동)
-    //    "영일만신항"은 "포항"을 include 하지 않으므로 반드시 별도 그룹으로 잡아야 야간편이 누락되지 않음 (실데이터 검증)
+  // ── 목적지 허브 탭 (구 포항 탭을 흡수) ────────────────────────
+  // 포항 페이지의 노선은 전부 울릉도행이라 울릉도 탭이 포항 탭을 완전히 포함한다.
+  // 탭을 6개로 늘리지 않으면서 강릉·묵호(강원권, 포항권보다 편수가 많다)를 담을 수 있다.
+  // /pohang은 next.config.ts에서 /ulleung으로 301 리다이렉트한다(QR·블로그 링크 보호).
+  ulleung: {
+    slug: "ulleung",
+    name: "울릉도",
+    weatherGrid: { nx: 127, ny: 127 },   // 울릉도 (초단기실황 수신 검증)
+    seaGrids: [{ nx: 126, ny: 127 }, { nx: 128, ny: 127 }, { nx: 127, ny: 126 }],  // 동해 WAV 수신 셀(검증)
+    tidalObsCode: null,   // 울릉도 전용 KHOA 예보지점 없음 + 동해 조차 미미 → 조석 비표시 (포항과 동일)
+    mainTerminal: "울릉 도동여객선터미널",
+    inbound: true,
+    // 출발항 4곳 → 울릉도. label=출발항, islandTerminal=도착하는 울릉 항구.
+    // 출발항마다 도착 항구가 다르다(도동·저동·사동) — 섬 반대편이라 상세에서 확인이 중요하다.
     routeGroups: [
       {
-        key: "ulleung-dodong",
-        label: "울릉도(도동)",
-        depPortKeywords: ["포항"],
-        destKeywords: ["울릉"],   // "포항"발은 dest="울릉" — 영일만발(dest="울릉(사동)")은 dep 불일치로 안 걸림
-        depTerminal: "포항여객선터미널",        // 구항 (대저페리 엘도라도익스프레스)
-        islandTerminal: "울릉도 도동여객선터미널",
-        fareUrl: "https://island.theksa.co.kr/page/booking",  // 해운조합 통합 예매
-        fallbackDep: ["09:50"],
-        fallbackArr: ["14:20"],
-        durationMin: 270,  // 09:50→14:20 기준 (4시간 30분)
+        key: "from-mukho",
+        label: "묵호(동해)",
+        depPortKeywords: ["묵호"],
+        destKeywords: ["울릉", "도동"],
+        depTerminal: "묵호항여객선터미널",
+        islandTerminal: "울릉 도동여객선터미널",
+        fareUrl: "https://island.theksa.co.kr/page/booking",
       },
       {
-        key: "ulleung-sadong",
-        label: "울릉도(사동)",
-        depPortKeywords: ["영일만"],   // MTIS oport_nm="영일만신항"
-        destKeywords: ["사동"],        // dest="울릉(사동)"
-        depTerminal: "포항항국제여객터미널",      // 영일만항/영일만신항 (울릉크루즈 뉴씨다오펄 카페리)
-        islandTerminal: "울릉 사동항여객선터미널",  // 울릉신항
+        key: "from-gangneung",
+        label: "강릉",
+        depPortKeywords: ["강릉"],
+        destKeywords: ["울릉", "저동"],
+        depTerminal: "강릉항여객터미널",
+        islandTerminal: "울릉 저동항여객선터미널",
+        fareUrl: "https://island.theksa.co.kr/page/booking",
+      },
+      {
+        key: "from-pohang",
+        label: "포항",
+        depPortKeywords: ["포항"],
+        destKeywords: ["울릉"],
+        depTerminal: "포항여객선터미널",          // 구항 (대저페리 엘도라도익스프레스)
+        islandTerminal: "울릉 도동여객선터미널",
+        fareUrl: "https://island.theksa.co.kr/page/booking",
+        durationMin: 270,   // 09:50→14:20
+      },
+      {
+        // "영일만신항"은 "포항"을 include 하지 않아 반드시 별도 그룹이어야 야간편이 안 빠진다(실데이터 검증)
+        key: "from-yeongilman",
+        label: "영일만신항(포항)",
+        depPortKeywords: ["영일만"],
+        destKeywords: ["사동", "울릉"],
+        depTerminal: "포항항국제여객터미널",
+        islandTerminal: "울릉 사동항여객선터미널",
         fareUrl: "https://www.ulcruise.co.kr",   // 울릉크루즈 공식
-        fallbackDep: ["23:00"],
-        fallbackArr: ["12:20"],
-        durationMin: 810,  // 23:00→12:20 야간 기준 (13시간 20분)
+        durationMin: 810,   // 23:00→12:20 야간
       },
     ],
-    metaDescription: "포항·영일만항 울릉도(도동·사동) 여객선 시간표·운항 현황·날씨. 울릉도→독도 배편 포함",
+    adAfterKey: "from-gangneung",   // 묵호·강릉 = 편수 상위 2개 뒤 단락 구분점
+    metaDescription: "울릉도 배편 총정리 — 묵호·강릉·포항·영일만항 출발 울릉도 여객선 시간표·결항 현황·날씨. 울릉도→독도 배편 포함",
     train: {
       stationName: "포항역",
       localName: "포항",
@@ -116,7 +137,7 @@ export const REGIONS: Record<string, RegionConfig> = {
       hubName: "서울",
       hubId: "NAT010000",
       fareHint: 53600,
-      bookingUrl: "https://www.korail.com/ticket/search/general",  // 신버전 예매 검색 폼(letskorail 레거시 폐지)
+      bookingUrl: "https://www.korail.com/ticket/search/general",
     },
     // 울릉도 → 독도 (순환항로 — MTIS oport=dest="울릉(저동/사동)", 독도는 nvg_seawy_nm에만)
     islandHops: [
