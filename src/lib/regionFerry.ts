@@ -86,7 +86,9 @@ function makeStaticDep(config: RegionConfig): WandoRoute[] {
     .filter((g) => g.fallbackDep?.length)
     .map((g) => ({
       id: `dep-${g.key}`,
-      to: g.label,
+      // 순환항로 안내는 API 상태와 무관한 사실이라 정적 fallback에서도 유지한다
+      ...(g.note ? { routeNote: g.note } : {}),
+      ...(config.inbound ? { to: config.name, from: g.label } : { to: g.label }),
       operator: "",
       times: g.fallbackDep!,
       status: "unknown" as RouteStatus,
@@ -103,8 +105,7 @@ function makeStaticArr(config: RegionConfig): WandoRoute[] {
     .filter((g) => g.fallbackArr?.length)
     .map((g) => ({
       id: `arr-${g.key}`,
-      to: config.name,
-      from: g.label,
+      ...(config.inbound ? { to: g.label, from: config.name } : { to: config.name, from: g.label }),
       operator: "",
       times: g.fallbackArr!,
       status: "unknown" as RouteStatus,
