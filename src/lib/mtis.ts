@@ -149,10 +149,20 @@ export function nextDay(date: string): string {
 // 조회 + 캐시
 // ────────────────────────────────────────────────
 
+// data.go.kr은 **초당** 요청 제한이 있다(초과 시 HTTP 429
+// "LIMITED_NUMBER_OF_SERVICE_REQUESTS_PER_SECOND_EXCEEDS_ERROR").
+// 빌드 때 여러 지역 페이지가 동시에 렌더되면 순간적으로 이 한도를 넘어 MTIS가 빈 응답이 되고,
+// 그 결과가 ISR에 굳어 **전 지역이 정적 fallback("참고 시간표")으로 서비스**된다(2026.08 실장애).
+// 시간표는 이 앱의 본 정보라 몇 백 ms 기다려서라도 받아내는 편이 옳다.
+const MTIS_RETRY = 3
+const MTIS_RETRY_MS = 500
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
 async function fetchMtisPage(
   key: string,
   date: string,
   pageNo: number,
+  attempt = 0,
 ): Promise<{ items: MtisItem[]; totalCount: number }> {
   const params = new URLSearchParams({
     serviceKey: key, pageNo: String(pageNo), numOfRows: String(MTIS_PAGE_SIZE),
@@ -167,8 +177,13 @@ async function fetchMtisPage(
     console.error(`[mtis] ${date} p${pageNo} fetch 실패(네트워크·타임아웃):`, e)
     return empty
   }
+  if (res.status === 429 && attempt < MTIS_RETRY) {
+    // 초당 제한 — 점진적으로 물러섰다가 재시도 (500ms, 1000ms, 1500ms)
+    await sleep(MTIS_RETRY_MS * (attempt + 1))
+    return fetchMtisPage(key, date, pageNo, attempt + 1)
+  }
   if (!res.ok) {
-    console.error(`[mtis] ${date} p${pageNo} HTTP ${res.status} ${res.statusText}`)
+    console.error(`[mtis] ${date} p${pageNo} HTTP ${res.status} ${res.statusText}${res.status === 429 ? " (초당 요청제한 — 재시도 모두 실패)" : ""}`)
     return empty
   }
   // 쿼터 초과 시 JSON이 아닌 plain text("API token quota exceeded")를 반환 → 파싱 가드
@@ -199,13 +214,11 @@ async function fetchMtisAll(key: string, date: string): Promise<MtisItem[]> {
   const first = await fetchMtisPage(key, date, 1)
   const items = [...first.items]
   const totalPages = Math.min(Math.ceil(first.totalCount / MTIS_PAGE_SIZE), MTIS_MAX_PAGES)
-  if (totalPages > 1) {
-    const rest = await Promise.allSettled(
-      Array.from({ length: totalPages - 1 }, (_, i) => fetchMtisPage(key, date, i + 2)),
-    )
-    for (const r of rest) {
-      if (r.status === "fulfilled") items.push(...r.value.items)
-    }
+  // 나머지 페이지는 **순차** 호출 — 동시에 던지면 초당 제한에 걸려 첫 페이지까지 말린다.
+  // numOfRows=2000이라 보통 1페이지로 끝나므로 실사용에서 지연은 거의 없다.
+  for (let pageNo = 2; pageNo <= totalPages; pageNo++) {
+    const page = await fetchMtisPage(key, date, pageNo)
+    items.push(...page.items)
   }
   return items
 }

@@ -173,7 +173,10 @@ export async function getRoutesForRegion(
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const depNodeNames = await findPortNames(depKeywords(config))
+    // 목적지 허브(제주·울릉도)는 출발항이 5곳이라 TAGO 노드가 수십 개로 불어난다.
+    // 도착 예정시각(부가 정보)을 얻으려다 API 키를 소진해 시간표(본 정보)를 잃는 건 손해다.
+    // 이들 노선은 장거리 정기항로라 config의 durationMin으로 대체할 수 있다.
+    const depNodeNames = config.inbound ? [] : await findPortNames(depKeywords(config))
     const [items, tomorrowData, arrLookup] = await Promise.all([
       getMtisDay(key, date),
       fetchTomorrowData(key, date, depGroupKey),
@@ -255,7 +258,7 @@ export async function getArrivalsForRegion(
 
   try {
     const date = kst.toISOString().slice(0, 10).replace(/-/g, "")
-    const islandNodeNames = await findPortNames(destKeywords(config))
+    const islandNodeNames = config.inbound ? [] : await findPortNames(destKeywords(config))
     const [items, tomorrowData, arrLookup] = await Promise.all([
       getMtisDay(key, date),
       fetchTomorrowData(key, date, arrGroupKey),

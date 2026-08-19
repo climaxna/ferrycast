@@ -12,6 +12,12 @@ import { cache } from "react"
 
 const TAGO_BASE = "https://apis.data.go.kr/1613000/DmstcShipNvgInfo"
 
+// 도착 예정시각 enrich에 쓸 TAGO 노드 최대 개수(지역·방향당).
+// 키워드 부분일치라 노드가 예상 밖으로 불어난다(예: "진도" → 잠진도·비진도까지 매칭).
+const MAX_ARRIVAL_NODES = 8
+// 한 번에 던질 TAGO 요청 수 (초당 제한 회피)
+const ARRIVAL_CONCURRENCY = 3
+
 interface TagoItem {
   depPlaceNm: string
   arrPlaceNm: string
@@ -113,15 +119,26 @@ export async function buildArrivalLookup(
   groupOf: (depNm: string, arrNm: string) => string | null,
 ): Promise<(groupKey: string, times: string[], allowedShips?: string[]) => Record<string, string>> {
   const portMap = await getPortNodeMap()
-  const nodeIds = nodeNames
+  const allIds = nodeNames
     .map((n) => portMap.get(n))
     .filter((id): id is string => !!id)
+  // ⚠️ 노드 수 상한 — 아래 Promise.allSettled가 노드를 **전부 동시에** 호출한다.
+  // MTIS와 같은 API 키를 쓰므로 여기서 폭주하면 rate limit에 걸려 **MTIS 시간표까지 빈 응답**이 되고
+  // 전 지역이 정적 fallback("참고 시간표")으로 떨어진다(2026.08 실제 장애).
+  // 도착 예정시각은 부가 정보이니, 상한을 넘으면 잘라서 본 정보를 지킨다.
+  const nodeIds = allIds.slice(0, MAX_ARRIVAL_NODES)
 
   // groupKey → [{ depMin, arr, ship }]
   const byGroup: Record<string, Array<{ depMin: number; arr: string; ship: string }>> = {}
 
   if (nodeIds.length) {
-    const results = await Promise.allSettled(nodeIds.map((id) => getNodeDepartures(id, date)))
+    // 동시 호출 수 제한 — 전부 한꺼번에 던지면 초당 요청제한에 걸리고,
+    // 같은 키를 쓰는 MTIS(본 정보)까지 429로 막힌다. 도착 예정시각은 부가 정보라 양보한다.
+    const results: PromiseSettledResult<TagoItem[]>[] = []
+    for (let i = 0; i < nodeIds.length; i += ARRIVAL_CONCURRENCY) {
+      const chunk = nodeIds.slice(i, i + ARRIVAL_CONCURRENCY)
+      results.push(...(await Promise.allSettled(chunk.map((id) => getNodeDepartures(id, date)))))
+    }
     for (const r of results) {
       if (r.status !== "fulfilled") continue
       for (const it of r.value) {
