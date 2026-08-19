@@ -110,12 +110,14 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               href={`https://map.kakao.com/?q=${encodeURIComponent(route.originName ? route.terminal : isAltTerminal ? "완도 화흥포항" : "완도여객선터미널")}`}
               target="_blank"
               rel="noopener noreferrer"
+              // 도착 탭의 터미널 카드는 원래 파란색인데 출발 쪽만 회색이라 어긋나 있었다.
+              // 방향 테마(accent)를 입혀 양쪽을 맞춘다. 화흥포처럼 다른 터미널이면 amber 경고색이 우선.
               className={`flex items-start gap-3 rounded-2xl px-4 py-4 transition-opacity active:opacity-70 ${
-                isAltTerminal ? "bg-amber-50" : "bg-slate-50"
+                isAltTerminal ? "bg-amber-50" : theme.badgeSoft
               }`}
             >
               <svg
-                className={`mt-0.5 shrink-0 ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}
+                className={`mt-0.5 shrink-0 ${isAltTerminal ? "text-amber-600" : theme.label}`}
                 width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                 aria-hidden="true"
               >
@@ -124,10 +126,10 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               </svg>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className={`text-base font-bold ${isAltTerminal ? "text-amber-800" : "text-slate-700"}`}>
+                  <p className={`text-base font-bold ${isAltTerminal ? "text-amber-800" : ""}`}>
                     {originName} 출발 · {route.terminal}
                   </p>
-                  <span className={`shrink-0 text-xs font-medium ${isAltTerminal ? "text-amber-600" : "text-slate-400"}`}>
+                  <span className={`shrink-0 text-xs font-medium ${isAltTerminal ? "text-amber-600" : theme.rel}`}>
                     지도 보기 →
                   </span>
                 </div>
