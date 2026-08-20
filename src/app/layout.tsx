@@ -16,8 +16,10 @@ const pretendard = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ferrycast.kr"),
-  title: "FerryCast — 완도 여객선 정보",
-  description: "완도 날씨·조석·항로 시간표·운항 현황을 한 화면에",
+  // 서비스가 완도 전용에서 전국(완도·울릉도·목포·인천·제주)으로 넓어져 문구를 전국 기준으로 바꿨다.
+  // 링크 미리보기(카톡·블로그)에 그대로 노출되는 문장이라 "완도"로 좁히면 다른 지역 공유가 어색해진다.
+  title: "FerryCast — 실시간 여객선 정보",
+  description: "전국 여객선 시간표·결항 현황을 한 화면에 · 완도 · 울릉도 · 목포 · 인천 · 제주",
   manifest: "/manifest.json",
   alternates: {
     canonical: "/",
@@ -25,8 +27,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "FerryCast",
-    title: "FerryCast — 완도 여객선 정보",
-    description: "완도 날씨·조석·항로 시간표·운항 현황을 한 화면에",
+    title: "FerryCast — 실시간 여객선 정보",
+    description: "전국 여객선 시간표·결항 현황을 한 화면에 · 완도 · 울릉도 · 목포 · 인천 · 제주",
     url: "https://ferrycast.kr",
     locale: "ko_KR",
     // og:image 고정 — 미지정 시 카카오·네이버가 페이지의 광고 배너 등 큰 이미지를 임의로 긁어감

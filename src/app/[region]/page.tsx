@@ -31,7 +31,9 @@ export async function generateMetadata({
   if (!config) return {}
   // 링크 미리보기(카톡·블로그·네이버)는 <title>이 아닌 og:title/og:description을 읽는다.
   // openGraph를 지역별로 덮어쓰지 않으면 루트 layout의 완도 OG가 그대로 노출된다.
-  const title = `FerryCast — ${config.name} 날씨·항로 현황`
+  // 루트와 같은 틀("실시간 여객선 정보")을 쓰되 지역명은 남긴다 —
+  // 목포 링크를 공유했는데 제목에 목포가 없으면 어느 지역인지 알 수 없고, 검색 식별도 흐려진다.
+  const title = `FerryCast — ${config.name} 실시간 여객선 정보`
   const url = `https://ferrycast.kr/${config.slug}`
   return {
     title,

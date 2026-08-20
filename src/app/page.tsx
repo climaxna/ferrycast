@@ -11,9 +11,12 @@ import RegionNav from "@/components/RegionNav"
 // Vercel ISR Writes 절감을 위해 600초(10분)로. 상대시간 카운트다운은 클라이언트가 60초마다 갱신.
 export const revalidate = 600
 
+// 브라우저 탭 제목·검색 결과용. og(링크 미리보기)는 layout.tsx가 담당한다.
+// 루트는 전국 진입점이면서 화면 내용은 완도라, 제목은 전국 틀로 통일하고
+// 완도 키워드는 description에 남겨 "완도 배편" 검색 유입을 지킨다.
 export const metadata = {
-  title: "FerryCast — 완도 날씨·항로 현황",
-  description: "완도 현재 날씨와 여객선 출발·도착 시간표·운항 현황을 한눈에",
+  title: "FerryCast — 실시간 여객선 정보",
+  description: "완도·울릉도·목포·인천·제주 여객선 시간표와 결항 현황을 실시간으로. 완도 날씨·조석 정보 포함",
 }
 
 function WeatherSkeleton() {
