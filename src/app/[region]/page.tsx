@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { REGIONS } from "@/config/regions"
+import { OG_TITLE, OG_DESCRIPTION } from "@/lib/seo"
 import { getWeatherForRegion } from "@/lib/regionWeather"
 import { getTidalForRegion, get5DayTidalForRegion } from "@/lib/regionTide"
 import { get5DayForecastForRegion } from "@/lib/regionForecast"
@@ -31,8 +32,9 @@ export async function generateMetadata({
   if (!config) return {}
   // 링크 미리보기(카톡·블로그·네이버)는 <title>이 아닌 og:title/og:description을 읽는다.
   // openGraph를 지역별로 덮어쓰지 않으면 루트 layout의 완도 OG가 그대로 노출된다.
-  // 루트와 같은 틀("실시간 여객선 정보")을 쓰되 지역명은 남긴다 —
-  // 목포 링크를 공유했는데 제목에 목포가 없으면 어느 지역인지 알 수 없고, 검색 식별도 흐려진다.
+  // <title>(브라우저 탭·검색 결과)만 지역별로 다르게 둔다. 5개 페이지가 같은 제목이면
+  // 검색엔진이 중복 문서로 보고 색인에서 빼거나 제목을 임의로 고쳐 쓴다.
+  // 링크 미리보기(og)는 지역 구분 없이 OG_TITLE로 통일한다 — 공유 시 브랜드를 한 문장으로.
   const title = `FerryCast — ${config.name} 실시간 여객선 정보`
   const url = `https://ferrycast.kr/${config.slug}`
   return {
@@ -42,8 +44,8 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       siteName: "FerryCast",
-      title,
-      description: config.metaDescription,
+      title: OG_TITLE,
+      description: OG_DESCRIPTION,
       url,
       locale: "ko_KR",
       // og:image 고정 — 미지정 시 카카오·네이버가 페이지의 광고 배너를 썸네일로 긁어가는 문제 방지

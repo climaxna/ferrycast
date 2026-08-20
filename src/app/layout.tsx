@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next"
+import { OG_TITLE, OG_DESCRIPTION } from "@/lib/seo"
 import localFont from "next/font/local"
 import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
@@ -27,8 +28,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "FerryCast",
-    title: "FerryCast — 실시간 여객선 정보",
-    description: "전국 여객선 시간표·결항 현황을 한 화면에 · 완도 · 울릉도 · 목포 · 인천 · 제주",
+    title: OG_TITLE,
+    description: OG_DESCRIPTION,
     url: "https://ferrycast.kr",
     locale: "ko_KR",
     // og:image 고정 — 미지정 시 카카오·네이버가 페이지의 광고 배너 등 큰 이미지를 임의로 긁어감
