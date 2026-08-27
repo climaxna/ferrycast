@@ -62,11 +62,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko" className={pretendard.variable}>
       <head>
-        {/* Google AdSense — 사이트 소유권 확인 + 광고 게재 (계정 심사용). ads.txt는 public/ads.txt */}
-        <Script
-          id="adsbygoogle-init"
+        {/* Google AdSense — 사이트 소유권 확인 + 광고 게재 (계정 심사용). ads.txt는 public/ads.txt.
+            ⚠️ next/script(afterInteractive)는 SSR HTML에 실제 <script>가 아니라 <link rel=preload>만
+            남겨, JS 미실행 크롤러(애드센스 검증기)가 스니펫을 못 찾아 "사이트 확인 불가"가 났다.
+            애드센스 안내 그대로 원문 <script>를 <head>에 직접 둔다(React 19가 head로 hoist). */}
+        <script
+          async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7390425487878895"
-          strategy="afterInteractive"
           crossOrigin="anonymous"
         />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-NNK3PPZZRT" strategy="afterInteractive" />
