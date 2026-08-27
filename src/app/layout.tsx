@@ -62,6 +62,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko" className={pretendard.variable}>
       <head>
+        {/* Google AdSense — 사이트 소유권 확인 + 광고 게재 (계정 심사용). ads.txt는 public/ads.txt */}
+        <Script
+          id="adsbygoogle-init"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7390425487878895"
+          strategy="afterInteractive"
+          crossOrigin="anonymous"
+        />
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-NNK3PPZZRT" strategy="afterInteractive" />
         <Script id="ga4-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html:
           `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-NNK3PPZZRT');`
