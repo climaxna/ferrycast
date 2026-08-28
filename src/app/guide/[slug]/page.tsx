@@ -81,7 +81,7 @@ export default async function GuidePage({
             ←
           </Link>
           <div className="min-w-0">
-            <p className="truncate text-base font-bold leading-tight text-slate-900">{guide.destination} 가는 법</p>
+            <p className="truncate text-base font-bold leading-tight text-slate-900">{guide.title.split(" — ")[0]}</p>
             <p className="mt-0.5 text-xs font-medium tracking-wide text-slate-400">
               Ferry<span className="text-blue-600">Cast</span> · {guide.regionName}
             </p>
@@ -169,6 +169,26 @@ export default async function GuidePage({
             {tt.note && <p className="mt-1.5 text-xs leading-relaxed text-slate-400">{tt.note}</p>}
           </section>
         ))}
+
+        {/* 출발지별 상세 — 허브 총정리(제주도 배편 등) → 개별 노선 가이드로 연결 */}
+        {guide.relatedGuides && guide.relatedGuides.length > 0 && (
+          <section>
+            <h2 className="mb-2 text-sm font-bold text-slate-700">출발지별 상세 시간표</h2>
+            <ul className="space-y-2">
+              {guide.relatedGuides.map((r) => (
+                <li key={r.href}>
+                  <Link
+                    href={r.href}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-sm transition-colors hover:border-blue-200"
+                  >
+                    <span className="text-sm font-semibold text-slate-700">{r.label}</span>
+                    <span className="text-slate-300" aria-hidden="true">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* 연락처 */}
         {guide.contacts && guide.contacts.length > 0 && (

@@ -30,6 +30,11 @@ export interface GuideFaq {
   a: string
 }
 
+export interface GuideLink {
+  label: string
+  href: string
+}
+
 export interface Guide {
   slug: string          // 예: "wando-cheongsando"
   regionSlug: string    // "" = 완도(메인), 그 외 REGIONS 키
@@ -40,7 +45,7 @@ export interface Guide {
   keywords: string[]     // 검색 의도 키워드(문장에 자연스럽게 반영)
   liveHref: string       // 실시간 화면 경로 ("/" 또는 "/incheon")
   // 실시간 위젯 매칭용 MTIS 그룹키. 실시간 route.id = `dep-${liveGroupKey}`.
-  // 없으면(예: 약산 섬↔섬 집계) 인라인 위젯 대신 실시간 화면 링크만 노출.
+  // 없으면(예: 약산 섬↔섬 집계, 허브 총정리) 인라인 위젯 대신 실시간 화면 링크만 노출.
   liveGroupKey?: string
   updated: string        // 콘텐츠 최신화 시점 "2026-08"
   intro: string[]        // 도입 문단(검색 스니펫·본문)
@@ -51,6 +56,7 @@ export interface Guide {
   faqs: GuideFaq[]
   bookingUrl?: string
   bookingNote?: string
+  relatedGuides?: GuideLink[]  // 허브 총정리 페이지 → 출발지별 상세 가이드 내부 링크
 }
 
 const UPDATED = "2026-08"
@@ -64,10 +70,10 @@ const WANDO_GUIDES: Guide[] = [
     regionName: "완도",
     destination: "청산도",
     liveGroupKey: "cheongsando",
-    title: "완도에서 청산도 가는 법 — 배 시간표·요금·소요시간",
+    title: "완도 청산도 배편 — 시간표·요금·소요시간",
     description:
-      "완도항에서 청산도(슬로시티) 가는 여객선 시간표, 요금, 소요시간(약 50분), 매표소 연락처 안내. 오늘 운항·결항 여부는 실시간으로 확인하세요.",
-    keywords: ["완도 청산도 배", "청산도 배 시간표", "청산도 여객선", "청산도 가는 법", "완도 청산도 요금"],
+      "완도항에서 청산도(슬로시티) 가는 배편(여객선) 시간표, 요금, 소요시간(약 50분), 매표소 연락처 안내. 오늘 운항·결항 여부는 실시간으로 확인하세요.",
+    keywords: ["청산도 배편", "완도 청산도 배편", "완도 청산도 배", "청산도 배 시간표", "청산도 여객선", "청산도 가는 법"],
     liveHref: "/",
     updated: UPDATED,
     intro: [
@@ -138,10 +144,10 @@ const WANDO_GUIDES: Guide[] = [
     regionName: "완도",
     destination: "소안도·보길도·노화도",
     liveGroupKey: "hwaheungpo-route",
-    title: "완도(화흥포)에서 소안도·보길도·노화도 가는 법 — 배 시간표·요금",
+    title: "완도 소안도·보길도·노화도 배편 — 시간표·요금",
     description:
-      "완도 화흥포항에서 노화도(동천)·소안도 가는 여객선 시간표, 요금, 매표소 연락처. 보길도는 노화도에서 연도교로 연결됩니다. 오늘 운항 여부는 실시간으로 확인하세요.",
-    keywords: ["완도 소안도 배", "화흥포 소안도", "보길도 가는 법", "노화도 배 시간표", "완도 보길도 배"],
+      "완도 화흥포항에서 노화도(동천)·소안도 가는 배편(여객선) 시간표, 요금, 매표소 연락처. 보길도는 노화도에서 연도교로 연결됩니다. 오늘 운항 여부는 실시간으로 확인하세요.",
+    keywords: ["소안도 배편", "보길도 배편", "노화도 배편", "완도 소안도 배", "화흥포 소안도", "보길도 가는 법", "노화도 배 시간표"],
     liveHref: "/",
     updated: UPDATED,
     intro: [
@@ -212,10 +218,10 @@ const WANDO_GUIDES: Guide[] = [
     regionSlug: "",
     regionName: "완도",
     destination: "금일도·생일도 (약산 당목항)",
-    title: "약산 당목항에서 금일도·생일도 가는 법 — 섬↔섬 배 시간표",
+    title: "약산 당목항 금일도·생일도 배편 — 섬↔섬 시간표",
     description:
-      "완도군 약산도 당목항에서 금일도(일정항)·생일도(서성항) 가는 차도선 시간표와 연락처. 완도 본항을 거치지 않는 섬↔섬 노선입니다.",
-    keywords: ["약산 금일도 배", "당목항 시간표", "생일도 가는 법", "금일도 배 시간표", "약산 당목항 차도선"],
+      "완도군 약산도 당목항에서 금일도(일정항)·생일도(서성항) 가는 배편(차도선) 시간표와 연락처. 완도 본항을 거치지 않는 섬↔섬 노선입니다.",
+    keywords: ["금일도 배편", "생일도 배편", "약산 금일도 배", "당목항 시간표", "생일도 가는 법", "금일도 배 시간표", "약산 당목항 차도선"],
     liveHref: "/",
     updated: UPDATED,
     intro: [
@@ -273,11 +279,29 @@ const WANDO_GUIDES: Guide[] = [
 
 // ── 타 지역 — config에서 파생한 요약 가이드 (시간표는 지어내지 않음) ────────────────
 
+// 일부 실제 항로는 REGIONS에 두 번 등록된다 — 예: 목포↔제주는 mokpo.routeGroups(제주
+// 도착 관점, 목포 탭에서 안 뺀다)와 jeju.routeGroups(제주 허브, 목포 출발 관점) 양쪽에
+// 다 있다. 의도적 중복(CLAUDE.md: "완도·목포 탭의 제주는 빼지 않는다")이지만, 가이드까지
+// 두 번 만들면 같은 항로가 제목·내용이 겹치는 두 페이지로 색인돼 검색엔진에 중복 콘텐츠로
+// 잡힌다. 나중에 생성되는 쪽(허브의 routeGroup)을 건너뛰고, 이미 존재하는 슬러그로 연결한다.
+// key: `${허브 config.slug}-${routeGroup.key}` → value: 그 항로의 실제(살아남는) 가이드 슬러그.
+const DUPLICATE_ROUTE_SLUGS: Record<string, string> = {
+  "jeju-from-mokpo": "mokpo-jeju",
+}
+
 function regionGuidesFrom(config: RegionConfig): Guide[] {
-  return config.routeGroups.map((g: RouteGroupConfig) => {
+  return config.routeGroups
+    .filter((g) => !(`${config.slug}-${g.key}` in DUPLICATE_ROUTE_SLUGS))
+    .map((g: RouteGroupConfig) => {
+    // ⚠️ 방향 주의 — config.inbound(제주·울릉도 허브)는 출발항 여러 곳 → 목적지 1곳이라
+    // routeGroup.label이 목적지가 아니라 **출발지**를 뜻한다(config/regions.ts 상단 주석 참고).
+    // 이걸 안 뒤집으면 "제주에서 목포 가는 법"처럼 방향이 거꾸로 나온다.
+    const origin = config.inbound ? g.label : config.name
+    const destination = config.inbound ? config.name : g.label
     const terminal = g.depTerminal ?? config.mainTerminal
+
     const facts: GuideFact[] = [
-      { label: "출발 지역", value: config.name },
+      { label: "출발 지역", value: origin },
       { label: "출발 터미널", value: terminal },
     ]
     if (g.islandTerminal) facts.push({ label: "도착 터미널", value: g.islandTerminal })
@@ -293,34 +317,35 @@ function regionGuidesFrom(config: RegionConfig): Guide[] {
       slug: `${config.slug}-${g.key}`,
       regionSlug: config.slug,
       regionName: config.name,
-      destination: g.label,
+      destination,
       liveGroupKey: g.key,
-      title: `${config.name}에서 ${g.label} 가는 법 — 배 시간표·운항 현황`,
-      description: `${config.name}에서 ${g.label} 가는 여객선 출발 터미널·대표 시간·예매 안내. 오늘 실제 운항·결항 여부는 FerryCast 실시간 화면에서 확인하세요.`,
+      title: `${origin} ${destination} 배편 — 시간표·운항 현황`,
+      description: `${origin}에서 ${destination} 가는 배편(여객선) 출발 터미널·대표 시간·예매 안내. 오늘 실제 운항·결항 여부는 FerryCast 실시간 화면에서 확인하세요.`,
       keywords: [
-        `${config.name} ${g.label} 배`,
-        `${g.label} 배 시간표`,
-        `${g.label} 여객선`,
-        `${g.label} 가는 법`,
+        `${origin} ${destination} 배편`,
+        `${destination} 배편`,
+        `${origin} ${destination} 배`,
+        `${destination} 배 시간표`,
+        `${destination} 가는 배`,
       ],
       liveHref: `/${config.slug}`,
       updated: UPDATED,
       intro: [
-        `${g.label}행 여객선은 ${terminal}에서 출발합니다. 시간표는 계절·요일·기상에 따라 달라지므로, 아래 대표 정보를 참고하되 오늘 실제 출발 시각과 운항·결항 여부는 FerryCast ${config.name} 실시간 화면에서 확인하세요.`,
+        `${destination}행 여객선은 ${terminal}(${origin})에서 출발합니다. 시간표는 계절·요일·기상에 따라 달라지므로, 아래 대표 정보를 참고하되 오늘 실제 출발 시각과 운항·결항 여부는 FerryCast ${config.name} 실시간 화면에서 확인하세요.`,
         "기상 악화·조류 등으로 예고 없이 결항될 수 있으니, 출발 전 공식 예매처나 실시간 화면에서 반드시 최종 확인하시기 바랍니다.",
       ],
       facts,
       faqs: [
         {
-          q: `오늘 ${g.label} 배 뜨나요?`,
-          a: `FerryCast ${config.name} 실시간 화면에서 ${g.label} 항로의 오늘 운항·결항 상태를 바로 확인할 수 있습니다.`,
+          q: `오늘 ${origin}-${destination} 배편 뜨나요?`,
+          a: `FerryCast ${config.name} 실시간 화면에서 ${origin}-${destination} 항로의 오늘 운항·결항 상태를 바로 확인할 수 있습니다.`,
         },
         {
-          q: `${g.label} 배는 어디서 타나요?`,
-          a: `${terminal}에서 출발합니다.`,
+          q: `${destination} 가는 배는 어디서 타나요?`,
+          a: `${origin} ${terminal}에서 출발합니다.`,
         },
         {
-          q: `${g.label} 배 예매는 어떻게 하나요?`,
+          q: `${destination} 배편 예매는 어떻게 하나요?`,
           a: g.fareUrl
             ? "공식 예매 페이지에서 좌석·요금을 확인하고 예약할 수 있습니다. 일부 노선은 현장 매표소 발권만 가능합니다."
             : "한국해운조합 승선예약 또는 현장 매표소에서 발권합니다.",
@@ -331,9 +356,94 @@ function regionGuidesFrom(config: RegionConfig): Guide[] {
   })
 }
 
+// ── 목적지 허브(제주·울릉도) 총정리 — "제주도 배편"·"울릉도 배편"처럼 출발지를 특정하지
+// 않는 헤드 키워드 전용 페이지. 개별 노선 가이드(jeju-from-mokpo 등)는 "목포 제주 배편"
+// 같은 롱테일을 잡고, 이 페이지는 넓은 검색어와 내부 링크(→ 출발지별 상세)를 담당한다.
+function hubOverviewGuide(config: RegionConfig, hubKeyword: string, blurb: string): Guide {
+  const originLabels = config.routeGroups.map((g) => g.label)
+  const durationOf = (min?: number) => {
+    if (!min) return null
+    const h = Math.floor(min / 60)
+    const m = min % 60
+    return h ? (m ? `${h}시간 ${m}분` : `${h}시간`) : `${m}분`
+  }
+
+  return {
+    slug: config.slug,
+    regionSlug: config.slug,
+    regionName: config.name,
+    destination: config.name,
+    title: `${hubKeyword} 총정리 — 출발지별 시간표·소요시간 비교`,
+    description: `${hubKeyword} 총정리. ${originLabels.join("·")} 출발 ${config.name}행 여객선 시간표·소요시간·운항 현황을 한 화면에서 비교하세요.`,
+    keywords: [
+      hubKeyword,
+      `${config.name} 여객선`,
+      `${config.name} 가는 배`,
+      ...originLabels.map((o) => `${o} ${config.name} 배편`),
+    ],
+    liveHref: `/${config.slug}`,
+    updated: UPDATED,
+    intro: [
+      blurb,
+      `출발지마다 터미널·소요시간이 달라 아래 표에서 먼저 비교하고, 항로별 상세 시간표는 아래 링크에서 확인하세요. 오늘 실제 운항·결항 여부는 FerryCast ${config.name} 실시간 화면에서 출발지별로 한 번에 볼 수 있습니다.`,
+    ],
+    facts: [
+      { label: "출발지 수", value: `${originLabels.length}곳 (${originLabels.join("·")})` },
+      { label: "도착 터미널", value: config.mainTerminal },
+    ],
+    timetables: [
+      {
+        title: "출발지별 비교",
+        note: "실제 출발 시각·오늘 운항 여부는 각 출발지 상세 가이드 또는 실시간 화면에서 확인하세요.",
+        columns: ["출발지", "출발 터미널", "소요시간"],
+        rows: config.routeGroups.map((g) => [
+          g.label,
+          g.depTerminal ?? config.mainTerminal,
+          durationOf(g.durationMin) ?? "실시간 확인",
+        ]),
+      },
+    ],
+    faqs: [
+      {
+        q: `${config.name} 배편은 어디서 탈 수 있나요?`,
+        a: `${originLabels.join("·")} 등 ${originLabels.length}곳에서 출발합니다. 출발지별 터미널·소요시간은 위 표를 참고하세요.`,
+      },
+      {
+        q: `${config.name} 가는 배 중 어느 노선이 제일 빠른가요?`,
+        a: "출발지별 소요시간이 크게 다릅니다. 위 비교표에서 소요시간이 짧은 출발지를 확인하세요.",
+      },
+      {
+        q: `오늘 ${config.name} 배 뜨나요?`,
+        a: `FerryCast ${config.name} 실시간 화면에서 출발지별 오늘 운항·결항 상태를 한 번에 확인할 수 있습니다.`,
+      },
+    ],
+    relatedGuides: config.routeGroups.map((g) => {
+      const rawSlug = `${config.slug}-${g.key}`
+      const slug = DUPLICATE_ROUTE_SLUGS[rawSlug] ?? rawSlug
+      return { label: `${g.label} → ${config.name} 상세 시간표`, href: `/guide/${slug}` }
+    }),
+  }
+}
+
+const HUB_GUIDES: Guide[] = [
+  REGIONS.jeju &&
+    hubOverviewGuide(
+      REGIONS.jeju,
+      "제주도 배편",
+      "제주도行 여객선은 목포·완도·진도·녹동·삼천포 등 전국 여러 항구에서 출발합니다. 어느 항구에서 타든 도착은 제주항이지만, 출발지에 따라 소요시간과 운임이 크게 다릅니다.",
+    ),
+  REGIONS.ulleung &&
+    hubOverviewGuide(
+      REGIONS.ulleung,
+      "울릉도 배편",
+      "울릉도行 여객선은 묵호(동해)·강릉·포항·영일만신항에서 출발합니다. 출발항마다 도착하는 울릉도 내 항구(도동·저동·사동)도 달라, 숙소·일정에 맞는 출발지 선택이 중요합니다.",
+    ),
+].filter((g): g is Guide => Boolean(g))
+
 const REGION_GUIDES: Guide[] = Object.values(REGIONS).flatMap(regionGuidesFrom)
 
-export const GUIDES: Guide[] = [...WANDO_GUIDES, ...REGION_GUIDES]
+// 허브 총정리(제주도 배편·울릉도 배편)를 해당 지역 목록 맨 앞에 오도록 개별 노선 가이드보다 먼저 둔다.
+export const GUIDES: Guide[] = [...WANDO_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES]
 
 export function getGuide(slug: string): Guide | undefined {
   return GUIDES.find((g) => g.slug === slug)
