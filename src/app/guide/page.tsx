@@ -5,15 +5,15 @@ import { guidesByRegion } from "@/content/guides"
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: "항로 가이드 — 배 시간표·요금·가는 법 | FerryCast",
+  title: "항로 가이드 — 배편 시간표·요금·가는 법 | FerryCast",
   description:
-    "완도·포항·목포·인천 주요 섬 여객선 가는 법, 시간표, 요금, 소요시간 안내. 청산도·소안도·울릉도·홍도·백령도 등. 오늘 운항·결항은 실시간으로 확인하세요.",
+    "제주도 배편, 울릉도 배편, 청산도 배편 등 전국 주요 섬 여객선 시간표, 요금, 소요시간 안내. 완도·포항·목포·인천 출발. 오늘 운항·결항은 실시간으로 확인하세요.",
   alternates: { canonical: "/guide" },
   openGraph: {
     type: "website",
     siteName: "FerryCast",
-    title: "항로 가이드 — 배 시간표·요금·가는 법 | FerryCast",
-    description: "완도·포항·목포·인천 주요 섬 여객선 가는 법·시간표·요금 안내",
+    title: "항로 가이드 — 배편 시간표·요금·가는 법 | FerryCast",
+    description: "제주도·울릉도·청산도 배편 등 전국 주요 섬 여객선 가는 법·시간표·요금 안내",
     url: "https://ferrycast.kr/guide",
     locale: "ko_KR",
     images: [{ url: "/og-v2.jpg", width: 1200, height: 630, alt: "FerryCast — 실시간 운항·결항 정보" }],
@@ -61,7 +61,8 @@ export default function GuideIndexPage() {
                     className="flex items-center justify-between gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3.5 shadow-sm transition-colors hover:border-blue-200"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-slate-800">{g.destination} 가는 법</p>
+                      {/* 타이틀은 "짧은 제목 — 부제" 형식이라 em dash 앞부분만 목록에 노출 */}
+                      <p className="truncate text-sm font-bold text-slate-800">{g.title.split(" — ")[0]}</p>
                       <p className="mt-0.5 truncate text-xs text-slate-400">
                         {g.facts.find((f) => f.label === "출발 터미널")?.value ?? "배 시간표·요금"}
                       </p>
