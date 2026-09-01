@@ -5,9 +5,13 @@ import Link from "next/link"
 import { GUIDES, getGuide, type Guide } from "@/content/guides"
 import GuideLiveBox from "@/components/GuideLiveBox"
 
-// 정적 콘텐츠지만 상단 실시간 박스(오늘 운항/결항)를 위해 10분 주기로 재생성.
-// 정적 HTML은 그대로 색인되므로 SEO에는 영향 없다(메인·지역 페이지와 동일 캐시 정책).
-export const revalidate = 600
+// 정적 콘텐츠 + 상단 실시간 박스(오늘 운항/결항)용 재생성 주기.
+// ⚠️ Vercel Hobby ISR Writes 월 20만 회 한도 — 가이드 22개 × 홈·지역 5개가 전부 600초
+// (10분) 주기였을 때 79.5%(159K)까지 찼다. 홈·지역은 결항 정보 신선도가 핵심 가치라
+// 절대 늦추지 않고, 검색 유입용 보조 페이지인 가이드만 1800초(30분)로 늦춰 write량을
+// 3분의 1로 줄인다. 데이터 장애 시 "정상"으로 오인시키지 않는 안전장치(GuideLiveBox)가
+// 있어 신선도가 다소 떨어져도 잘못된 정보를 보여주진 않는다.
+export const revalidate = 1800
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }))
