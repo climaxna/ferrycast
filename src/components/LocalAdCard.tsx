@@ -39,10 +39,11 @@ export default function LocalAdCard({ ad }: { ad: LocalAd }) {
         {...(ad.href ? { target: "_blank", rel: "noopener noreferrer sponsored" } : {})}
         onClick={() => trackAdClick(ad)}
         // 배편 카드(흰 배경 + 옅은 slate 테두리)들 사이에서 눈에 안 띈다는 피드백 반영 —
-        // 골드(amber) 굵은 띠 + 은은한 발광으로 "스폰서 배너"라는 게 스크롤 중에도 바로 보이게 한다.
+        // 골드(amber) 테두리 + 옅은 발광으로 "스폰서 배너"임을 은근히 알린다.
+        // (처음엔 3px+진한 amber-400으로 했다가 "너무 튄다"는 피드백에 2px+연한 amber-300으로 낮춤)
         // amber는 앱에서 "비운항" 배지에도 쓰지만 그건 작은 뱃지, 이건 큰 전면 배너라 혼동 여지가 적고,
         // 이미 혜택형(benefit) 카드가 같은 amber 톤을 "주목" 용도로 쓰고 있어 톤 일관성도 맞는다.
-        className="relative block overflow-hidden rounded-2xl border-[3px] border-amber-400 shadow-[0_0_0_1px_rgba(251,191,36,0.35),0_4px_16px_-2px_rgba(251,191,36,0.45)] transition-shadow hover:shadow-[0_0_0_1px_rgba(251,191,36,0.5),0_6px_20px_-2px_rgba(251,191,36,0.6)]"
+        className="relative block overflow-hidden rounded-2xl border-2 border-amber-300 shadow-[0_2px_8px_-2px_rgba(251,191,36,0.35)] transition-shadow hover:shadow-[0_4px_12px_-2px_rgba(251,191,36,0.45)]"
         style={{ aspectRatio: String(ad.displayRatio ?? AD_SLOT_RATIO) }}
       >
         {/* Image(fill)도 absolute라 DOM 순서가 곧 쌓임 순서 — 라벨을 뒤에 두고 z-10으로 올린다 */}
