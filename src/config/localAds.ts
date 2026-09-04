@@ -28,7 +28,12 @@ export type LocalAdVariant = "text" | "photo" | "benefit" | "image"
 export interface LocalAd {
   id: string              // 리포트용 고유 키 (변경 금지)
   variant: LocalAdVariant
-  region: string          // "wando" | RegionConfig.slug
+  region: string          // "wando" | RegionConfig.slug — 광고주 소재지(리포트·GA4 ad_region용, 항상 유지)
+  showOnAllRegions?: boolean  // true면 region과 무관하게 모든 지역 화면에 노출.
+                               // 용도: (1) "광고가 실제로 들어오고 있다"를 방문자에게 보여주는 사회적 증거
+                               // (2) 지역 광고주가 아직 없는 지역에서도 "광고 한 자리 더 모집합니다"가
+                               //     뜨도록(LocalAdSlot의 hasAds) — 빈 슬롯보다 신뢰가 붙는다.
+                               // 지역과 무관한 업종(숙박·특산물 등 택배 가능)에만 쓸 것.
   until: string           // "YYYYMMDD" 게재 만료일 (필수)
   title: string           // 상호 + 한 줄 (예: "○○펜션 · 오션뷰 객실")
   desc: string            // 첫 줄에 위치 정보 권장 (예: "선착장에서 5분 · 전 객실 바다 전망")
@@ -55,6 +60,10 @@ export const LOCAL_ADS: LocalAd[] = [
     id: "incheon-36stay",
     variant: "image",
     region: "incheon",
+    // 지역 광고 영업이 아직 다른 지역에서 안 들어와, 실제 게재 중인 광고를 전 지역(완도·목포·
+    // 제주·울릉도)에도 노출한다 — "우리도 광고 자리 실제로 나가고 있다"를 보여주는 사회적 증거 +
+    // 다른 지역 방문자에게도 "광고 한 자리 더 모집합니다"가 뜨게 하려는 목적(LocalAdSlot).
+    showOnAllRegions: true,
     // ⚠️ 계약 종료일 — 이 날짜가 지나면 배너가 자동으로 내려가고 모집 슬롯으로 돌아간다.
     // 월 단위 계약 기준 1개월로 잡아둠. 실제 계약 조건에 맞게 반드시 확인할 것.
     until: "20260913",
@@ -77,7 +86,7 @@ export const LOCAL_ADS: LocalAd[] = [
 // 날짜 비교는 "YYYYMMDD" 문자열 사전순 비교라 타임존·파싱 버그가 없다.
 export function getActiveAds(region: string): LocalAd[] {
   const today = kstDateStr()
-  return LOCAL_ADS.filter((ad) => ad.region === region && ad.until >= today)
+  return LOCAL_ADS.filter((ad) => (ad.region === region || ad.showOnAllRegions) && ad.until >= today)
 }
 
 // ── 미리보기 전용 ────────────────────────────────────────────
