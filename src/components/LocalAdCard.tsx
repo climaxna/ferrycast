@@ -38,7 +38,11 @@ export default function LocalAdCard({ ad }: { ad: LocalAd }) {
         href={href}
         {...(ad.href ? { target: "_blank", rel: "noopener noreferrer sponsored" } : {})}
         onClick={() => trackAdClick(ad)}
-        className="relative block overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition-shadow hover:shadow-md"
+        // 배편 카드(흰 배경 + 옅은 slate 테두리)들 사이에서 눈에 안 띈다는 피드백 반영 —
+        // 골드(amber) 굵은 띠 + 은은한 발광으로 "스폰서 배너"라는 게 스크롤 중에도 바로 보이게 한다.
+        // amber는 앱에서 "비운항" 배지에도 쓰지만 그건 작은 뱃지, 이건 큰 전면 배너라 혼동 여지가 적고,
+        // 이미 혜택형(benefit) 카드가 같은 amber 톤을 "주목" 용도로 쓰고 있어 톤 일관성도 맞는다.
+        className="relative block overflow-hidden rounded-2xl border-[3px] border-amber-400 shadow-[0_0_0_1px_rgba(251,191,36,0.35),0_4px_16px_-2px_rgba(251,191,36,0.45)] transition-shadow hover:shadow-[0_0_0_1px_rgba(251,191,36,0.5),0_6px_20px_-2px_rgba(251,191,36,0.6)]"
         style={{ aspectRatio: String(ad.displayRatio ?? AD_SLOT_RATIO) }}
       >
         {/* Image(fill)도 absolute라 DOM 순서가 곧 쌓임 순서 — 라벨을 뒤에 두고 z-10으로 올린다 */}
@@ -50,8 +54,9 @@ export default function LocalAdCard({ ad }: { ad: LocalAd }) {
           style={ad.imagePos ? { objectPosition: ad.imagePos } : undefined}
           sizes="(max-width: 512px) 100vw, 512px"
         />
-        {/* 전면 이미지형은 배너 자체가 명백한 광고물이라 '광고' 라벨을 얹지 않는다
-            (디자인을 가리기도 함). 콘텐츠처럼 보이는 텍스트/사진형에는 아래에서 라벨 유지. */}
+        {/* 전면 이미지형은 배너 자체가 명백한 광고물이라 '광고' 텍스트 라벨은 얹지 않는다
+            (디자인을 가리기도 함). 대신 위 테두리 띠로 "여기 있다"를 알린다.
+            콘텐츠처럼 보이는 텍스트/사진형에는 아래에서 텍스트 라벨 유지. */}
       </a>
     )
   }
