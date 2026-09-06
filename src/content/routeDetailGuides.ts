@@ -104,6 +104,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     guideHref: "/guide/mokpo-heuksando",
+    tourHref: "/tour/heuksando",
   },
   gageodo: {
     title: "목포 · 가거도 이용 안내",

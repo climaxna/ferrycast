@@ -157,6 +157,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "heuksando",
+    region: "흑산도",
+    title: "흑산도 주요 관광지 — 흑산도항 도착 뒤 확인하는 4곳",
+    description: "흑산도항에 도착한 뒤 찾아볼 수 있는 흑산도 일주도로, 상라봉 전망대, 자산문화원, 배낭기미해수욕장을 한국관광공사 안내 기준으로 정리했습니다.",
+    arrivalPort: "흑산도항",
+    intro: "목포 출발편은 흑산도항에 도착합니다. 흑산도 안 관광지는 항구에서 떨어진 곳도 있어 섬 안 이동을 따로 계획하는 편이 좋습니다. 아래 장소는 한국관광공사 안내에 소개된 곳이며, 도로·탐방 여건과 운영 여부는 방문일에 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 한국관광공사 대한민국 구석구석의 흑산도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "한국관광공사 흑산도 공식 안내",
+    officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=7acc69af-7a3b-47d9-9ddc-1c22a358ae28",
+    ferryGuideHref: "/guide/mokpo-heuksando",
+    ferryGuideLabel: "목포·흑산도 배편·승선 안내 보기",
+    places: [
+      {
+        name: "흑산도 일주도로",
+        category: "드라이브 · 해안 경관",
+        description: "해안을 따라 섬을 둘러볼 수 있는 도로입니다. 전망 장소와 굽이진 구간이 이어져 있어 이동 수단과 당일 도로 여건을 먼저 확인하는 것이 좋습니다.",
+        mapQuery: "흑산도 일주도로",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=7acc69af-7a3b-47d9-9ddc-1c22a358ae28",
+      },
+      {
+        name: "상라봉 전망대",
+        category: "전망 · 섬 풍경",
+        description: "상라산 일대의 전망 장소로 소개됩니다. 흑산도항과 주변 섬 풍경을 볼 수 있으며, 탐방 전 날씨와 현장 통제 여부를 확인하세요.",
+        mapQuery: "흑산도 상라봉 전망대",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=7acc69af-7a3b-47d9-9ddc-1c22a358ae28",
+      },
+      {
+        name: "자산문화원",
+        category: "문화 · 자산어보",
+        description: "정약전의 흑산도 유배 생활과 『자산어보』 관련 자료를 소개하는 곳으로 안내됩니다. 전시 운영 여부는 방문 전에 확인하세요.",
+        mapQuery: "흑산도 자산문화원",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=7acc69af-7a3b-47d9-9ddc-1c22a358ae28",
+      },
+      {
+        name: "배낭기미해수욕장",
+        category: "해변 · 휴식",
+        description: "한국관광공사 흑산도 안내에서 대표 해수욕장으로 소개된 곳입니다. 계절별 개장·안전·편의시설 운영 여부는 현지 안내를 확인하세요.",
+        mapQuery: "흑산도 배낭기미해수욕장",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=7acc69af-7a3b-47d9-9ddc-1c22a358ae28",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
