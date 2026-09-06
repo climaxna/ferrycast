@@ -4,8 +4,7 @@ import { enrichGuide, USAGE_GUIDES } from "./guideEditorial"
 // ─────────────────────────────────────────────────────────────────────────
 // 항로 가이드(검색 유입용 고정 콘텐츠).
 //
-// FerryCast 본 화면은 100% 실시간 앱이라 검색엔진이 색인해 순위를 매길 "고정 텍스트"가
-// 거의 없다. 이 파일은 "○○ 가는 법 / 시간표 / 요금 / 소요시간 / 터미널" 질의에 대응하는
+// 이 파일은 "○○ 가는 법 / 시간표 / 요금 / 소요시간 / 터미널" 질의에 대응하는
 // 정적 페이지(`/guide/[slug]`)의 원천이다. 각 가이드는 항상 실시간 화면(liveHref)으로
 // 연결해, 검색 → 가이드 → 실시간 확인 → (지역광고 노출) 흐름을 만든다.
 //
@@ -50,7 +49,7 @@ export interface Guide {
   destination: string   // "청산도"
   // config에서 단어만 바꿔 찍어낸 자동 생성 가이드(regionGuidesFrom)인지 여부.
   // 도입문·FAQ 문장이 노선마다 거의 동일해 구글이 "scaled content"(양산형 콘텐츠)로
-  // 볼 위험이 크다(2026.09 애드센스 "가치가 별로 없는 콘텐츠" 반려 원인 중 하나로 지목).
+  // 볼 가능성을 고려한 내부 분류다. 개별 페이지가 애드센스 반려 원인으로 확인된 것은 아니다.
   // → sitemap에서 빼고 페이지에 noindex를 건다. 수기로 보강되면 이 플래그를 지운다.
   thin?: boolean
   kind?: "route" | "usage"
@@ -87,9 +86,9 @@ const WANDO_GUIDES: Guide[] = [
     regionName: "완도",
     destination: "청산도",
     liveGroupKey: "cheongsando",
-    title: "완도 청산도 배편 — 시간표·요금·소요시간",
+    title: "완도 청산도 배편 — 참고 시간표·승선 준비·요금 확인 방법",
     description:
-      "완도항에서 청산도(슬로시티) 가는 배편(여객선) 시간표, 요금, 소요시간(약 50분), 매표소 연락처 안내. 오늘 운항·결항 여부는 실시간으로 확인하세요.",
+      "완도항에서 청산도 도청항으로 가는 배편의 참고 시간표, 승선 준비, 요금 문의 방법과 매표소 연락처를 안내합니다. 최신 운임표를 제공하는 페이지는 아닙니다.",
     keywords: ["청산도 배편", "완도 청산도 배편", "완도 청산도 배", "청산도 배 시간표", "청산도 여객선", "청산도 가는 법"],
     liveHref: "/",
     updated: UPDATED,
@@ -141,7 +140,7 @@ const WANDO_GUIDES: Guide[] = [
     faqs: [
       {
         q: "오늘 청산도 배 뜨나요?",
-        a: "기상에 따라 당일 결항될 수 있습니다. FerryCast 완도 실시간 화면에서 오늘 청산도 항로의 운항·결항 상태를 바로 확인할 수 있습니다.",
+        a: "완도 화면에서 청산도 편별 상태를 확인하세요. 참고 시간표가 표시되거나 조회가 되지 않으면 현재 운항을 확인하지 못한 상태이므로 선사 공지와 매표소 안내를 확인해야 합니다.",
       },
       {
         q: "완도에서 청산도까지 얼마나 걸리나요?",
@@ -351,13 +350,13 @@ function regionGuidesFrom(config: RegionConfig): Guide[] {
       updated: UPDATED,
       intro: [
         `${destination}행 여객선은 ${terminal}(${origin})에서 출발합니다. 시간표는 계절·요일·기상에 따라 달라지므로, 아래 대표 정보를 참고하되 오늘 실제 출발 시각과 운항·결항 여부는 FerryCast ${config.name} 실시간 화면에서 확인하세요.`,
-        "기상 악화·조류 등으로 예고 없이 결항될 수 있으니, 출발 전 공식 예매처나 실시간 화면에서 반드시 최종 확인하시기 바랍니다.",
+        "참고 시간표는 당일 출항을 확정하는 자료가 아닙니다. 조회 지연이나 실패가 있으면 예약한 선사의 공지와 현장 안내를 확인하세요.",
       ],
       facts,
       faqs: [
         {
           q: `오늘 ${origin}-${destination} 배편 뜨나요?`,
-          a: `FerryCast ${config.name} 실시간 화면에서 ${origin}-${destination} 항로의 오늘 운항·결항 상태를 바로 확인할 수 있습니다.`,
+          a: `FerryCast ${config.name} 화면에서 ${origin}-${destination} 편별 상태를 확인하세요. 참고 시간표나 조회 실패 상태라면 현재 운항 여부는 선사에 별도로 확인해야 합니다.`,
         },
         {
           q: `${destination} 가는 배는 어디서 타나요?`,
@@ -366,7 +365,7 @@ function regionGuidesFrom(config: RegionConfig): Guide[] {
         {
           q: `${destination} 배편 예매는 어떻게 하나요?`,
           a: g.fareUrl
-            ? "공식 예매 페이지에서 좌석·요금을 확인하고 예약할 수 있습니다. 일부 노선은 현장 매표소 발권만 가능합니다."
+            ? "연결된 선사 페이지에서 예약 안내를 확인하세요. 운임 안내만 제공하는 페이지일 수도 있으며, 현장 발권 여부와 실제 판매 가능 편은 해당 선사에 확인해야 합니다."
             : "한국해운조합 승선예약 또는 현장 매표소에서 발권합니다.",
         },
       ],
@@ -408,25 +407,25 @@ function hubOverviewGuide(config: RegionConfig, hubKeyword: string, blurb: strin
       `출발지마다 터미널·소요시간이 달라 아래 표에서 먼저 비교하고, 항로별 상세 시간표는 아래 링크에서 확인하세요. 오늘 실제 운항·결항 여부는 FerryCast ${config.name} 실시간 화면에서 출발지별로 한 번에 볼 수 있습니다.`,
     ],
     facts: [
-      { label: "출발지 수", value: `${originLabels.length}곳 (${originLabels.join("·")})` },
+      { label: "서비스 수록 출발지", value: `${originLabels.length}곳 (${originLabels.join("·")})` },
       { label: "도착 터미널", value: config.mainTerminal },
     ],
     timetables: [
       {
         title: "출발지별 비교",
-        note: "실제 출발 시각·오늘 운항 여부는 각 출발지 상세 가이드 또는 실시간 화면에서 확인하세요.",
+        note: "서비스에 보관한 항로 정보의 비교표입니다. 상세 가이드도 참고 자료이며, 여행 날짜의 출항·접안 장소와 시각은 예약한 선사의 안내를 확인하세요.",
         columns: ["출발지", "출발 터미널", "소요시간"],
         rows: config.routeGroups.map((g) => [
           g.label,
           g.depTerminal ?? config.mainTerminal,
-          durationOf(g.durationMin) ?? "실시간 확인",
+          durationOf(g.durationMin) ?? "선사 확인 필요",
         ]),
       },
     ],
     faqs: [
       {
         q: `${config.name} 배편은 어디서 탈 수 있나요?`,
-        a: `${originLabels.join("·")} 등 ${originLabels.length}곳에서 출발합니다. 출발지별 터미널·소요시간은 위 표를 참고하세요.`,
+        a: `FerryCast는 ${originLabels.join("·")} 출발 정보를 모아 제공합니다. 국내 모든 항로의 목록이나 각 항로의 상시 운항을 뜻하지는 않습니다.`,
       },
       {
         q: `${config.name} 가는 배 중 어느 노선이 제일 빠른가요?`,
@@ -434,7 +433,7 @@ function hubOverviewGuide(config: RegionConfig, hubKeyword: string, blurb: strin
       },
       {
         q: `오늘 ${config.name} 배 뜨나요?`,
-        a: `FerryCast ${config.name} 실시간 화면에서 출발지별 오늘 운항·결항 상태를 한 번에 확인할 수 있습니다.`,
+        a: `FerryCast ${config.name} 화면에서 출발지별 편 상태를 확인하세요. 데이터가 없거나 참고 시간표가 표시되는 경우에는 선사 공지로 운항 여부를 확인해야 합니다.`,
       },
     ],
     relatedGuides: config.routeGroups.map((g) => {
@@ -450,7 +449,7 @@ const HUB_GUIDES: Guide[] = [
     hubOverviewGuide(
       REGIONS.jeju,
       "제주도 배편",
-      "제주도行 여객선은 목포·완도·진도·녹동·삼천포 등 전국 여러 항구에서 출발합니다. 어느 항구에서 타든 도착은 제주항이지만, 출발지에 따라 소요시간과 운임이 크게 다릅니다.",
+      "이 가이드는 FerryCast에 수록된 목포·완도·진도·녹동·삼천포 출발 제주행 항로를 비교합니다. 제주 도착 터미널과 부두는 예약한 선편의 안내를 확인하세요.",
     ),
   REGIONS.ulleung &&
     hubOverviewGuide(
