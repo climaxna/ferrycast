@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import type { WandoRoute } from "@/lib/types"
 import { useModalClose } from "@/hooks/useModalClose"
 import { toMinutes as toMin, relativeTime } from "@/lib/utils"
@@ -441,6 +442,16 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                 {guide.source.label}
                 <span aria-hidden="true">→</span>
               </a>
+              {guide.guideHref && (
+                <Link
+                  href={guide.guideHref}
+                  onClick={onClose}
+                  className="mt-3 flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
+                >
+                  항로별 시간표·터미널 안내 자세히 보기
+                  <span aria-hidden="true">→</span>
+                </Link>
+              )}
               <p className="mt-2 text-xs leading-5 text-slate-400">운항·접수 조건은 바뀔 수 있으므로 승선 전 공식 안내를 최종 기준으로 확인하세요.</p>
             </section>
           )}

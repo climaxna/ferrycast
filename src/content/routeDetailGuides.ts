@@ -5,6 +5,7 @@ export type RouteDetailGuide = {
   intro: string
   checks: Array<{ title: string; description: string }>
   source: { label: string; href: string }
+  guideHref?: string
 }
 
 const BOOKING = "https://island.theksa.co.kr/page/booking"
@@ -19,6 +20,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "귀항편", description: "청산도에서 완도로 돌아오는 편은 별도 시간표입니다. 당일 왕복이라면 출발 전에 귀항 시각과 숙소·버스 이동 시간을 함께 잡아두세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/wando-cheongsando",
   },
   "hwaheungpo-route": {
     title: "화흥포 · 소안도·보길도·노화 이용 안내",
@@ -29,6 +31,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "현장 변수", description: "섬 사이 편은 기상·조류와 선박 운영에 따라 일부 편만 바뀔 수 있습니다. 부분 결항 표시는 해당 편의 상태이므로 시간별로 확인하는 것이 좋습니다." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/wando-soan-bogil-nohwa",
   },
   jeju: {
     title: "제주 항로 이용 안내",
@@ -49,6 +52,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "귀항 계획", description: "울릉도에서 나오는 배는 출발 항구와 시간이 다를 수 있습니다. 왕복 여행이면 돌아오는 편의 항구와 시각을 출발 전에 함께 확인하세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/ulleung-from-pohang",
   },
   "from-yeongilman": {
     title: "영일만 · 울릉도 이용 안내",
@@ -59,6 +63,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "결항 확인", description: "울릉도 항로는 해상 기상에 따라 변동될 수 있습니다. 승선 전 공식 공지와 함께 당일 편별 상태를 확인하세요." },
     ],
     source: { label: "울릉크루즈 공식 안내", href: "https://www.ulcruise.co.kr" },
+    guideHref: "/guide/ulleung-from-yeongilman",
   },
   dokdo: {
     title: "울릉도 · 독도 이용 안내",
@@ -69,6 +74,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "당일 확인", description: "기상 영향이 큰 항로이므로 일정·교통·숙소를 연결하기 전, 출항 당일 편별 운항 상태를 반드시 다시 확인하세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/ulleung",
   },
   hongdo: {
     title: "목포 · 홍도 이용 안내",
@@ -79,6 +85,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "귀항편", description: "홍도에서 목포로 나오는 편은 별도 시간표입니다. 숙박 예약 전 귀항편의 운항일과 시간을 확인하세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/mokpo-hongdo",
   },
   heuksando: {
     title: "목포 · 흑산도 이용 안내",
@@ -89,6 +96,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "해상 상황", description: "서남해 항로는 해상 기상에 따라 일부 편이 달라질 수 있습니다. 화면의 편별 결항 표시와 공식 공지를 함께 확인하세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/mokpo-heuksando",
   },
   gageodo: {
     title: "목포 · 가거도 이용 안내",
@@ -99,6 +107,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "귀항 준비", description: "가거도 출발 편은 다음 이동 일정에 직접 영향을 줍니다. 숙박을 확정하기 전 귀항편의 운항일과 시각을 먼저 확인하세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/mokpo-gageodo",
   },
   deokjeokdo: {
     title: "인천 · 덕적도 이용 안내",
@@ -109,6 +118,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "차량 동반", description: "차량을 가져갈 경우 여객 예약과 별도로 선적 가능 여부·접수 조건을 확인해야 합니다." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/incheon-deokjeokdo",
   },
   baengnyeongdo: {
     title: "인천 · 백령도 이용 안내",
@@ -119,6 +129,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "왕복 일정", description: "당일 왕복보다 숙박 일정이 필요한 경우가 많습니다. 여행을 확정하기 전 백령도 출발 귀항편도 함께 확인하세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    guideHref: "/guide/incheon-baengnyeongdo",
   },
   yeonpyeongdo: {
     title: "인천 · 연평도 이용 안내",
@@ -134,5 +145,19 @@ const GUIDES: Record<string, RouteDetailGuide> = {
 
 export function getRouteDetailGuide(route: WandoRoute): RouteDetailGuide | null {
   const key = route.id.replace(/^(dep|arr|hop)-/, "")
-  return GUIDES[key] ?? null
+  const guide = GUIDES[key]
+  if (!guide) return null
+
+  // 제주행은 출발항별 페이지가 있어 하나의 제주 안내로 뭉뚱그리지 않는다.
+  if (key === "jeju") {
+    const origin = route.from ?? route.originName ?? "완도"
+    const guideHref = origin.includes("목포") ? "/guide/mokpo-jeju"
+      : origin.includes("완도") ? "/guide/jeju-from-wando"
+      : origin.includes("진도") ? "/guide/jeju-from-jindo"
+      : origin.includes("녹동") ? "/guide/jeju-from-nokdong"
+      : origin.includes("삼천포") ? "/guide/jeju-from-samcheonpo"
+      : "/guide/jeju"
+    return { ...guide, guideHref }
+  }
+  return guide
 }

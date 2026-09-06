@@ -472,7 +472,7 @@ export function guidesByRegion(): Array<{ regionSlug: string; regionName: string
   const order = ["common", "", ...Object.keys(REGIONS)]
   return order
     .map((rs) => {
-      const guides = GUIDES.filter((g) => g.regionSlug === rs)
+      const guides = GUIDES.filter((g) => g.regionSlug === rs && !g.thin)
       if (!guides.length) return null
       return {
         regionSlug: rs,
