@@ -148,7 +148,7 @@ export default async function RegionPage({
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center gap-2.5 px-4 py-3">
           {/* 로고+제목 = 새로고침 (수동 새로고침 아이콘을 없앤 뒤의 갱신 수단) */}
-          <AppHeaderTitle subtitle={`${config.name} 날씨 · 여객선 현황`} />
+          <AppHeaderTitle subtitle={region === "incheon" ? "인천 날씨 · 여객선 현황" : `${config.name} 실시간 여객선 현황`} />
           <Link
             href={`/${config.slug}/qr`}
             aria-label="QR 코드"
@@ -172,9 +172,11 @@ export default async function RegionPage({
       </header>
 
       <div className="mx-auto max-w-lg space-y-3 px-4 pb-4 pt-2">
-        <Suspense fallback={<WeatherSkeleton />}>
-          <RegionWeatherCard region={region} />
-        </Suspense>
+        {region === "incheon" && (
+          <Suspense fallback={<WeatherSkeleton />}>
+            <RegionWeatherCard region={region} />
+          </Suspense>
+        )}
 
         <RegionNav current={config.slug} />
 

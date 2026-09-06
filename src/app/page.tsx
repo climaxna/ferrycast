@@ -1,7 +1,6 @@
 import { Suspense } from "react"
 import { connection } from "next/server"
 import Link from "next/link"
-import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
 import YaksanRouteSection from "@/components/YaksanRouteSection"
 import AppHeaderTitle from "@/components/AppHeaderTitle"
@@ -19,10 +18,6 @@ export const revalidate = 600
 export const metadata = {
   title: "FerryCast — 실시간 여객선 정보",
   description: "완도·울릉도·목포·인천·제주 여객선 시간표와 결항 현황을 실시간으로. 완도 날씨·조석 정보 포함",
-}
-
-function WeatherSkeleton() {
-  return <div className="h-36 animate-pulse rounded-2xl bg-slate-100" />
 }
 
 function RouteSkeleton() {
@@ -44,7 +39,7 @@ export default async function Page() {
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center gap-2.5 px-4 py-3">
           {/* 로고+제목 = 새로고침 (수동 새로고침 아이콘을 없앤 뒤의 갱신 수단) */}
-          <AppHeaderTitle subtitle="완도 날씨 · 여객선 현황" />
+          <AppHeaderTitle subtitle="실시간 여객선 현황" />
           <Link
             href="/qr"
             aria-label="QR 코드"
@@ -68,10 +63,6 @@ export default async function Page() {
       </header>
 
       <div className="mx-auto max-w-lg space-y-3 px-4 pb-4 pt-2">
-        <Suspense fallback={<WeatherSkeleton />}>
-          <WeatherCard />
-        </Suspense>
-
         <RegionNav current="" />
 
         <Suspense fallback={<RouteSkeleton />}>
