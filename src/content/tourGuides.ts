@@ -201,6 +201,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "gageodo",
+    region: "가거도",
+    title: "가거도 주요 관광지 — 가거도항 도착 뒤 확인하는 4곳",
+    description: "가거도항에 도착한 뒤 찾아볼 수 있는 독실산, 섬등반도, 가거도 등대, 회룡산을 한국관광공사 안내 기준으로 정리했습니다.",
+    arrivalPort: "가거도항",
+    intro: "목포 출발편은 가거도항에 도착합니다. 가거도는 산지와 해안 절벽 지형이 이어져 섬 안 이동을 별도로 계획해야 합니다. 아래 장소는 한국관광공사 안내에 소개된 곳이며, 탐방로·도로·운영 여건은 방문일에 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 한국관광공사 대한민국 구석구석의 가거도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "한국관광공사 가거도 공식 안내",
+    officialHref: "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=47836660-7194-498c-90a6-f8bfa9662b3c",
+    ferryGuideHref: "/guide/mokpo-gageodo",
+    ferryGuideLabel: "목포·가거도 배편·승선 안내 보기",
+    places: [
+      {
+        name: "독실산",
+        category: "탐방 · 산악 경관",
+        description: "가거도 중앙에 솟은 산으로 소개됩니다. 날씨 변화와 안개 영향을 받을 수 있어 탐방 전 현지 여건과 안내를 확인하는 것이 좋습니다.",
+        mapQuery: "가거도 독실산",
+        officialHref: "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=47836660-7194-498c-90a6-f8bfa9662b3c",
+      },
+      {
+        name: "섬등반도",
+        category: "해안 절벽 · 자연 경관",
+        description: "독실산에서 서쪽으로 이어지는 반도형 지형입니다. 주상절리와 해식애가 펼쳐진 해안 경관으로 한국관광공사가 안내합니다.",
+        mapQuery: "가거도 섬등반도",
+        officialHref: "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=47836660-7194-498c-90a6-f8bfa9662b3c",
+      },
+      {
+        name: "가거도 등대",
+        category: "등대 · 해안 풍경",
+        description: "섬등반도와 함께 가거도 여행 명소로 소개되는 등대입니다. 방문 가능 구간과 이동 여건은 현지 안내를 확인하세요.",
+        mapQuery: "가거도 등대",
+        officialHref: "https://korean.visitkorea.or.kr/detail/cs_detail_cos.do?cotid=8ba547ce-fc32-45a7-bf9f-203ee1b4a203",
+      },
+      {
+        name: "회룡산",
+        category: "전망 · 마을 풍경",
+        description: "가거도항과 대리마을 풍경을 볼 수 있는 곳으로 한국관광공사 여행코스에 소개됩니다. 탐방로 상태는 출발 전에 확인하세요.",
+        mapQuery: "가거도 회룡산",
+        officialHref: "https://korean.visitkorea.or.kr/detail/cs_detail_cos.do?cotid=8ba547ce-fc32-45a7-bf9f-203ee1b4a203",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {

@@ -116,6 +116,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     guideHref: "/guide/mokpo-gageodo",
+    tourHref: "/tour/gageodo",
   },
   deokjeokdo: {
     title: "인천 · 덕적도 이용 안내",
