@@ -1,4 +1,5 @@
 import type { WandoRoute } from "@/lib/types"
+import { REGIONS } from "@/config/regions"
 
 export type RouteDetailGuide = {
   title: string
@@ -145,19 +146,29 @@ const GUIDES: Record<string, RouteDetailGuide> = {
 
 export function getRouteDetailGuide(route: WandoRoute): RouteDetailGuide | null {
   const key = route.id.replace(/^(dep|arr|hop)-/, "")
-  const guide = GUIDES[key]
+  const guide = GUIDES[key] ?? (route.originName === "제주" ? GUIDES.jeju : undefined)
   if (!guide) return null
+  return { ...guide, guideHref: getRouteGuideHref(route) ?? undefined }
+}
 
-  // 제주행은 출발항별 페이지가 있어 하나의 제주 안내로 뭉뚱그리지 않는다.
-  if (key === "jeju") {
-    const origin = route.from ?? route.originName ?? "완도"
-    const guideHref = origin.includes("목포") ? "/guide/mokpo-jeju"
-      : origin.includes("완도") ? "/guide/jeju-from-wando"
-      : origin.includes("진도") ? "/guide/jeju-from-jindo"
-      : origin.includes("녹동") ? "/guide/jeju-from-nokdong"
-      : origin.includes("삼천포") ? "/guide/jeju-from-samcheonpo"
-      : "/guide/jeju"
-    return { ...guide, guideHref }
+// originName은 화면의 지역이다. 귀항편의 from은 섬 이름이므로 지역 판정에 쓰지 않는다.
+export function getRouteGuideHref(route: WandoRoute): string | null {
+  const key = route.id.replace(/^(dep|arr|hop)-/, "")
+  const region = route.originName ?? "완도"
+  if (route.id.startsWith("yaksan-")) return "/guide/wando-yaksan-islands"
+  if (region === "완도") {
+    if (key === "jeju") return "/guide/jeju-from-wando"
+    if (key === "cheongsando") return "/guide/wando-cheongsando"
+    if (key === "hwaheungpo-route") return "/guide/wando-soan-bogil-nohwa"
+    return null
   }
-  return guide
+  const config = Object.values(REGIONS).find(item => item.name === region)
+  if (config?.routeGroups.some(group => group.key === key)) {
+    const slug = config.slug === "jeju" && key === "from-mokpo"
+      ? "mokpo-jeju" : `${config.slug}-${key}`
+    return `/guide/${slug}`
+  }
+  // 독도는 관련 설명이 있는 울릉도 종합 가이드로 연결한다.
+  if (region === "울릉도" && key === "dokdo") return "/guide/ulleung"
+  return null
 }

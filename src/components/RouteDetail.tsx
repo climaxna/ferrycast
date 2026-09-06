@@ -8,7 +8,7 @@ import { toMinutes as toMin, relativeTime } from "@/lib/utils"
 import { ROUTE_THEME, type AccentTheme } from "@/lib/routeTheme"
 import AlarmSheet from "@/components/AlarmSheet"
 import TomorrowSheet from "@/components/TomorrowSheet"
-import { getRouteDetailGuide } from "@/content/routeDetailGuides"
+import { getRouteDetailGuide, getRouteGuideHref } from "@/content/routeDetailGuides"
 
 interface Props {
   route: WandoRoute
@@ -67,6 +67,7 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
     route.arrivals?.[t] ?? (route.durationMin ? addMinutes(t, route.durationMin) : null)
   const hasArrival = !!route.arrivals || !!route.durationMin
   const guide = getRouteDetailGuide(route)
+  const guideHref = getRouteGuideHref(route)
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: "100dvh" }}>
@@ -442,9 +443,10 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                 {guide.source.label}
                 <span aria-hidden="true">→</span>
               </a>
-              {guide.guideHref && (
+              {guideHref && (
                 <Link
-                  href={guide.guideHref}
+                  href={guideHref}
+                  prefetch={false}
                   onClick={onClose}
                   className="mt-3 flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
                 >
@@ -454,6 +456,14 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               )}
               <p className="mt-2 text-xs leading-5 text-slate-400">운항·접수 조건은 바뀔 수 있으므로 승선 전 공식 안내를 최종 기준으로 확인하세요.</p>
             </section>
+          )}
+
+          {!guide && guideHref && (
+            <Link href={guideHref} prefetch={false} onClick={onClose}
+              className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-700">
+              항로별 시간표·터미널 안내 자세히 보기
+              <span aria-hidden="true">→</span>
+            </Link>
           )}
 
           {/* 현장 발권 노선(약산권 등) — 예약 버튼 대신 매표소 연락처 안내 */}
