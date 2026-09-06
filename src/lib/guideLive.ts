@@ -12,6 +12,7 @@ export interface GuideLiveStatus {
   isLive: boolean                  // false면 API 장애 fallback — 상태를 단정하지 않는다
   todayTimes: string[]             // 오늘 전체 출발 시각
   nextTimes: string[]              // 지금 이후 남은 출발 시각(최대 4개)
+  cancelledCount?: number          // 운항 항로 안에 섞인 결항·비운항 편 수
   cancelReason?: string
   cancelKind?: "cancelled" | "suspended"
 }
@@ -50,6 +51,7 @@ export async function getGuideLiveStatus(guide: Guide): Promise<GuideLiveStatus 
     isLive: route.isLive ?? isLive,
     todayTimes: route.times,
     nextTimes: next,
+    cancelledCount: route.cancelledTimes?.length ?? 0,
     cancelReason: route.cancelReason,
     cancelKind: route.cancelKind,
   }

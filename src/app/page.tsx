@@ -7,6 +7,7 @@ import YaksanRouteSection from "@/components/YaksanRouteSection"
 import AppHeaderTitle from "@/components/AppHeaderTitle"
 import AdFitBanner from "@/components/AdFitBanner"
 import RegionNav from "@/components/RegionNav"
+import RegionGuideLinks from "@/components/RegionGuideLinks"
 
 // ISR 재생성 주기 — 데이터가 어차피 5~10분 캐시라 60초는 낭비(동일 결과 반복 write).
 // Vercel ISR Writes 절감을 위해 600초(10분)로. 상대시간 카운트다운은 클라이언트가 60초마다 갱신.
@@ -83,6 +84,8 @@ export default async function Page() {
         <Suspense fallback={null}>
           <YaksanRouteSection />
         </Suspense>
+
+        <RegionGuideLinks region="" />
 
         <div className="space-y-2">
           {/* 지역 광고는 시간표 직후 단락으로 이동(RouteSection adSlot). 하단은 애드핏.

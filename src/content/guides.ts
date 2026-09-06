@@ -1,4 +1,5 @@
 import { REGIONS, type RegionConfig, type RouteGroupConfig } from "@/config/regions"
+import { enrichGuide, USAGE_GUIDES } from "./guideEditorial"
 
 // ─────────────────────────────────────────────────────────────────────────
 // 항로 가이드(검색 유입용 고정 콘텐츠).
@@ -35,6 +36,13 @@ export interface GuideLink {
   href: string
 }
 
+export interface GuideSection {
+  id: string
+  title: string
+  paragraphs: string[]
+  checklist?: string[]
+}
+
 export interface Guide {
   slug: string          // 예: "wando-cheongsando"
   regionSlug: string    // "" = 완도(메인), 그 외 REGIONS 키
@@ -45,6 +53,10 @@ export interface Guide {
   // 볼 위험이 크다(2026.09 애드센스 "가치가 별로 없는 콘텐츠" 반려 원인 중 하나로 지목).
   // → sitemap에서 빼고 페이지에 noindex를 건다. 수기로 보강되면 이 플래그를 지운다.
   thin?: boolean
+  kind?: "route" | "usage"
+  sections?: GuideSection[]
+  sources?: (GuideLink & { note: string })[]
+  sourceNote?: string
   title: string         // H1 & <title>
   description: string    // meta description (검색 스니펫)
   keywords: string[]     // 검색 의도 키워드(문장에 자연스럽게 반영)
@@ -123,7 +135,7 @@ const WANDO_GUIDES: Guide[] = [
       { label: "네이버밴드", value: "청산도 선박운항시간표" },
     ],
     tips: [
-      "차량을 싣는 경우 예약·발권 마감이 이르니 출발 30분 전에는 터미널에 도착하세요.",
+      "차량을 싣는 경우 여객 발권과 차량 접수 절차를 각각 확인하세요. 선적 마감·대기 방법은 해당 날짜의 선사 안내를 따르세요.",
       "슬로시티 특성상 섬 내 이동은 도보·자전거·마을버스 위주입니다.",
     ],
     faqs: [
@@ -203,7 +215,7 @@ const WANDO_GUIDES: Guide[] = [
     faqs: [
       {
         q: "보길도는 배로 바로 가나요?",
-        a: "보길도 직항은 없습니다. 화흥포에서 노화도로 배를 타고 간 뒤, 노화도와 보길도를 잇는 보길대교를 차·버스로 건너갑니다.",
+        a: "이 가이드의 화흥포 출발 노선은 노화도 동천항에 내린 뒤 보길대교를 건너 보길도로 이동하는 경로입니다. 도보 승객은 하선 후 이동편도 미리 확인하세요.",
       },
       {
         q: "소안도행 배는 어디서 타나요?",
@@ -230,7 +242,7 @@ const WANDO_GUIDES: Guide[] = [
     liveHref: "/",
     updated: UPDATED,
     intro: [
-      "약산도(완도군 약산면)는 본섬과 약산연도교로 연결되어 차량으로 들어갈 수 있고, 당목항이 인근 섬으로 가는 환승 거점입니다. 당목항에서 금일도(일정항)·생일도(서성항)로 차도선이 오갑니다.",
+      "약산도(완도군 약산면)는 고금도와 다리로 연결되어 차량으로 들어갈 수 있고, 당목항이 인근 섬으로 가는 환승 거점입니다. 당목항에서 금일도(일정항)·생일도(서성항)로 차도선이 오갑니다.",
       "이 노선은 완도 본항 터미널을 경유하지 않는 섬↔섬 노선이라, FerryCast에서도 완도 출발/도착 탭과 구분해 별도로 표시합니다. 아래는 하절기 대표 시간표입니다.",
     ],
     facts: [
@@ -449,7 +461,7 @@ const HUB_GUIDES: Guide[] = [
 const REGION_GUIDES: Guide[] = Object.values(REGIONS).flatMap(regionGuidesFrom)
 
 // 허브 총정리(제주도 배편·울릉도 배편)를 해당 지역 목록 맨 앞에 오도록 개별 노선 가이드보다 먼저 둔다.
-export const GUIDES: Guide[] = [...WANDO_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES]
+export const GUIDES: Guide[] = [...USAGE_GUIDES, ...WANDO_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES].map(enrichGuide)
 
 export function getGuide(slug: string): Guide | undefined {
   return GUIDES.find((g) => g.slug === slug)
@@ -457,7 +469,7 @@ export function getGuide(slug: string): Guide | undefined {
 
 // 지역별 그룹 (가이드 목록 페이지·내부 링크용). 완도 먼저, 그다음 config 순서.
 export function guidesByRegion(): Array<{ regionSlug: string; regionName: string; liveHref: string; guides: Guide[] }> {
-  const order = ["", ...Object.keys(REGIONS)]
+  const order = ["common", "", ...Object.keys(REGIONS)]
   return order
     .map((rs) => {
       const guides = GUIDES.filter((g) => g.regionSlug === rs)

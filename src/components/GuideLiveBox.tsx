@@ -39,7 +39,7 @@ export default async function GuideLiveBox({ guide }: { guide: Guide }) {
         </p>
         {live.cancelReason && <p className={`mt-1 text-sm ${c.sub}`}>사유: {live.cancelReason}</p>}
         <p className={`mt-1 text-xs ${c.sub}`}>
-          {suspended ? "선박검사·정비 등 계획된 비운항입니다. " : "기상 등으로 오늘 운항이 중단됐습니다. "}
+          {suspended ? "제공된 정보에서 비운항으로 분류됐습니다. " : "제공된 정보에서 결항으로 분류됐습니다. "}
           출발 전 공식 채널에서 최종 확인하세요.
         </p>
         <Link
@@ -52,16 +52,28 @@ export default async function GuideLiveBox({ guide }: { guide: Guide }) {
     )
   }
 
-  // ── 정상 운항 ──
+  // 남은 시각이 없다는 사실을 실제 전편 운항 완료로 표현하지 않는다.
+  if (live.nextTimes.length === 0) {
+    return (
+      <Link href={guide.liveHref} className="block rounded-2xl border border-slate-200 bg-white px-5 py-4 text-slate-700 shadow-sm hover:border-blue-200">
+        <p className="text-sm font-bold">현재 시간표에 남은 출발편이 없습니다</p>
+        <p className="mt-1 text-xs leading-relaxed">실제 출항 완료를 의미하지 않습니다. 편별 상태와 다음 일정을 확인하세요. →</p>
+      </Link>
+    )
+  }
+
+  // 항로 운항과 전편 정상은 다르다. 부분 결항은 별도로 안내한다.
   return (
     <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 shadow-sm">
       <p className="flex items-center gap-2 text-base font-bold text-emerald-800">
         <span aria-hidden="true">🟢</span>
-        오늘 정상 운항 — {guide.destination}
+        운항으로 표시된 편 있음 — {guide.destination}
       </p>
-      {live.nextTimes.length > 0 ? (
+      {!!live.cancelledCount && (
+        <p className="mt-2 text-sm font-semibold text-rose-700">일부 결항·비운항 {live.cancelledCount}편 · 내 시각의 상태를 확인하세요.</p>
+      )}
         <div className="mt-2">
-          <p className="text-xs font-semibold text-emerald-700">지금 이후 출발</p>
+          <p className="text-xs font-semibold text-emerald-700">지금 이후 예정 시각 · 출항 확정은 선사 확인</p>
           <div className="mt-1 flex flex-wrap gap-1.5">
             {live.nextTimes.map((t) => (
               <span
@@ -73,9 +85,6 @@ export default async function GuideLiveBox({ guide }: { guide: Guide }) {
             ))}
           </div>
         </div>
-      ) : (
-        <p className="mt-1 text-sm text-emerald-700">오늘 남은 출발편은 없습니다. 내일 시간표를 확인하세요.</p>
-      )}
       <Link
         href={guide.liveHref}
         className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:text-blue-700"

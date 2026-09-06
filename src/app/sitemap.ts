@@ -23,12 +23,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }))
 
-  // thin(자동 생성) 가이드는 색인 대상에서 뺀다. sitemap의 인상은 "품질 신호"라
-  // 얇은 페이지를 여기 나열하면 사이트 전체의 콘텐츠 밀도가 낮게 평가된다.
-  // 페이지 자체는 robots noindex로도 이중 차단한다([slug]/page.tsx 참고).
+  // 색인 대상으로 관리하는 가이드만 포함한다. noindex는 광고 심사 제외 수단이 아니다.
   const guides: MetadataRoute.Sitemap = GUIDES.filter((g) => !g.thin).map((g) => ({
     url: `${BASE}/guide/${g.slug}`,
-    lastModified: now,
+    lastModified: g.updated,
     changeFrequency: "weekly",
     priority: 0.6,
   }))

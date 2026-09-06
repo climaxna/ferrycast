@@ -18,6 +18,7 @@ import AdArea from "@/components/AdArea"
 import AdFitBanner from "@/components/AdFitBanner"
 import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
+import RegionGuideLinks from "@/components/RegionGuideLinks"
 
 export function generateStaticParams() {
   return Object.keys(REGIONS).map((region) => ({ region }))
@@ -186,6 +187,8 @@ export default async function RegionPage({
         <Suspense fallback={null}>
           <RegionIslandHops region={region} />
         </Suspense>
+
+        <RegionGuideLinks region={config.slug} />
 
         <div className="space-y-2">
           {/* 지역 광고는 시간표 직후 단락으로 이동(RegionRouteTabs adSlot). 하단은 특산물+애드핏 */}

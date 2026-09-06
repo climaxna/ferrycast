@@ -5,6 +5,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { GUIDES, getGuide, type Guide } from "@/content/guides"
 import GuideLiveBox from "@/components/GuideLiveBox"
+import RegionNav from "@/components/RegionNav"
 
 // 정적 콘텐츠 + 상단 실시간 박스(오늘 운항/결항)용 재생성 주기.
 // ⚠️ Vercel Hobby ISR Writes 월 20만 회 한도 — 가이드 22개 × 홈·지역 5개가 전부 600초
@@ -81,7 +82,7 @@ export default async function GuidePage({
 
   // 모든 가이드를 빌드할 때 상단 실시간 박스가 MTIS를 한꺼번에 호출하지 않도록 한다.
   // 고정 본문은 그대로 서버 렌더링되며, 실시간 데이터는 요청 시 캐시를 통해 가져온다.
-  await connection()
+  if (guide.kind !== "usage") await connection()
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -111,6 +112,7 @@ export default async function GuidePage({
             · {guide.regionName}
           </nav>
           <h1 className="text-xl font-bold leading-snug tracking-tight text-slate-900">{guide.title}</h1>
+          <p className="mt-2 text-xs text-slate-500">내용 수정 <time dateTime={guide.updated}>{guide.updated}</time></p>
           <div className="mt-3 space-y-2.5">
             {guide.intro.map((p, i) => (
               <p key={i} className="text-sm leading-relaxed text-slate-600">
@@ -121,7 +123,12 @@ export default async function GuidePage({
         </div>
 
         {/* 실시간 박스 — 검색으로 착지한 사용자가 클릭 없이 오늘 운항/결항을 바로 봄 */}
-        <Suspense
+        {guide.kind === "usage" ? (
+          <section aria-label="지역별 배편 확인">
+            <h2 className="mb-2 text-sm font-bold text-slate-700">내가 이용할 지역의 배편 확인</h2>
+            <RegionNav current="common" />
+          </section>
+        ) : <Suspense
           fallback={
             <div className="flex items-center justify-between rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 px-5 py-4 text-white shadow-lg shadow-blue-900/10">
               <div>
@@ -135,7 +142,20 @@ export default async function GuidePage({
           }
         >
           <GuideLiveBox guide={guide} />
-        </Suspense>
+        </Suspense>}
+
+        {guide.sections && (
+          <nav aria-label="이 글의 목차" className="rounded-2xl border border-slate-200 bg-white p-4">
+            <p className="mb-1 text-sm font-bold text-slate-800">이 글에서 확인할 내용</p>
+            <ol className="list-inside list-decimal text-sm text-slate-600">
+              {guide.sections.map((section) => (
+                <li key={section.id}>
+                  <a href={`#${section.id}`} className="inline-flex min-h-11 items-center py-2 text-blue-700 underline-offset-4 hover:underline focus-visible:outline-blue-600">{section.title}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
 
         {/* 요약 정보 */}
         <section>
@@ -150,7 +170,28 @@ export default async function GuidePage({
           </dl>
         </section>
 
-        {/* 시간표(검증 노선만) */}
+        {guide.sections?.map((section) => (
+          <section key={section.id} id={section.id} className="scroll-mt-24 space-y-3 border-t border-slate-200 pt-5">
+            <h2 className="text-base font-bold leading-snug text-slate-900">{section.title}</h2>
+            {section.paragraphs.map((paragraph, i) => (
+              <p key={i} className="text-sm leading-7 text-slate-700">{paragraph}</p>
+            ))}
+            {section.checklist && (
+              <ul className="list-disc space-y-2 rounded-xl bg-blue-50 p-4 pl-8 text-sm leading-relaxed text-slate-700">
+                {section.checklist.map((item) => <li key={item}>{item}</li>)}
+              </ul>
+            )}
+          </section>
+        ))}
+
+        {guide.sourceNote && (
+          <aside className="rounded-xl border border-slate-200 bg-white p-4 text-xs leading-relaxed text-slate-600">
+            <p className="mb-1 font-bold text-slate-700">자료 기준과 이용 범위</p>
+            <p>{guide.sourceNote}</p>
+          </aside>
+        )}
+
+        {/* 과거 확인 자료의 참고 시간표 — 오늘 운항을 보장하지 않음 */}
         {guide.timetables?.map((tt) => (
           <section key={tt.title}>
             <h2 className="mb-2 text-sm font-bold text-slate-700">{tt.title}</h2>
@@ -185,7 +226,7 @@ export default async function GuidePage({
         {/* 출발지별 상세 — 허브 총정리(제주도 배편 등) → 개별 노선 가이드로 연결 */}
         {guide.relatedGuides && guide.relatedGuides.length > 0 && (
           <section>
-            <h2 className="mb-2 text-sm font-bold text-slate-700">출발지별 상세 시간표</h2>
+            <h2 className="mb-2 text-sm font-bold text-slate-700">함께 확인할 가이드</h2>
             <ul className="space-y-2">
               {guide.relatedGuides.map((r) => (
                 <li key={r.href}>
@@ -275,6 +316,22 @@ export default async function GuidePage({
         )}
 
         {/* 면책 + 실시간 재안내 */}
+        {guide.sources && (
+          <section className="space-y-3 border-t border-slate-200 pt-4">
+            <h2 className="text-sm font-bold text-slate-800">출처와 확인 범위</h2>
+            <ul className="space-y-3">
+              {guide.sources.map((source) => (
+                <li key={source.href}>
+                  <a href={source.href} {...(source.href.startsWith("https://") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="inline-flex min-h-11 items-center text-sm font-medium text-blue-700 underline underline-offset-4">
+                    {source.label}{source.href.startsWith("https://") ? " ↗" : ""}
+                  </a>
+                  <p className="text-xs leading-relaxed text-slate-600">{source.note}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-500">
             이 가이드는 참고용입니다.{" "}
@@ -286,9 +343,9 @@ export default async function GuidePage({
             href={guide.liveHref}
             className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-100"
           >
-            {guide.regionName} 실시간 운항 현황 보기 →
+            {guide.kind === "usage" ? "지역을 선택하고 배편 확인" : `${guide.regionName} 실시간 운항 현황 보기`} →
           </Link>
-          <p className="mt-3 text-xs text-slate-400">최종 확인 {guide.updated}</p>
+          <p className="mt-3 text-xs text-slate-500">내용 수정 {guide.updated} · 실시간 조회 시각과는 다릅니다.</p>
         </footer>
       </article>
     </main>

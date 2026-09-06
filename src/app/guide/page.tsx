@@ -42,6 +42,7 @@ export default function GuideIndexPage() {
       <div className="mx-auto max-w-lg space-y-6 px-4 py-5">
         <p className="text-sm leading-relaxed text-slate-500">
           완도·울릉도·목포·인천·제주 주요 섬으로 가는 여객선의 시간표, 요금, 소요시간, 터미널 정보를 정리했습니다.
+          결항 표시 읽는 법, 해무 때 확인 순서와 승선 준비도 함께 안내합니다.
           오늘 실제 운항·결항 여부는 각 지역 실시간 화면에서 확인하세요.
         </p>
 
@@ -49,9 +50,9 @@ export default function GuideIndexPage() {
           <section key={grp.regionSlug || "wando"}>
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-sm font-bold text-slate-700">{grp.regionName}</h2>
-              <Link href={grp.liveHref} className="text-xs font-semibold text-blue-600 hover:underline">
+              {grp.regionSlug !== "common" && <Link href={grp.liveHref} className="text-xs font-semibold text-blue-600 hover:underline">
                 실시간 현황 →
-              </Link>
+              </Link>}
             </div>
             <ul className="space-y-2">
               {grp.guides.map((g) => (
@@ -62,9 +63,9 @@ export default function GuideIndexPage() {
                   >
                     <div className="min-w-0">
                       {/* 타이틀은 "짧은 제목 — 부제" 형식이라 em dash 앞부분만 목록에 노출 */}
-                      <p className="truncate text-sm font-bold text-slate-800">{g.title.split(" — ")[0]}</p>
-                      <p className="mt-0.5 truncate text-xs text-slate-400">
-                        {g.facts.find((f) => f.label === "출발 터미널")?.value ?? "배 시간표·요금"}
+                      <p className="text-sm font-bold text-slate-800">{g.title.split(" — ")[0]}</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-slate-600">
+                        {g.kind === "usage" ? g.title.split(" — ")[1] : g.facts.find((f) => f.label === "출발 터미널")?.value ?? "배 시간표·요금"}
                       </p>
                     </div>
                     <span className="shrink-0 text-slate-300" aria-hidden="true">
