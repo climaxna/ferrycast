@@ -7,6 +7,7 @@ import { toMinutes as toMin, relativeTime } from "@/lib/utils"
 import { ROUTE_THEME, type AccentTheme } from "@/lib/routeTheme"
 import AlarmSheet from "@/components/AlarmSheet"
 import TomorrowSheet from "@/components/TomorrowSheet"
+import { getRouteDetailGuide } from "@/content/routeDetailGuides"
 
 interface Props {
   route: WandoRoute
@@ -64,6 +65,7 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
   const arrOf = (t: string): string | null =>
     route.arrivals?.[t] ?? (route.durationMin ? addMinutes(t, route.durationMin) : null)
   const hasArrival = !!route.arrivals || !!route.durationMin
+  const guide = getRouteDetailGuide(route)
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: "100dvh" }}>
@@ -410,6 +412,37 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               예약하기
               <span aria-hidden="true">→</span>
             </a>
+          )}
+
+          {guide && (
+            <section className="border-t border-slate-100 pt-5" aria-labelledby="route-guide-heading">
+              <div className="flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-blue-600" aria-hidden="true">
+                  <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                  <path d="M12 8v4l2.5 1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <h3 id="route-guide-heading" className="text-base font-bold text-slate-900">이 항로 이용 안내</h3>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{guide.intro}</p>
+              <div className="mt-3 space-y-3">
+                {guide.checks.map((check) => (
+                  <div key={check.title} className="rounded-xl bg-slate-50 px-3.5 py-3">
+                    <p className="text-sm font-bold text-slate-800">{check.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600">{check.description}</p>
+                  </div>
+                ))}
+              </div>
+              <a
+                href={guide.source.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-800"
+              >
+                {guide.source.label}
+                <span aria-hidden="true">→</span>
+              </a>
+              <p className="mt-2 text-xs leading-5 text-slate-400">운항·접수 조건은 바뀔 수 있으므로 승선 전 공식 안내를 최종 기준으로 확인하세요.</p>
+            </section>
           )}
 
           {/* 현장 발권 노선(약산권 등) — 예약 버튼 대신 매표소 연락처 안내 */}
