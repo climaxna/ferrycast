@@ -1,4 +1,5 @@
 import type { RegionConfig } from "@/config/regions"
+import { cachedWeather } from "./weatherCache"
 
 export type { WeatherData } from "@/lib/weather"
 export { windDirLabel, waveLabel, ptyLabel } from "@/lib/weather"
@@ -40,6 +41,7 @@ async function fetchSkySrc(
   key: string,
   nx: number,
   ny: number,
+  signal: AbortSignal,
 ): Promise<number> {
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
   const pad = (n: number) => String(n).padStart(2, "0")
@@ -58,24 +60,26 @@ async function fetchSkySrc(
   try {
     const res = await fetch(
       `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${params}`,
-      { next: { revalidate: 600 } },
+      { next: { revalidate: 600 }, signal },
     )
-    if (!res.ok) return 1
+    if (!res.ok) return -1
     const json = await res.json()
-    if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") return 1
+    if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") return -1
     const items: Array<{ category: string; fcstValue: string }> =
       json?.response?.body?.items?.item ?? []
     const skyItem = items.find((i) => i.category === "SKY")
-    return skyItem ? parseInt(skyItem.fcstValue) : 1
-  } catch { return 1 }
+    return skyItem ? parseInt(skyItem.fcstValue) : -1
+  } catch { return -1 }
 }
 
-async function fetchWaveHeightSrc(
+export async function fetchWaveHeightSrc(
   key: string,
   seaGrids: Array<{ nx: number; ny: number }>,
+  signal = AbortSignal.timeout(6000),
 ): Promise<number | null> {
   const { baseDate, baseTime } = getVilageFcstBase()
   for (const { nx, ny } of seaGrids) {
+    if (signal.aborted) break
     try {
       const params = new URLSearchParams({
         serviceKey: key, dataType: "JSON", numOfRows: "300", pageNo: "1",
@@ -83,7 +87,7 @@ async function fetchWaveHeightSrc(
       })
       const res = await fetch(
         `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`,
-        { next: { revalidate: 1800 } },
+        { next: { revalidate: 1800 }, signal },
       )
       if (!res.ok) continue
       const json = await res.json()
@@ -99,20 +103,8 @@ async function fetchWaveHeightSrc(
   return null
 }
 
-// 지역별 직전 정상값 보관 (서버 인스턴스 메모리) — 기상청 실패 시 빈 화면 방지
-const _lastGoodRegion = new Map<string, { data: WeatherData; at: number }>()
-const REGION_WEATHER_STALE_MAX_MS = 3 * 60 * 60 * 1000  // 최대 3시간
-
 export async function getWeatherForRegion(config: RegionConfig): Promise<WeatherData | null> {
-  const fresh = await fetchRegionWeatherFresh(config)
-  const k = `${config.weatherGrid.nx},${config.weatherGrid.ny}`
-  if (fresh) {
-    _lastGoodRegion.set(k, { data: fresh, at: Date.now() })
-    return fresh
-  }
-  const prev = _lastGoodRegion.get(k)
-  if (prev && Date.now() - prev.at < REGION_WEATHER_STALE_MAX_MS) return prev.data
-  return null
+  return cachedWeather(config.slug, () => fetchRegionWeatherFresh(config))
 }
 
 interface NcstItem { category: string; obsrValue: string; baseDate: string; baseTime: string }
@@ -129,14 +121,14 @@ function prevBase(baseDate: string, baseTime: string): { baseDate: string; baseT
   return { baseDate: d, baseTime: `${String(h).padStart(2, "0")}00` }
 }
 
-async function fetchNcstItems(key: string, nx: number, ny: number, baseDate: string, baseTime: string): Promise<NcstItem[] | null> {
+async function fetchNcstItems(key: string, nx: number, ny: number, baseDate: string, baseTime: string, signal: AbortSignal): Promise<NcstItem[] | null> {
   const params = new URLSearchParams({
     serviceKey: key, dataType: "JSON", numOfRows: "10", pageNo: "1",
     base_date: baseDate, base_time: baseTime, nx: String(nx), ny: String(ny),
   })
   const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?${params}`
   try {
-    const res = await fetch(url, { next: { revalidate: 600 } })
+    const res = await fetch(url, { next: { revalidate: 600 }, signal })
     if (!res.ok) return null
     const json = await res.json()
     if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") return null
@@ -153,22 +145,23 @@ async function fetchRegionWeatherFresh(config: RegionConfig): Promise<WeatherDat
 
   const { nx, ny } = config.weatherGrid
   const cur = getBaseDateTime()
-  const [items1, waveHeight, sky] = await Promise.all([
-    fetchNcstItems(key, nx, ny, cur.baseDate, cur.baseTime),
-    fetchWaveHeightSrc(key, config.seaGrids),
-    fetchSkySrc(key, nx, ny),
+  const signal = AbortSignal.timeout(6000)
+  const [items1, sky] = await Promise.all([
+    fetchNcstItems(key, nx, ny, cur.baseDate, cur.baseTime, signal),
+    fetchSkySrc(key, nx, ny, AbortSignal.any([signal, AbortSignal.timeout(2000)])),
   ])
 
   let items = items1
   let usedDate = cur.baseDate
   let usedTime = cur.baseTime
-  if (!items) {
+  if (!items && !signal.aborted) {
     const prev = prevBase(cur.baseDate, cur.baseTime)
-    items = await fetchNcstItems(key, nx, ny, prev.baseDate, prev.baseTime)
+    items = await fetchNcstItems(key, nx, ny, prev.baseDate, prev.baseTime, signal)
     usedDate = prev.baseDate
     usedTime = prev.baseTime
   }
   if (!items) return null
+  if (!items.some(i => i.category === "T1H" && Number.isFinite(Number(i.obsrValue)))) return null
 
   const get = (cat: string) => parseFloat(items!.find((i) => i.category === cat)?.obsrValue ?? "0")
   const first = items[0]
@@ -182,6 +175,5 @@ async function fetchRegionWeatherFresh(config: RegionConfig): Promise<WeatherDat
     rain1h: get("RN1"),
     baseDate: first?.baseDate ?? usedDate,
     baseTime: first?.baseTime ?? usedTime,
-    waveHeight: waveHeight ?? undefined,
   }
 }

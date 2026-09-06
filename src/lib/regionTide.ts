@@ -9,6 +9,7 @@ async function fetchTidal(
   obsCode: string,
   reqDate: string,
   revalidate: number,
+  signal: AbortSignal,
 ): Promise<Array<{ predcDt: string; predcTdlvVl: number; extrSe: string; obsvtrNm: string }> | null> {
   const params = new URLSearchParams({
     serviceKey: key, type: "json", numOfRows: "20", pageNo: "1",
@@ -17,7 +18,7 @@ async function fetchTidal(
   try {
     const res = await fetch(
       `https://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService?${params}`,
-      { next: { revalidate } },
+      { next: { revalidate }, signal },
     )
     if (!res.ok) return null
     const json = await res.json()
@@ -31,7 +32,7 @@ async function fetchTidal(
   }
 }
 
-export async function getTidalForRegion(obsCode: string): Promise<TidalForecast | null> {
+export async function getTidalForRegion(obsCode: string, signal = AbortSignal.timeout(8000)): Promise<TidalForecast | null> {
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return null
 
@@ -41,7 +42,7 @@ export async function getTidalForRegion(obsCode: string): Promise<TidalForecast 
     String(kst.getUTCMonth() + 1).padStart(2, "0") +
     String(kst.getUTCDate()).padStart(2, "0")
 
-  const items = await fetchTidal(key, obsCode, reqDate, 300)
+  const items = await fetchTidal(key, obsCode, reqDate, 300, signal)
   if (!items) return null
 
   const events: TidalEvent[] = items.map((d) => ({
@@ -58,7 +59,7 @@ export async function getTidalForRegion(obsCode: string): Promise<TidalForecast 
   }
 }
 
-export async function get5DayTidalForRegion(obsCode: string): Promise<TidalDayForecast[]> {
+export async function get5DayTidalForRegion(obsCode: string, signal = AbortSignal.timeout(8000)): Promise<TidalDayForecast[]> {
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return []
 
@@ -67,7 +68,7 @@ export async function get5DayTidalForRegion(obsCode: string): Promise<TidalDayFo
 
   const results = await Promise.all(
     dates.map(async (reqDate) => {
-      const items = await fetchTidal(key, obsCode, reqDate, 3600)
+      const items = await fetchTidal(key, obsCode, reqDate, 3600, signal)
       if (!items) return null
       const events: TidalEvent[] = items
         .filter((d) => {

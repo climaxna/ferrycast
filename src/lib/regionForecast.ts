@@ -31,6 +31,7 @@ function getVilageFcstBaseCandidates(): Array<{ baseDate: string; baseTime: stri
 
 export async function get5DayForecastForRegion(
   grids: Array<{ nx: number; ny: number }>,
+  signal = AbortSignal.timeout(8000),
 ): Promise<DailyForecast[]> {
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return []
@@ -40,13 +41,14 @@ export async function get5DayForecastForRegion(
 
   for (const { baseDate, baseTime } of candidates) {
     for (const { nx, ny } of grids) {
+      if (signal.aborted) return []
       try {
         const params = new URLSearchParams({
           serviceKey: key, dataType: "JSON", numOfRows: "1000", pageNo: "1",
           base_date: baseDate, base_time: baseTime, nx: String(nx), ny: String(ny),
         })
         const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
-        const res = await fetch(url, { next: { revalidate: 600 } })
+        const res = await fetch(url, { next: { revalidate: 600 }, signal })
         if (!res.ok) continue
         const json = await res.json()
         if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") continue

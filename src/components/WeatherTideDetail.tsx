@@ -17,6 +17,8 @@ export default function WeatherTideDetail({
   tidal,
   forecast5,
   tidal5,
+  loading = false,
+  error = null,
   onClose,
 }: {
   regionName: string
@@ -24,6 +26,8 @@ export default function WeatherTideDetail({
   tidal: TidalForecast | null
   forecast5: DailyForecast[]
   tidal5: TidalDayForecast[]
+  loading?: boolean
+  error?: string | null
   onClose: () => void
 }) {
   useModalClose(onClose)
@@ -58,10 +62,13 @@ export default function WeatherTideDetail({
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-lg px-4 py-5 space-y-6">
+          {loading && <p role="status" className="text-sm text-slate-600">상세 예보·물때를 불러오는 중입니다…</p>}
+          {error && <p role="status" className="text-sm text-amber-800">{error}</p>}
+          {w.stale && <p className="text-sm text-amber-800">최신 조회 실패로 최근 관측값을 표시합니다.</p>}
 
           {/* ① 지금 실황 */}
           <section>
-            <h3 className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-400">지금</h3>
+            <h3 className="mb-2 text-sm font-bold tracking-wider text-slate-500">관측값 · {w.baseDate.slice(4, 6)}/{w.baseDate.slice(6)} {w.baseTime.slice(0, 2)}:{w.baseTime.slice(2)} 기준</h3>
             <div className="rounded-2xl bg-gradient-to-b from-[#2563eb] to-[#1d4ed8] p-4 text-white shadow-sm">
               <div className="flex items-center gap-3">
                 <span className="text-4xl font-bold tabular-nums leading-none">{Math.round(w.temp)}°</span>

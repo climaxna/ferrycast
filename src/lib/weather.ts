@@ -1,4 +1,7 @@
+import { cachedWeather } from "./weatherCache"
+
 export interface WeatherData {
+  stale?: boolean
   temp: number
   humidity: number
   windSpeed: number
@@ -58,6 +61,7 @@ export function weatherIconKind(pty: number, sky = 1): WeatherIconKind {
   if (pty === 2 || pty === 6) return "sleet"    // 비/눈 혼합
   if (pty === 3 || pty === 7) return "snow"     // 눈·눈날림
   if (pty > 0) return "fog"                     // 미지 코드 → 안개형으로 안전 처리
+  if (sky < 0) return "cloud"
   if (sky === 4) return "cloud"
   if (sky === 3) return "partly"
   return "sun"
@@ -78,6 +82,7 @@ export function ptyLabel(pty: number, sky = 1): { text: string; kind: WeatherIco
     return { text: text[pty] ?? "알 수 없음", kind }
   }
   // PTY=0: 강수 없음 → SKY 코드로 날씨 판단
+  if (sky < 0) return { text: "하늘정보 없음", kind }
   if (sky === 4) return { text: "흐림",     kind }
   if (sky === 3) return { text: "구름많음", kind }
   return               { text: "맑음",     kind }
@@ -102,7 +107,7 @@ function getVilageFcstBase(): { baseDate: string; baseTime: string } {
 
 // 초단기예보(getUltraSrtFcst)에서 SKY 코드 조회
 // PTY=0일 때 맑음/구름많음/흐림 구분을 위해 필요
-async function fetchSky(key: string): Promise<number> {
+async function fetchSky(key: string, signal: AbortSignal): Promise<number> {
   const kst = new Date(Date.now() + 9 * 60 * 60 * 1000)
   const pad = (n: number) => String(n).padStart(2, "0")
   // 초단기예보는 매 시각 30분 기준, 45분 후 발표
@@ -121,20 +126,20 @@ async function fetchSky(key: string): Promise<number> {
   try {
     const res = await fetch(
       `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${params}`,
-      { next: { revalidate: 600 } }
+      { next: { revalidate: 600 }, signal }
     )
-    if (!res.ok) return 1
+    if (!res.ok) return -1
     const json = await res.json()
     const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
-    if (resultCode !== "00") return 1
+    if (resultCode !== "00") return -1
     const items: Array<{ category: string; fcstValue: string }> =
       json?.response?.body?.items?.item ?? []
     const skyItem = items.find((i) => i.category === "SKY")
-    return skyItem ? parseInt(skyItem.fcstValue) : 1
-  } catch { return 1 }
+    return skyItem ? parseInt(skyItem.fcstValue) : -1
+  } catch { return -1 }
 }
 
-async function fetchWaveHeight(key: string): Promise<number | null> {
+export async function fetchWaveHeight(key: string, signal = AbortSignal.timeout(6000)): Promise<number | null> {
   const { baseDate, baseTime } = getVilageFcstBase()
   // 완도(X=57,Y=74)는 육지 격자 — WAV 없음. 남쪽 해상 격자를 순서대로 시도
   const seaGrids = [
@@ -144,6 +149,7 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
     { nx: 56, ny: 72 },
   ]
   for (const { nx, ny } of seaGrids) {
+    if (signal.aborted) break
     try {
       const params = new URLSearchParams({
         serviceKey: key,
@@ -156,7 +162,7 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
         ny: String(ny),
       })
       const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
-      const res = await fetch(url, { next: { revalidate: 1800 } })
+      const res = await fetch(url, { next: { revalidate: 1800 }, signal })
       if (!res.ok) continue
       const json = await res.json()
       const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
@@ -172,21 +178,8 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
   return null
 }
 
-// 서버 인스턴스 메모리에 직전 정상값 보관 — 기상청 호출 실패 시 빈 화면 대신 직전값 노출
-let _lastGoodWando: { data: WeatherData; at: number } | null = null
-const WEATHER_STALE_MAX_MS = 6 * 60 * 60 * 1000  // 직전값 허용 최대 6시간
-
 export async function getWandoWeather(): Promise<WeatherData | null> {
-  const fresh = await fetchWandoWeatherFresh()
-  if (fresh) {
-    _lastGoodWando = { data: fresh, at: Date.now() }
-    return fresh
-  }
-  // 신규 호출 실패(한도초과·NO_DATA·일시오류) 시 직전 정상값으로 빈 화면 방지
-  if (_lastGoodWando && Date.now() - _lastGoodWando.at < WEATHER_STALE_MAX_MS) {
-    return _lastGoodWando.data
-  }
-  return null
+  return cachedWeather("wando", fetchWandoWeatherFresh)
 }
 
 interface NcstItem { category: string; obsrValue: string; baseDate: string; baseTime: string }
@@ -204,14 +197,14 @@ function prevBase(baseDate: string, baseTime: string): { baseDate: string; baseT
   return { baseDate: d, baseTime: `${String(h).padStart(2, "0")}00` }
 }
 
-async function fetchNcstItems(key: string, baseDate: string, baseTime: string): Promise<NcstItem[] | null> {
+async function fetchNcstItems(key: string, baseDate: string, baseTime: string, signal: AbortSignal): Promise<NcstItem[] | null> {
   const params = new URLSearchParams({
     serviceKey: key, dataType: "JSON", numOfRows: "10", pageNo: "1",
     base_date: baseDate, base_time: baseTime, nx: "57", ny: "74",
   })
   const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?${params}`
   try {
-    const res = await fetch(url, { next: { revalidate: 600 } })
+    const res = await fetch(url, { next: { revalidate: 600 }, signal })
     if (!res.ok) return null
     const json = await res.json()
     if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") return null
@@ -228,23 +221,24 @@ async function fetchWandoWeatherFresh(): Promise<WeatherData | null> {
   if (!key) return null
 
   const cur = getBaseDateTime()
-  const [items1, waveHeight, sky] = await Promise.all([
-    fetchNcstItems(key, cur.baseDate, cur.baseTime),
-    fetchWaveHeight(key),
-    fetchSky(key),
+  const signal = AbortSignal.timeout(6000)
+  const [items1, sky] = await Promise.all([
+    fetchNcstItems(key, cur.baseDate, cur.baseTime, signal),
+    fetchSky(key, AbortSignal.any([signal, AbortSignal.timeout(2000)])),
   ])
 
   // 현재 base 실패(경계 NO_DATA 등) 시 직전시각으로 1회 재시도
   let items = items1
   let usedDate = cur.baseDate
   let usedTime = cur.baseTime
-  if (!items) {
+  if (!items && !signal.aborted) {
     const prev = prevBase(cur.baseDate, cur.baseTime)
-    items = await fetchNcstItems(key, prev.baseDate, prev.baseTime)
+    items = await fetchNcstItems(key, prev.baseDate, prev.baseTime, signal)
     usedDate = prev.baseDate
     usedTime = prev.baseTime
   }
   if (!items) return null
+  if (!items.some(i => i.category === "T1H" && Number.isFinite(Number(i.obsrValue)))) return null
 
   const get = (cat: string) => parseFloat(items!.find((i) => i.category === cat)?.obsrValue ?? "0")
   const first = items[0]
@@ -258,6 +252,5 @@ async function fetchWandoWeatherFresh(): Promise<WeatherData | null> {
     rain1h: get("RN1"),
     baseDate: first?.baseDate ?? usedDate,
     baseTime: first?.baseTime ?? usedTime,
-    waveHeight: waveHeight ?? undefined,
   }
 }
