@@ -399,35 +399,17 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               : "참고용 시간표 · 실제 운항 여부는 공식 채널에서 확인하세요"}
           </p>
 
-          {/* 보조 액션(운임·예약) — 이 화면의 주인공은 시간표다.
-              이전에는 운임 카드(py-4)와 예약 버튼(그라디언트 py-4 text-base)이 화면에서 가장 굵어
-              시선이 시간표를 지나 아래로 끌려갔다. 한 줄로 합치고 무게를 낮춘다.
-              예약은 여전히 주 동선이라 solid를 유지하되 크기만 줄이고, 운임은 외곽선으로 한 단계 아래에 둔다. */}
-          {(route.fareUrl || !route.noBooking) && (
-            <div className="flex gap-2">
-              {route.fareUrl && (
-                <a
-                  href={route.fareUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 active:opacity-70"
-                >
-                  운임 요금표
-                  <span aria-hidden="true">→</span>
-                </a>
-              )}
-              {!route.noBooking && (
-                <a
-                  href="https://island.theksa.co.kr/page/booking"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 active:opacity-80"
-                >
-                  해운조합 예약
-                  <span aria-hidden="true">→</span>
-                </a>
-              )}
-            </div>
+          {/* 운임 확인과 예매가 같은 공식 예약 흐름으로 이어져, 행동을 하나로 통일한다. */}
+          {!route.noBooking && (
+            <a
+              href="https://island.theksa.co.kr/page/booking"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 active:opacity-80"
+            >
+              예약하기
+              <span aria-hidden="true">→</span>
+            </a>
           )}
 
           {/* 현장 발권 노선(약산권 등) — 예약 버튼 대신 매표소 연락처 안내 */}
