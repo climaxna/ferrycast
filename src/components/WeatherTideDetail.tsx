@@ -101,7 +101,7 @@ export default function WeatherTideDetail({
               날짜별 날씨{hasTidal ? " · 물때" : ""} 예보
             </h3>
             {forecast5.length === 0 ? (
-              <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-400">날씨 예보를 불러올 수 없습니다</p>
+              <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">{loading ? "날짜별 예보 확인 중…" : "날씨 예보를 불러올 수 없습니다"}</p>
             ) : (
               <div className="space-y-2">
                 {forecast5.map((day) => (
@@ -115,6 +115,15 @@ export default function WeatherTideDetail({
                 ))}
               </div>
             )}
+            {/* 날씨 조회 실패 시에도 정상 수신한 조석 정보를 숨기지 않는다. */}
+            {tidal5.filter(day => day.events.length > 0 && !forecast5.some(forecast => forecast.date === day.date)).map(day => (
+              <div key={day.date} className="mt-2 rounded-2xl border border-blue-100 bg-blue-50 p-3">
+                <p className="mb-2 text-sm font-semibold text-slate-700">{day.dateLabel} · {day.date.slice(4, 6)}/{day.date.slice(6)} 물때</p>
+                <ul className="grid grid-cols-2 gap-2 text-xs text-slate-700">
+                  {day.events.map((event, i) => <li key={i} className="rounded-lg bg-white p-2">{event.type === "high" ? "만조" : "간조"} {event.time} · {event.height}cm</li>)}
+                </ul>
+              </div>
+            ))}
           </section>
 
           <p className="pb-6 text-xs leading-relaxed text-slate-400">
