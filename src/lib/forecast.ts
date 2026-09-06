@@ -57,7 +57,7 @@ function getVilageFcstBaseCandidates(): Array<{ baseDate: string; baseTime: stri
 }
 
 
-export async function get5DayForecast(signal = AbortSignal.timeout(8000)): Promise<DailyForecast[]> {
+export async function get5DayForecast(): Promise<DailyForecast[]> {
   // apihub.kma.go.kr는 서비스별 별도 등록 필요. data.go.kr 공통키 사용.
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return []
@@ -68,7 +68,6 @@ export async function get5DayForecast(signal = AbortSignal.timeout(8000)): Promi
 
   for (const { baseDate, baseTime } of candidates) {
     for (const { nx, ny } of grids) {
-      if (signal.aborted) return []
       try {
         const params = new URLSearchParams({
           serviceKey: key,
@@ -81,7 +80,7 @@ export async function get5DayForecast(signal = AbortSignal.timeout(8000)): Promi
           ny: String(ny),
         })
         const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
-        const res = await fetch(url, { next: { revalidate: 600 }, signal })
+        const res = await fetch(url, { next: { revalidate: 600 } })
         if (!res.ok) continue
         const json = await res.json()
         const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode

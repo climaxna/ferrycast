@@ -1,6 +1,5 @@
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
-import { connection } from "next/server"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { GUIDES, getGuide, type Guide } from "@/content/guides"
@@ -79,10 +78,6 @@ export default async function GuidePage({
   const { slug } = await params
   const guide = getGuide(slug)
   if (!guide) notFound()
-
-  // 모든 가이드를 빌드할 때 상단 실시간 박스가 MTIS를 한꺼번에 호출하지 않도록 한다.
-  // 고정 본문은 그대로 서버 렌더링되며, 실시간 데이터는 요청 시 캐시를 통해 가져온다.
-  if (guide.kind !== "usage") await connection()
 
   return (
     <main className="min-h-screen bg-slate-50">

@@ -1,11 +1,12 @@
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
-import { connection } from "next/server"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { REGIONS } from "@/config/regions"
 import { OG_TITLE, OG_DESCRIPTION } from "@/lib/seo"
 import { getWeatherForRegion } from "@/lib/regionWeather"
+import { getTidalForRegion, get5DayTidalForRegion } from "@/lib/regionTide"
+import { get5DayForecastForRegion } from "@/lib/regionForecast"
 import { getRoutesForRegion, getArrivalsForRegion, getIslandHopsForRegion, getRegionStatusSummaries } from "@/lib/regionFerry"
 import { getTrainsForRegion } from "@/lib/regionTrain"
 import RegionWeatherCardClient from "./RegionWeatherCardClient"
@@ -75,10 +76,18 @@ async function RegionWeatherCard({
   region: string
 }) {
   const config = REGIONS[region]
-  const weather = await getWeatherForRegion(config)
+  const [weather, tidal, forecast5, tidal5] = await Promise.all([
+    getWeatherForRegion(config),
+    config.tidalObsCode ? getTidalForRegion(config.tidalObsCode) : Promise.resolve(null),
+    get5DayForecastForRegion([config.weatherGrid, ...config.seaGrids]),
+    config.tidalObsCode ? get5DayTidalForRegion(config.tidalObsCode) : Promise.resolve([]),
+  ])
   return (
     <RegionWeatherCardClient
       weather={weather}
+      tidal={tidal}
+      forecast5={forecast5}
+      tidal5={tidal5}
       regionName={config.name}
       regionSlug={config.slug}
     />
@@ -130,10 +139,6 @@ export default async function RegionPage({
   const { region } = await params
   const config = REGIONS[region]
   if (!config) notFound()
-
-  // 지역 페이지들을 빌드 워커가 동시에 사전 생성하면 공공 API 연결 제한에 걸려
-  // fallback 시간표가 배포될 수 있다. 실시간 영역은 첫 실제 요청에서 렌더한다.
-  await connection()
 
   return (
     <main className="min-h-screen bg-slate-50">

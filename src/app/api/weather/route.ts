@@ -10,12 +10,10 @@ export const dynamic = "force-dynamic"
 export async function GET(req: NextRequest) {
   const region = req.nextUrl.searchParams.get("region")
   const config = region ? REGIONS[region] : null
-  if (region && !config) return NextResponse.json({ error: "Unknown region" }, { status: 400 })
   const data = config ? await getWeatherForRegion(config) : await getWandoWeather()
   return NextResponse.json(data ?? null, {
-    status: data ? 200 : 503,
-    headers: data && !data.stale
-      ? { "Cache-Control": "public, s-maxage=300" }
+    headers: data
+      ? { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=3600" }
       : { "Cache-Control": "no-store" },
   })
 }

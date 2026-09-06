@@ -15,7 +15,7 @@ export interface TidalForecast {
 // 완도 예보지점 코드
 const OBS_CODE = "DT_0027"
 
-export async function getTidalForecast(signal = AbortSignal.timeout(8000)): Promise<TidalForecast | null> {
+export async function getTidalForecast(): Promise<TidalForecast | null> {
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return null
 
@@ -35,7 +35,7 @@ export async function getTidalForecast(signal = AbortSignal.timeout(8000)): Prom
       reqDate,
     })
     const url = `https://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService?${params}`
-    const res = await fetch(url, { next: { revalidate: 3600 }, signal })
+    const res = await fetch(url, { next: { revalidate: 3600 } })
     if (!res.ok) return null
 
     const json = await res.json()
@@ -84,7 +84,7 @@ export interface TidalDayForecast {
   obsName: string
 }
 
-export async function get5DayTidalForecast(signal = AbortSignal.timeout(8000)): Promise<TidalDayForecast[]> {
+export async function get5DayTidalForecast(): Promise<TidalDayForecast[]> {
   const key = process.env.DATAGOKR_API_KEY
   if (!key) return []
 
@@ -103,7 +103,7 @@ export async function get5DayTidalForecast(signal = AbortSignal.timeout(8000)): 
           reqDate,
         })
         const url = `https://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService?${params}`
-        const res = await fetch(url, { next: { revalidate: 3600 }, signal })
+        const res = await fetch(url, { next: { revalidate: 3600 } })
         if (!res.ok) return null
         const json = await res.json()
         const resultCode = json?.header?.resultCode ?? json?.response?.header?.resultCode
