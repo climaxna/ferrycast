@@ -15,6 +15,7 @@ export type TourGuide = {
   intro: string
   sourceNote: string
   updated: string
+  sourceLabel: string
   officialHref: string
   ferryGuideHref: string
   ferryGuideLabel: string
@@ -33,6 +34,7 @@ export const TOUR_GUIDES: TourGuide[] = [
     intro: "청산도행 여객선은 도청항을 기준으로 도착합니다. 아래 장소는 완도문화관광이 청산권 주요 관광지로 소개한 곳입니다. 섬 안 이동 시간, 운영 여부, 주차·입장 조건은 방문일에 공식 안내 또는 현지 운영처에 확인하세요.",
     sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 완도문화관광의 청산도·청산권 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 공식 안내를 확인하세요.",
     updated: "2026-09-07",
+    sourceLabel: "완도문화관광",
     officialHref: "https://www.wando.go.kr/tour/sub.cs?m=106",
     ferryGuideHref: "/guide/wando-cheongsando",
     ferryGuideLabel: "청산도 배편·승선 안내 보기",
@@ -83,6 +85,7 @@ export const TOUR_GUIDES: TourGuide[] = [
     intro: "화흥포항 출발편은 노화도 동천항에 도착합니다. 보길도는 동천항에서 보길대교를 건너 이동합니다. 아래 장소는 완도문화관광의 보길도 당일코스에 소개된 곳이며, 섬 안 이동 시간과 운영 여부는 방문일에 확인하세요.",
     sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 완도문화관광의 보길도 당일코스와 보길도 윤선도 원림 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 공식 안내를 확인하세요.",
     updated: "2026-09-07",
+    sourceLabel: "완도문화관광",
     officialHref: "https://www.wando.go.kr/tour/sub.cs?m=105",
     ferryGuideHref: "/guide/wando-soan-bogil-nohwa",
     ferryGuideLabel: "화흥포·보길도 배편·승선 안내 보기",
@@ -114,6 +117,43 @@ export const TOUR_GUIDES: TourGuide[] = [
         description: "보길도 서쪽 망월봉 끝자락에 자리한 전망대입니다. 다도해 섬과 바다를 조망하는 장소로 완도문화관광이 안내합니다.",
         mapQuery: "보길도 망끝전망대",
         officialHref: "https://www.wando.go.kr/tour/sub.cs?m=105",
+      },
+    ],
+  },
+  {
+    slug: "hongdo",
+    region: "홍도",
+    title: "홍도 주요 관광지 — 홍도항 도착 뒤 확인하는 3곳",
+    description: "홍도항에 도착한 뒤 찾아볼 수 있는 홍도 해상관광, 깃대봉, 홍도 전망대를 한국관광공사 안내 기준으로 정리했습니다.",
+    arrivalPort: "홍도항",
+    intro: "목포 출발편은 홍도항에 도착합니다. 홍도는 섬 전체가 천연보호구역으로 지정된 지역입니다. 아래 장소는 한국관광공사 안내에 소개된 곳이며, 탐방·유람선 운영 여부와 현장 규정은 방문일에 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 한국관광공사 대한민국 구석구석의 홍도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "한국관광공사 홍도 공식 안내",
+    officialHref: "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=857fd91d-1c56-4581-8631-edd47e6bd318",
+    ferryGuideHref: "/guide/mokpo-hongdo",
+    ferryGuideLabel: "목포·홍도 배편·승선 안내 보기",
+    places: [
+      {
+        name: "홍도 해상관광",
+        category: "유람선 · 해안 경관",
+        description: "홍도의 해안 절벽과 주변 섬 풍경을 배 위에서 보는 관광 방식입니다. 운항 여부와 승선 조건은 해상 상황 및 현지 유람선 안내를 확인하세요.",
+        mapQuery: "홍도 유람선 관광",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=f6f1db28-c2a3-42b5-bca7-95e393130ef2",
+      },
+      {
+        name: "깃대봉",
+        category: "탐방 · 정상 경관",
+        description: "홍도의 주봉으로 소개되는 곳입니다. 정상에서는 주변 능선과 섬 풍경을 볼 수 있으며, 탐방 전 날씨와 현장 통제 여부를 확인하는 것이 좋습니다.",
+        mapQuery: "홍도 깃대봉",
+        officialHref: "https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=857fd91d-1c56-4581-8631-edd47e6bd318",
+      },
+      {
+        name: "홍도 전망대",
+        category: "전망 · 섬 풍경",
+        description: "한국관광공사 홍도 안내에서 깃대봉 탐방로와 함께 소개된 전망 장소입니다. 이동 여건과 이용 가능 구간은 현지 안내를 확인하세요.",
+        mapQuery: "홍도 전망대",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=f6f1db28-c2a3-42b5-bca7-95e393130ef2",
       },
     ],
   },

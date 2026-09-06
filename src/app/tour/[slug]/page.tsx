@@ -92,7 +92,7 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
         <section className="border-t border-slate-200 pt-4">
           <h2 className="text-sm font-bold text-slate-800">출처와 확인 범위</h2>
           <p className="mt-2 text-xs leading-5 text-slate-600">{guide.sourceNote}</p>
-          <a href={guide.officialHref} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">완도문화관광 {guide.region} 공식 안내 ↗</a>
+          <a href={guide.officialHref} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">{guide.sourceLabel} ↗</a>
         </section>
 
         <Link href={guide.ferryGuideHref} className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">

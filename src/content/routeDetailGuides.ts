@@ -92,6 +92,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     guideHref: "/guide/mokpo-hongdo",
+    tourHref: "/tour/hongdo",
   },
   heuksando: {
     title: "목포 · 흑산도 이용 안내",
