@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import Link from "next/link"
+import { connection } from "next/server"
 import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
 import YaksanRouteSection from "@/components/YaksanRouteSection"
@@ -34,7 +35,12 @@ function RouteSkeleton() {
   )
 }
 
-export default function Page() {
+export default async function Page() {
+  // 실시간 공공 API를 빌드 중 호출하면 다중 워커가 동시에 data.go.kr에 접속해
+  // timeout/429가 발생하고, 정적 fallback 화면이 배포 결과에 굳을 수 있다.
+  // 페이지 렌더만 실제 요청 시점으로 미루고 각 fetch의 10분 데이터 캐시는 유지한다.
+  await connection()
+
   return (
     <main className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">

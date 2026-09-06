@@ -154,8 +154,10 @@ export function nextDay(date: string): string {
 // 빌드 때 여러 지역 페이지가 동시에 렌더되면 순간적으로 이 한도를 넘어 MTIS가 빈 응답이 되고,
 // 그 결과가 ISR에 굳어 **전 지역이 정적 fallback("참고 시간표")으로 서비스**된다(2026.08 실장애).
 // 시간표는 이 앱의 본 정보라 몇 백 ms 기다려서라도 받아내는 편이 옳다.
-const MTIS_RETRY = 3
+const MTIS_RATE_LIMIT_RETRY = 3
+const MTIS_TRANSIENT_RETRY = 1
 const MTIS_RETRY_MS = 500
+const MTIS_TIMEOUT_MS = 8_000
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 async function fetchMtisPage(
@@ -172,13 +174,24 @@ async function fetchMtisPage(
   const empty = { items: [] as MtisItem[], totalCount: 0 }
   let res: Response
   try {
-    res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 600 } })
+    res = await fetch(`${MTIS_BASE}?${params}`, {
+      next: { revalidate: 600 },
+      signal: AbortSignal.timeout(MTIS_TIMEOUT_MS),
+    })
   } catch (e) {
+    if (attempt < MTIS_TRANSIENT_RETRY) {
+      await sleep(MTIS_RETRY_MS * (attempt + 1))
+      return fetchMtisPage(key, date, pageNo, attempt + 1)
+    }
     console.error(`[mtis] ${date} p${pageNo} fetch 실패(네트워크·타임아웃):`, e)
     return empty
   }
-  if (res.status === 429 && attempt < MTIS_RETRY) {
+  if (res.status === 429 && attempt < MTIS_RATE_LIMIT_RETRY) {
     // 초당 제한 — 점진적으로 물러섰다가 재시도 (500ms, 1000ms, 1500ms)
+    await sleep(MTIS_RETRY_MS * (attempt + 1))
+    return fetchMtisPage(key, date, pageNo, attempt + 1)
+  }
+  if (res.status >= 500 && attempt < MTIS_TRANSIENT_RETRY) {
     await sleep(MTIS_RETRY_MS * (attempt + 1))
     return fetchMtisPage(key, date, pageNo, attempt + 1)
   }
@@ -192,6 +205,12 @@ async function fetchMtisPage(
   try {
     json = JSON.parse(text)
   } catch {
+    // data.go.kr 게이트웨이는 dataType=JSON 요청에도 장애 시 XML로
+    // SERVICETIMEOUT_ERROR를 돌려준다. 짧게 한 번 재시도한 뒤 fallback으로 넘긴다.
+    if (text.includes("SERVICETIMEOUT_ERROR") && attempt < MTIS_TRANSIENT_RETRY) {
+      await sleep(MTIS_RETRY_MS * (attempt + 1))
+      return fetchMtisPage(key, date, pageNo, attempt + 1)
+    }
     console.error(`[mtis] ${date} p${pageNo} JSON 파싱 실패(쿼터 초과 의심). 응답 앞부분: ${text.slice(0, 160)}`)
     return empty
   }
