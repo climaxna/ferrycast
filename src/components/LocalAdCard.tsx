@@ -56,9 +56,7 @@ export default function LocalAdCard({ ad }: { ad: LocalAd }) {
           style={ad.imagePos ? { objectPosition: ad.imagePos } : undefined}
           sizes="(max-width: 512px) 100vw, 512px"
         />
-        {/* 전면 이미지형은 배너 자체가 명백한 광고물이라 '광고' 텍스트 라벨은 얹지 않는다
-            (디자인을 가리기도 함). 대신 위 테두리 띠로 "여기 있다"를 알린다.
-            콘텐츠처럼 보이는 텍스트/사진형에는 아래에서 텍스트 라벨 유지. */}
+        <AdLabel tone="onImage" />
       </a>
     )
   }

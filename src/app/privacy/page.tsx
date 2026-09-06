@@ -26,20 +26,27 @@ export default function PrivacyPage() {
       <div className="mx-auto max-w-lg space-y-6 px-4 py-6">
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-600">
-            FerryCast(이하 "서비스")는 완도 여객선 정보·날씨·조석 정보를 제공하는 웹 서비스입니다.
-            서비스는 회원가입·로그인·결제 기능이 없으며, 이용자의 개인정보를 직접 수집·저장하지 않습니다.
+            FerryCast(이하 "서비스")는 여객선 운항 정보와 여행 이용 안내를 제공하는 웹 서비스입니다.
+            회원가입·로그인·사이트 내 결제 기능은 없지만, 방문 분석·광고 도구가 정보를 처리할 수 있으며
+            이메일 문의 시 발신 주소와 문의 내용이 운영자에게 전달됩니다.
           </p>
-          <p className="mt-2 text-xs text-slate-400">시행일: 2026년 1월 1일</p>
+          <p className="mt-2 text-xs text-slate-400">최근 수정일: 2026년 9월 7일</p>
         </div>
 
         <Section title="1. 수집하는 개인정보">
-          <p>서비스는 이용자의 이름·이메일·전화번호·위치 정보 등 개인정보를 직접 수집하지 않습니다.</p>
-          <p className="mt-2">다만 아래 제3자 서비스가 서비스 이용 과정에서 쿠키 및 익명 통계 데이터를 수집할 수 있습니다.</p>
+          <p>배편 조회를 위해 이름·전화번호·정밀 위치를 입력할 필요는 없습니다. 문의 메일에 포함된 발신 주소·본문·첨부파일은 문의 대응 과정에서 확인합니다. 불필요한 개인정보는 보내지 마세요.</p>
+          <p className="mt-2">접속 과정에서 분석·광고·호스팅 제공자가 페이지 주소, 접속 시각, 브라우저·기기 정보, IP 주소 등 기술 정보를 처리할 수 있습니다. 이를 모두 익명 정보라고 단정하지 않습니다.</p>
         </Section>
 
         <Section title="2. 제3자 광고 서비스">
+          <SubItem title="Google AdSense">
+            Google 광고 스크립트가 설치되어 있으며, 실제 광고 게재 여부는 승인·설정에 따라 달라집니다.
+            Google과 광고 파트너는 광고 제공·측정·개인화를 위해 쿠키 등을 사용할 수 있습니다.
+            <ExternalLink href="https://policies.google.com/technologies/partner-sites?hl=ko">Google의 파트너 사이트 정보 이용 안내</ExternalLink>와{" "}
+            <ExternalLink href="https://myadcenter.google.com/">광고 개인 최적화 설정</ExternalLink>을 확인할 수 있습니다.
+          </SubItem>
           <SubItem title="카카오 AdFit">
-            광고 노출 최적화를 위해 카카오가 쿠키·브라우저 정보를 수집할 수 있습니다.
+            광고 단위가 설정된 경우 카카오 광고가 로드되며, 광고 제공을 위해 쿠키·브라우저 정보를 처리할 수 있습니다.
             자세한 내용은 <ExternalLink href="https://www.kakao.com/policy/privacy">카카오 개인정보처리방침</ExternalLink>을 참고하세요.
           </SubItem>
           <SubItem title="쿠팡 파트너스">
@@ -49,9 +56,18 @@ export default function PrivacyPage() {
         </Section>
 
         <Section title="3. 방문 통계">
+          <SubItem title="Google Analytics 4">
+            방문 페이지와 이용 흐름, 일부 지역 광고 배너 클릭, 앱 설치·실행 이벤트를 분석합니다.
+            광고 클릭 이벤트에는 광고 식별자·광고 지역·연결 유형이 포함됩니다.
+            Google Analytics는 쿠키 등을 이용할 수 있습니다. 자세한 정보는{" "}
+            <ExternalLink href="https://policies.google.com/privacy?hl=ko">Google 개인정보처리방침</ExternalLink>과{" "}
+            <ExternalLink href="https://tools.google.com/dlpage/gaoptout?hl=ko">Analytics 수집 거부 도구</ExternalLink>를 참고하세요.
+          </SubItem>
           <p>
-            서비스 개선을 위해 Vercel Analytics를 사용하여 익명의 페이지뷰·방문자 통계를 수집합니다.
-            특정 개인을 식별할 수 없는 집계 데이터만 사용됩니다.
+            Vercel Web Analytics로 페이지뷰·방문 통계를 확인합니다. 이 분석 도구는 쿠키를 사용하지 않는 방식이며,
+            사이트 호스팅 과정의 기술 로그 처리와는 구분됩니다. 자세한 내용은{" "}
+            <ExternalLink href="https://vercel.com/docs/analytics/privacy-policy">Vercel Web Analytics 개인정보 안내</ExternalLink>와{" "}
+            <ExternalLink href="https://vercel.com/legal/privacy-notice">Vercel 개인정보처리방침</ExternalLink>을 참고하세요.
           </p>
         </Section>
 
@@ -62,16 +78,18 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="5. 쿠키">
+        <Section title="5. 쿠키·기기 저장소와 이용자 설정">
           <p>
-            서비스 자체는 쿠키를 직접 설정하지 않습니다.
-            브라우저 설정에서 쿠키를 비활성화할 수 있으나, 일부 광고 기능이 제한될 수 있습니다.
+            앱 설치 안내를 닫은 선택은 기기의 로컬 저장소에 기록합니다. 브라우저에서 사이트 데이터를 삭제하면
+            이 선택도 초기화될 수 있습니다. 광고·분석 쿠키는 브라우저 설정에서 삭제하거나 차단할 수 있으며,
+            일부 광고·통계 기능이 제한될 수 있습니다. 광고 개인 최적화를 끄는 것과 모든 정보 수집을 중단하는 것은 다릅니다.
           </p>
         </Section>
 
         <Section title="6. 문의">
           <p>
-            개인정보 관련 문의는 아래로 연락하세요.
+            문의로 제공한 정보의 열람·정정·삭제 등 개인정보 관련 요청은 아래 이메일로 보내주세요.
+            요청 대상과 회신 주소만 알려주시고 신분증 사본 등은 보내지 마세요.
           </p>
           <p className="mt-2">
             이메일:{" "}
