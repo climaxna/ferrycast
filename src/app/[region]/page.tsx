@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { connection } from "next/server"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
@@ -139,6 +140,8 @@ export default async function RegionPage({
   const { region } = await params
   const config = REGIONS[region]
   if (!config) notFound()
+
+  await connection()
 
   return (
     <main className="min-h-screen bg-slate-50">

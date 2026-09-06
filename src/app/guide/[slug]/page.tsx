@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { connection } from "next/server"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
@@ -78,6 +79,8 @@ export default async function GuidePage({
   const { slug } = await params
   const guide = getGuide(slug)
   if (!guide) notFound()
+
+  if (guide.kind !== "usage") await connection()
 
   return (
     <main className="min-h-screen bg-slate-50">

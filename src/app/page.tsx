@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { connection } from "next/server"
 import Link from "next/link"
 import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
@@ -35,7 +36,9 @@ function RouteSkeleton() {
   )
 }
 
-export default function Page() {
+export default async function Page() {
+  await connection()
+
   return (
     <main className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
