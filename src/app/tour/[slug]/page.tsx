@@ -85,18 +85,18 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
           <h2 className="text-sm font-bold text-slate-800">방문 전 확인</h2>
           <ul className="mt-2 space-y-2 text-sm leading-6 text-slate-600">
             <li>관광지 운영시간·입장료·주차·안전 정보는 장소별 공식 안내를 확인하세요.</li>
-            <li>섬 안 이동과 귀항편은 별도입니다. 배편 시간표에서 도청항 출발 귀항편을 확인하세요.</li>
+            <li>섬 안 이동과 귀항편은 별도입니다. 배편 시간표에서 {guide.arrivalPort} 출발 귀항편을 확인하세요.</li>
           </ul>
         </aside>
 
         <section className="border-t border-slate-200 pt-4">
           <h2 className="text-sm font-bold text-slate-800">출처와 확인 범위</h2>
           <p className="mt-2 text-xs leading-5 text-slate-600">{guide.sourceNote}</p>
-          <a href={guide.officialHref} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">완도문화관광 청산도 공식 안내 ↗</a>
+          <a href={guide.officialHref} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">완도문화관광 {guide.region} 공식 안내 ↗</a>
         </section>
 
-        <Link href="/guide/wando-cheongsando" className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-          청산도 배편·승선 안내 보기 <span aria-hidden="true">→</span>
+        <Link href={guide.ferryGuideHref} className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+          {guide.ferryGuideLabel} <span aria-hidden="true">→</span>
         </Link>
       </article>
     </main>

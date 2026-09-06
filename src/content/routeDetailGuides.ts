@@ -8,6 +8,7 @@ export type RouteDetailGuide = {
   source: { label: string; href: string }
   guideHref?: string
   tourHref?: string
+  tourLabel?: string
 }
 
 const BOOKING = "https://island.theksa.co.kr/page/booking"
@@ -35,6 +36,8 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     guideHref: "/guide/wando-soan-bogil-nohwa",
+    tourHref: "/tour/bogildo",
+    tourLabel: "보길도 주요 관광지 안내 보기",
   },
   jeju: {
     title: "제주 항로 이용 안내",

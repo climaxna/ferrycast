@@ -461,7 +461,7 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                   onClick={onClose}
                   className="mt-2 flex min-h-11 items-center justify-between rounded-xl bg-blue-50 px-3.5 text-sm font-semibold text-blue-800 transition-colors hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                 >
-                  {route.to} 주요 관광지 안내 보기
+                  {guide.tourLabel ?? `${route.to} 주요 관광지 안내 보기`}
                   <span aria-hidden="true">→</span>
                 </Link>
               )}

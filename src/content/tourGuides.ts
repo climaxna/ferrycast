@@ -16,6 +16,8 @@ export type TourGuide = {
   sourceNote: string
   updated: string
   officialHref: string
+  ferryGuideHref: string
+  ferryGuideLabel: string
   places: TourPlace[]
 }
 
@@ -32,6 +34,8 @@ export const TOUR_GUIDES: TourGuide[] = [
     sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 완도문화관광의 청산도·청산권 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 공식 안내를 확인하세요.",
     updated: "2026-09-07",
     officialHref: "https://www.wando.go.kr/tour/sub.cs?m=106",
+    ferryGuideHref: "/guide/wando-cheongsando",
+    ferryGuideLabel: "청산도 배편·승선 안내 보기",
     places: [
       {
         name: "서편제 촬영지",
@@ -67,6 +71,49 @@ export const TOUR_GUIDES: TourGuide[] = [
         description: "완도문화관광이 청산권 주요 관광지로 안내하는 해변입니다. 개장·안전요원·편의시설 운영 여부는 계절과 방문일에 따라 확인하세요.",
         mapQuery: "청산도 신흥리해수욕장",
         officialHref: "https://www.wando.go.kr/tour/sub.cs?m=17&startPage=1&tCimThemeAreaCode=Z004",
+      },
+    ],
+  },
+  {
+    slug: "bogildo",
+    region: "보길도",
+    title: "보길도 주요 관광지 — 동천항에서 이어지는 4곳",
+    description: "동천항에 도착한 뒤 보길대교를 건너 찾아볼 수 있는 보길도 윤선도 원림, 예송리해수욕장, 통리해수욕장, 망끝전망대를 완도문화관광 안내 기준으로 정리했습니다.",
+    arrivalPort: "동천항",
+    intro: "화흥포항 출발편은 노화도 동천항에 도착합니다. 보길도는 동천항에서 보길대교를 건너 이동합니다. 아래 장소는 완도문화관광의 보길도 당일코스에 소개된 곳이며, 섬 안 이동 시간과 운영 여부는 방문일에 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 완도문화관광의 보길도 당일코스와 보길도 윤선도 원림 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 공식 안내를 확인하세요.",
+    updated: "2026-09-07",
+    officialHref: "https://www.wando.go.kr/tour/sub.cs?m=105",
+    ferryGuideHref: "/guide/wando-soan-bogil-nohwa",
+    ferryGuideLabel: "화흥포·보길도 배편·승선 안내 보기",
+    places: [
+      {
+        name: "보길도 윤선도 원림",
+        category: "역사 · 정원",
+        description: "고산 윤선도의 생활·창작 공간으로 소개되는 부용동 정원입니다. 낙서재, 세연정, 동천석실 등으로 이어지는 조선시대 별서정원의 구성을 볼 수 있습니다.",
+        mapQuery: "보길도 윤선도 원림",
+        officialHref: "https://www.wando.go.kr/tour/sub.cs?m=30",
+      },
+      {
+        name: "예송리해수욕장",
+        category: "해변 · 상록수림",
+        description: "완도문화관광 보길도 코스에 소개된 해변입니다. 해변 뒤편의 상록수림과 주변 섬 풍경을 함께 볼 수 있는 곳으로 안내됩니다.",
+        mapQuery: "보길도 예송리해수욕장",
+        officialHref: "https://www.wando.go.kr/tour/sub.cs?m=105",
+      },
+      {
+        name: "통리해수욕장",
+        category: "해변 · 바다 풍경",
+        description: "보길도 당일코스에 포함된 해변입니다. 앞바다의 여러 섬과 해변 풍경을 볼 수 있는 장소로 소개됩니다.",
+        mapQuery: "보길도 통리해수욕장",
+        officialHref: "https://www.wando.go.kr/tour/sub.cs?m=105",
+      },
+      {
+        name: "망끝전망대",
+        category: "전망 · 해안 경관",
+        description: "보길도 서쪽 망월봉 끝자락에 자리한 전망대입니다. 다도해 섬과 바다를 조망하는 장소로 완도문화관광이 안내합니다.",
+        mapQuery: "보길도 망끝전망대",
+        officialHref: "https://www.wando.go.kr/tour/sub.cs?m=105",
       },
     ],
   },
