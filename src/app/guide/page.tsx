@@ -7,7 +7,7 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: "항로 가이드 — 배편 시간표·요금·가는 법 | FerryCast",
   description:
-    "제주도 배편, 울릉도 배편, 청산도 배편 등 전국 주요 섬 여객선 시간표, 요금, 소요시간 안내. 완도·포항·목포·인천 출발. 오늘 운항·결항은 실시간으로 확인하세요.",
+    "제주도 배편, 울릉도 배편, 청산도 배편 등 전국 주요 섬 여객선 시간표, 요금, 소요시간 안내. 완도·울릉도·목포·인천 출발. 오늘 운항·결항은 실시간으로 확인하세요.",
   alternates: { canonical: "/guide" },
   openGraph: {
     type: "website",
@@ -41,7 +41,7 @@ export default function GuideIndexPage() {
 
       <div className="mx-auto max-w-lg space-y-6 px-4 py-5">
         <p className="text-sm leading-relaxed text-slate-500">
-          완도·포항·목포·인천 주요 섬으로 가는 여객선의 시간표, 요금, 소요시간, 터미널 정보를 정리했습니다.
+          완도·울릉도·목포·인천·제주 주요 섬으로 가는 여객선의 시간표, 요금, 소요시간, 터미널 정보를 정리했습니다.
           오늘 실제 운항·결항 여부는 각 지역 실시간 화면에서 확인하세요.
         </p>
 

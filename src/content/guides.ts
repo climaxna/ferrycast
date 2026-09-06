@@ -40,6 +40,11 @@ export interface Guide {
   regionSlug: string    // "" = 완도(메인), 그 외 REGIONS 키
   regionName: string    // "완도"
   destination: string   // "청산도"
+  // config에서 단어만 바꿔 찍어낸 자동 생성 가이드(regionGuidesFrom)인지 여부.
+  // 도입문·FAQ 문장이 노선마다 거의 동일해 구글이 "scaled content"(양산형 콘텐츠)로
+  // 볼 위험이 크다(2026.09 애드센스 "가치가 별로 없는 콘텐츠" 반려 원인 중 하나로 지목).
+  // → sitemap에서 빼고 페이지에 noindex를 건다. 수기로 보강되면 이 플래그를 지운다.
+  thin?: boolean
   title: string         // H1 & <title>
   description: string    // meta description (검색 스니펫)
   keywords: string[]     // 검색 의도 키워드(문장에 자연스럽게 반영)
@@ -352,6 +357,7 @@ function regionGuidesFrom(config: RegionConfig): Guide[] {
         },
       ],
       bookingUrl: g.fareUrl ?? "https://island.theksa.co.kr/page/booking",
+      thin: true,
     } satisfies Guide
   })
 }

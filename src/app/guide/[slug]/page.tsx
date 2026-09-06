@@ -31,6 +31,9 @@ export async function generateMetadata({
     description: guide.description,
     keywords: guide.keywords,
     alternates: { canonical: `/guide/${guide.slug}` },
+    // thin(자동 생성) 가이드는 색인에서 뺀다 — 도입문·FAQ가 노선마다 거의 동일해
+    // "scaled content"로 보일 위험이 크다. 링크는 살아 있어 실시간 화면 유입 통로로는 계속 쓴다.
+    ...(guide.thin ? { robots: { index: false, follow: true } } : {}),
     openGraph: {
       type: "article",
       siteName: "FerryCast",
