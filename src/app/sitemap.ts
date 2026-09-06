@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { REGIONS } from "@/config/regions"
 import { GUIDES } from "@/content/guides"
+import { TOUR_GUIDES } from "@/content/tourGuides"
 
 const BASE = "https://ferrycast.kr"
 
@@ -31,5 +32,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }))
 
-  return [...core, ...regions, ...guides]
+  const tours: MetadataRoute.Sitemap = TOUR_GUIDES.map((guide) => ({
+    url: `${BASE}/tour/${guide.slug}`,
+    lastModified: guide.updated,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }))
+
+  return [...core, ...regions, ...guides, ...tours]
 }

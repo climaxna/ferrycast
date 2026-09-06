@@ -454,6 +454,17 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                   <span aria-hidden="true">→</span>
                 </Link>
               )}
+              {guide.tourHref && (
+                <Link
+                  href={guide.tourHref}
+                  prefetch={false}
+                  onClick={onClose}
+                  className="mt-2 flex min-h-11 items-center justify-between rounded-xl bg-blue-50 px-3.5 text-sm font-semibold text-blue-800 transition-colors hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                >
+                  {route.to} 주요 관광지 안내 보기
+                  <span aria-hidden="true">→</span>
+                </Link>
+              )}
               <p className="mt-2 text-xs leading-5 text-slate-400">운항·접수 조건은 바뀔 수 있으므로 승선 전 공식 안내를 최종 기준으로 확인하세요.</p>
             </section>
           )}

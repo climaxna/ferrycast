@@ -7,6 +7,7 @@ export type RouteDetailGuide = {
   checks: Array<{ title: string; description: string }>
   source: { label: string; href: string }
   guideHref?: string
+  tourHref?: string
 }
 
 const BOOKING = "https://island.theksa.co.kr/page/booking"
@@ -22,6 +23,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     guideHref: "/guide/wando-cheongsando",
+    tourHref: "/tour/cheongsando",
   },
   "hwaheungpo-route": {
     title: "화흥포 · 소안도·보길도·노화 이용 안내",
