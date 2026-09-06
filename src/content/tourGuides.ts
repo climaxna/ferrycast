@@ -245,6 +245,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "baengnyeongdo",
+    region: "백령도",
+    title: "백령도 주요 관광지 — 용기포항 도착 뒤 확인하는 4곳",
+    description: "용기포항에 도착한 뒤 찾아볼 수 있는 두무진, 사곶해변, 콩돌해안, 용기원산 전망대를 인천관광·인천시 안내 기준으로 정리했습니다.",
+    arrivalPort: "용기포항",
+    intro: "인천 출발편은 백령도 용기포항에 도착합니다. 주요 관광지가 섬 안에 흩어져 있어 섬 내 이동을 따로 계획하는 편이 좋습니다. 아래 장소는 인천관광과 인천시 안내에 소개된 곳이며, 기상·통제·운영 여건은 방문일에 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 인천관광과 인천광역시 백령·대청 국가지질공원 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "인천관광 백령도 공식 안내",
+    officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD21121610281282088&pgListMode=S",
+    ferryGuideHref: "/guide/incheon-baengnyeongdo",
+    ferryGuideLabel: "인천·백령도 배편·승선 안내 보기",
+    places: [
+      {
+        name: "두무진",
+        category: "해안 절벽 · 지질 경관",
+        description: "백령도 서북쪽 해안의 기암 절벽 경관입니다. 포구에서 해상관람 또는 육상 탐방으로 볼 수 있으며, 해상관람은 기상에 따라 달라질 수 있습니다.",
+        mapQuery: "백령도 두무진",
+        officialHref: "https://itour.incheon.go.kr/thmtour/rcmdtour/detail.do?cotId=ITA21121017382163662",
+      },
+      {
+        name: "사곶해변",
+        category: "해변 · 지질 명소",
+        description: "백령·대청 국가지질공원이 백령도 지질명소로 안내하는 해변입니다. 해변 이용 여건과 안전 안내는 계절·방문일에 따라 확인하세요.",
+        mapQuery: "백령도 사곶해변",
+        officialHref: "https://www.incheon.go.kr/env/ENV040102",
+      },
+      {
+        name: "콩돌해안",
+        category: "해안 · 지질 명소",
+        description: "둥글고 작은 자갈이 이어지는 해안으로, 백령·대청 국가지질공원이 안내하는 백령도 지질명소 중 하나입니다.",
+        mapQuery: "백령도 콩돌해안",
+        officialHref: "https://www.incheon.go.kr/env/ENV040102",
+      },
+      {
+        name: "용기원산 전망대",
+        category: "전망 · 섬 전경",
+        description: "국토끝섬전망대로도 소개되는 전망 장소입니다. 백령도 전경을 조망할 수 있으며, 이동 전 날씨와 현장 안내를 확인하세요.",
+        mapQuery: "백령도 용기원산 전망대",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=db13fe4f-fcf3-45a8-a5c9-146ffe9cec37",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
