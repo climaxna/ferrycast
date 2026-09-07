@@ -173,6 +173,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "도착 후 일정", description: "연평도 안 숙소·교통은 실제 하선 시각 이후로 여유를 두고 계획하세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/yeonpyeongdo",
   },
 }
 

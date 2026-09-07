@@ -421,6 +421,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "yeonpyeongdo",
+    region: "연평도",
+    title: "연평도 주요 관광지 — 대연평도 도착 뒤 확인하는 4곳",
+    description: "연평도에 도착한 뒤 찾아볼 수 있는 연평평화전망대, 조기역사관 전망대, 등대공원, 안보교육장을 인천 관광 안내 기준으로 정리했습니다.",
+    arrivalPort: "대연평도 선착장",
+    intro: "연평도는 역사·평화·해안 경관을 함께 살필 수 있는 섬입니다. 관광지 운영 여부와 이동 가능 구간은 기상·현장 여건에 따라 달라질 수 있으므로, 출발 전 공식 안내와 현지 안내를 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 인천 섬포털 및 인천관광의 연평도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "인천 섬포털 연평도 공식 안내",
+    officialHref: "https://isum.incheon.go.kr/isleInfo.do?isle=184&key=2407020005",
+    ferryGuideHref: "/incheon",
+    ferryGuideLabel: "인천 배편 시간표 보기",
+    places: [
+      {
+        name: "연평평화전망대",
+        category: "전망 · 역사",
+        description: "전망대와 전시관, 북카페 등이 있는 공간으로 소개됩니다. 관람 가능 시간과 체험 시설 운영 여부는 방문일에 공식 안내를 확인하세요.",
+        mapQuery: "연평평화전망대",
+        officialHref: "https://isum.incheon.go.kr/spot/view.do?key=2407020020&spotSn=2408010059",
+      },
+      {
+        name: "조기역사관 2층 전망대",
+        category: "전시 · 전망",
+        description: "연평도의 조기잡이 역사와 풍물을 살펴볼 수 있는 공간으로 소개됩니다. 전시·전망대 이용 가능 시간은 현장 또는 공식 안내를 확인하세요.",
+        mapQuery: "연평도 조기역사관",
+        officialHref: "https://isum.incheon.go.kr/spot/view.do?key=2407020020&spotSn=2408010060",
+      },
+      {
+        name: "연평도 등대공원",
+        category: "공원 · 해안 조망",
+        description: "연평도 등대 주변에 조성된 공원입니다. 조기역사관과 가까워 함께 둘러볼 수 있으며, 해안 산책은 날씨와 현장 안전 여건을 확인하세요.",
+        mapQuery: "연평도 등대공원",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD22012114353636366",
+      },
+      {
+        name: "연평도 안보교육장",
+        category: "전시 · 교육",
+        description: "연평도 포격도발 현장을 보존해 안보교육의 장으로 운영하는 시설입니다. 관람 전 운영 시간과 입장 가능 여부를 공식 안내에서 확인하세요.",
+        mapQuery: "연평도 안보교육장",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD21122917071069816",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
