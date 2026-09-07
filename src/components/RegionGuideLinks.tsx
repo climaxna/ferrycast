@@ -29,6 +29,12 @@ export default function RegionGuideLinks({ region }: { region: string }) {
             </Link>
           </li>
         ))}
+        <li>
+          <Link href="/tour" className="flex min-h-11 items-center justify-between gap-3 rounded-lg py-3 text-sm font-semibold text-blue-700 transition-colors hover:text-blue-800 focus-visible:outline-blue-600">
+            <span>도착지 관광지 안내 모아보기</span>
+            <span aria-hidden="true" className="shrink-0">→</span>
+          </Link>
+        </li>
       </ul>
     </section>
   )
