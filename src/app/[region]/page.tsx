@@ -196,7 +196,7 @@ export default async function RegionPage({
           <AdFitBanner />
         </div>
 
-        <footer className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+        <aside aria-label="운항 정보 최종 확인" className="rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-500">
             이 정보는 참고용입니다.{" "}
             <strong className="font-semibold text-slate-700">
@@ -205,12 +205,6 @@ export default async function RegionPage({
             기상 악화·조류 등으로 예고 없이 결항될 수 있습니다.
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Link
-              href="/guide"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
-            >
-              항로 가이드
-            </Link>
             <a
               href="https://island.theksa.co.kr/page/booking"
               target="_blank"
@@ -219,20 +213,8 @@ export default async function RegionPage({
             >
               해운조합 승선예약
             </a>
-            <Link
-              href="/about"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
-            >
-              서비스 소개
-            </Link>
-            <Link
-              href="/privacy"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:border-blue-200 hover:text-blue-700"
-            >
-              개인정보처리방침
-            </Link>
           </div>
-        </footer>
+        </aside>
       </div>
     </main>
   )
