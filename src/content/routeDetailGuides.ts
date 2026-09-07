@@ -144,6 +144,18 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     tourHref: "/tour/bigeum-docho",
   },
+  oedaldo: {
+    title: "목포 · 달리도·외달도 이용 안내",
+    intro: "외달도행은 달리도·율도 등을 순회하는 항로로 표시될 수 있습니다. 외달도에서 내릴 편인지 시간표의 항로 안내와 도착지를 함께 확인하세요.",
+    checks: [
+      { title: "순회 항로 확인", description: "목포에서 달리도·율도·외달도를 순회하는 편이 있습니다. 목적지와 경유 표기를 함께 확인해 실제 하선 섬을 놓치지 않도록 하세요." },
+      { title: "계절 시설", description: "외달도 해수풀장과 해변 체험은 계절·기상에 따라 운영 여부가 달라질 수 있습니다. 출발 전 목포문화관광 또는 현장 안내를 확인하세요." },
+      { title: "귀항편", description: "외달도에서 목포로 나오는 편은 순회 순서에 따라 다를 수 있습니다. 섬 안 일정 전에 귀항 시각을 먼저 확인하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/oedaldo",
+    tourLabel: "외달도 관광지 안내 보기",
+  },
   deokjeokdo: {
     title: "인천 · 덕적도 이용 안내",
     intro: "덕적도행은 인천연안여객터미널에서 출발합니다. 자월·승봉·이작 등 경유 섬이 섞일 수 있어, 덕적도 하선 편인지 시간표의 항로 안내를 확인해야 합니다.",

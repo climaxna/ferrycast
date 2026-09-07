@@ -685,6 +685,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "oedaldo",
+    region: "외달도",
+    title: "외달도 주요 관광지 — 선착장 도착 뒤 확인하는 4곳",
+    description: "외달도에 도착한 뒤 찾아볼 수 있는 해수욕장, 해수풀장, 갯벌체험, 해변길을 목포문화관광 공식 안내 기준으로 정리했습니다.",
+    arrivalPort: "외달도 선착장",
+    intro: "외달도행은 달리도·율도 등을 순회하는 편으로 표시될 수 있습니다. 외달도에 도착한 뒤에는 도보 이동이 가능한 섬이지만, 계절 시설과 해변 체험 운영 여부는 출발 전 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 목포문화관광의 외달도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "목포문화관광 외달도 공식 안내",
+    officialHref: "https://www.mokpo.go.kr/tour/attraction/area?idx=7476&mode=view",
+    ferryGuideHref: "/mokpo",
+    ferryGuideLabel: "목포 배편 시간표 보기",
+    places: [
+      {
+        name: "외달도 해수욕장",
+        category: "해변 · 휴식",
+        description: "고운 모래 백사장과 바다 풍경으로 소개되는 외달도의 대표 해변입니다. 해변 이용 가능 기간과 편의시설 운영 여부는 방문일에 확인하세요.",
+        mapQuery: "외달도 해수욕장",
+        officialHref: "https://www.mokpo.go.kr/tour/attraction/island?idx=7476&mode=view",
+      },
+      {
+        name: "외달도 해수풀장",
+        category: "계절 시설 · 물놀이",
+        description: "해수욕장 인근의 계절 운영 시설입니다. 개장 기간과 이용 가능 여부는 해마다 달라질 수 있어 목포문화관광 또는 현장 안내를 확인해야 합니다.",
+        mapQuery: "외달도 해수풀장",
+        officialHref: "https://www.mokpo.go.kr/tour/attraction/area?idx=7476&mode=view",
+      },
+      {
+        name: "외달도 갯벌체험",
+        category: "갯벌 · 체험",
+        description: "외달도 해변 일대에서 소개되는 체험 활동입니다. 물때와 기상, 체험 운영 여부가 중요하므로 예약·현장 안내를 먼저 확인하세요.",
+        mapQuery: "외달도 갯벌체험",
+        officialHref: "https://www.mokpo.go.kr/tour/attraction/area?idx=7476&mode=view",
+      },
+      {
+        name: "외달도 해변길·솔머리끝",
+        category: "해안 산책 · 조망",
+        description: "해변을 따라 걸으며 섬 풍경을 볼 수 있는 동선입니다. 해안 산책은 일몰 전 귀항편과 기상·현장 안전 여건을 고려해 계획하세요.",
+        mapQuery: "외달도 솔머리끝",
+        officialHref: "https://www.odii.kr/smarttour_web/story/detail?from=iframe&sid=3282&slid=8072&tid=2650&tlid=2778",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
