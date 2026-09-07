@@ -295,6 +295,111 @@ const WANDO_GUIDES: Guide[] = [
   },
 ]
 
+// ── 수기 보강 항로 가이드 ────────────────────────────────────────────────
+// config에서 자동 생성한 요약 가이드는 noindex(thin)로 두고, 실제 이용 흐름과 공식
+// 출처를 확인해 충분히 작성한 항로만 이 목록에 넣는다. 같은 slug의 자동 생성본은 아래에서 제외한다.
+const CURATED_ROUTE_GUIDES: Guide[] = [
+  {
+    slug: "mokpo-jeju",
+    regionSlug: "mokpo",
+    regionName: "목포",
+    destination: "제주",
+    liveGroupKey: "jeju",
+    title: "목포 제주 배편 — 출발 터미널·차량 선적·승선 전 확인",
+    description: "목포에서 제주로 가는 여객선 이용 전 확인할 출발 장소, 차량 동반 예약, 신분증과 당일 운항 상태를 안내합니다. 고정 시간표 대신 출발일의 공식 운항 안내를 확인하세요.",
+    keywords: ["목포 제주 배편", "목포 제주 여객선", "목포 제주 차량선적", "목포항 제주 배", "목포 제주 배편 예약"],
+    liveHref: "/mokpo",
+    updated: "2026-09",
+    intro: [
+      "목포 제주 항로는 목포항에서 제주항으로 가는 장거리 카페리 항로입니다. 목포의 도서 항로 터미널이 여러 곳이므로, ‘목포항’이라는 이름만 보고 이동하기보다 예약 확인서에 적힌 승선 장소와 집결 시각을 기준으로 준비해야 합니다.",
+      "이 페이지는 고정 시간표나 요금을 대신하지 않습니다. 선박 교체·정비·기상에 따라 운항 계획이 달라질 수 있으므로, 출발일에는 FerryCast의 편별 상태와 예약한 선사의 공지를 함께 확인하세요.",
+    ],
+    facts: [
+      { label: "출발 지역", value: "목포" },
+      { label: "출발 장소", value: "목포항국제여객터미널 기준 · 예약 확인서의 부두·집결 안내 우선" },
+      { label: "도착 장소", value: "제주항 연안여객터미널 권역 · 선편별 안내 확인" },
+      { label: "예약·운항 안내", value: "씨월드고속훼리 공식 채널" },
+      { label: "차량 동반", value: "여객 승선과 차량 선적 조건을 각각 확인" },
+      { label: "당일 확인", value: "신분증·승선권·운항 상태" },
+    ],
+    sections: [
+      {
+        id: "terminal",
+        title: "목포에서 어디로 가야 하나요?",
+        paragraphs: [
+          "목포에는 연안여객선터미널, 북항여객선터미널, 국제여객터미널 등 목적지가 다른 승선 장소가 있습니다. 제주행은 예약한 선편의 안내를 기준으로 목포항국제여객터미널 권역에서 절차가 진행될 수 있으므로, 출발 전에 승선권·문자 안내의 터미널 또는 부두 표기를 다시 확인하세요.",
+          "주차·택시·픽업 위치도 승선 장소에 따라 달라집니다. 특히 늦은 시간 또는 이른 시간 출항편은 이동수단의 운행 여부까지 따로 확인하는 편이 안전합니다.",
+        ],
+        checklist: [
+          "예약 확인서의 출발 터미널·부두·집결 시각 확인",
+          "승선권과 실물 신분증 준비",
+          "터미널 주차 또는 하차 위치를 출발 전 확인",
+        ],
+      },
+      {
+        id: "vehicle",
+        title: "차를 싣는다면 여객 예약만으로 끝나지 않습니다",
+        paragraphs: [
+          "차량을 함께 가져가는 경우에는 승객 좌석과 차량 선적이 모두 가능한지 확인해야 합니다. 차량 종류·크기·적재물·운전자 정보에 따라 접수 조건이 달라질 수 있으며, 선적 마감 시각도 여객 승선 절차와 같지 않을 수 있습니다.",
+          "차량 예약이 완료됐더라도 출발일에는 선사의 차량 접수 안내와 현장 직원의 유도에 따라야 합니다. 차량 안에 남겨둘 물품과 승선 후 필요한 짐을 미리 나눠 두면 승선 과정이 수월합니다.",
+        ],
+      },
+      {
+        id: "sailing-day",
+        title: "출발일에는 무엇을 최종 확인하나요?",
+        paragraphs: [
+          "장거리 항로는 해상 기상과 선박 운항 계획의 영향을 받습니다. FerryCast에서는 목포→제주 편의 운항·결항 상태를 확인할 수 있지만, 최종 승선 가능 여부와 출항 장소·시각은 예약한 선사의 공지가 우선합니다.",
+          "출항 시간이 자정을 넘는 편은 달력상 출발일과 터미널에서 수속하는 날짜가 다르게 느껴질 수 있습니다. 예약 화면의 날짜와 집결 시간을 함께 읽고, 혼동되면 선사에 확인하세요.",
+        ],
+      },
+      {
+        id: "arrival",
+        title: "제주항 도착 뒤 이동도 따로 준비하세요",
+        paragraphs: [
+          "제주항에 도착한 뒤 숙소·렌터카·시외 이동은 여객선 도착 시각과 분리해서 계획하는 편이 좋습니다. 하선과 차량 하역에 시간이 걸릴 수 있고, 기상이나 항만 사정으로 실제 도착 시각이 달라질 수 있습니다.",
+          "제주 도착 뒤의 관광지·항만 주변 이동 정보는 별도입니다. 제주 여행 일정을 확정하기 전에는 귀항편도 함께 확인해 두세요.",
+        ],
+      },
+    ],
+    sourceNote: "2026년 9월 기준으로 씨월드고속훼리의 승선 안내와 FerryCast에 수록된 항로 정보를 바탕으로 정리했습니다. 선박·시각·터미널·차량 선적 조건은 수시로 바뀔 수 있으므로 예약한 선사의 최신 안내가 우선합니다.",
+    sources: [
+      { label: "씨월드고속훼리 여객 이용 안내", href: "https://www.seaferry.kr/bbs/content.php?co_id=p401", note: "승선권·신분증 등 승선 절차 확인" },
+      { label: "씨월드고속훼리 공식 홈페이지", href: "https://www.seaferry.co.kr", note: "출발일 운항·예약·차량 선적 조건 확인" },
+    ],
+    tips: [
+      "예매 화면의 선박명·출발 장소·날짜를 캡처해 두면 터미널에서 다시 확인할 때 편합니다.",
+      "차량 동반 여행은 차량 선적 가능 여부와 여객 승선권을 한 번에 확인하세요.",
+      "결항·지연 가능성을 고려해 제주 도착 직후의 예약은 여유 있게 잡는 편이 좋습니다.",
+    ],
+    faqs: [
+      {
+        q: "목포 제주 배는 어디서 타나요?",
+        a: "목포항국제여객터미널 권역을 기준으로 안내되지만, 실제 승선 장소·부두는 예약한 선편의 확인서와 선사 공지를 우선해 확인하세요.",
+      },
+      {
+        q: "목포 제주 배편에 차를 싣고 갈 수 있나요?",
+        a: "차량 동반 가능 여부와 접수 조건은 선박·날짜·차종에 따라 다릅니다. 여객 예약과 차량 선적 가능 여부를 각각 선사 공식 채널에서 확인하세요.",
+      },
+      {
+        q: "오늘 목포 제주 배가 뜨나요?",
+        a: "이 페이지의 실시간 운항 현황과 목포 화면의 제주 항로를 확인하세요. 최종 승선 가능 여부는 예약한 선사의 당일 공지가 우선입니다.",
+      },
+      {
+        q: "목포 제주 배편 출발 시간이 자정을 넘으면 언제 터미널에 가야 하나요?",
+        a: "출항 시각만 보지 말고 예약 확인서의 집결·수속 시각을 기준으로 준비하세요. 날짜 혼동이 있으면 선사에 출발일과 집결일을 직접 확인하는 것이 가장 안전합니다.",
+      },
+    ],
+    bookingUrl: "https://www.seaferry.co.kr",
+    bookingNote: "선박·객실·차량 선적 가능 여부와 출발일 운항 계획은 씨월드고속훼리 공식 채널에서 최종 확인",
+    relatedGuides: [
+      { label: "제주도 배편 출발지별 비교 보기", href: "/guide/jeju" },
+      { label: "제주항 도착 뒤 관광지 안내 보기", href: "/tour/jeju-port" },
+    ],
+  },
+]
+
+const CURATED_ROUTE_SLUGS = new Set(CURATED_ROUTE_GUIDES.map((guide) => guide.slug))
+
 // ── 타 지역 — config에서 파생한 요약 가이드 (시간표는 지어내지 않음) ────────────────
 
 // 일부 실제 항로는 REGIONS에 두 번 등록된다 — 예: 목포↔제주는 mokpo.routeGroups(제주
@@ -309,7 +414,10 @@ const DUPLICATE_ROUTE_SLUGS: Record<string, string> = {
 
 function regionGuidesFrom(config: RegionConfig): Guide[] {
   return config.routeGroups
-    .filter((g) => !(`${config.slug}-${g.key}` in DUPLICATE_ROUTE_SLUGS))
+    .filter((g) => {
+      const slug = `${config.slug}-${g.key}`
+      return !(slug in DUPLICATE_ROUTE_SLUGS) && !CURATED_ROUTE_SLUGS.has(slug)
+    })
     .map((g: RouteGroupConfig) => {
     // ⚠️ 방향 주의 — config.inbound(제주·울릉도 허브)는 출발항 여러 곳 → 목적지 1곳이라
     // routeGroup.label이 목적지가 아니라 **출발지**를 뜻한다(config/regions.ts 상단 주석 참고).
@@ -462,7 +570,7 @@ const HUB_GUIDES: Guide[] = [
 const REGION_GUIDES: Guide[] = Object.values(REGIONS).flatMap(regionGuidesFrom)
 
 // 허브 총정리(제주도 배편·울릉도 배편)를 해당 지역 목록 맨 앞에 오도록 개별 노선 가이드보다 먼저 둔다.
-export const GUIDES: Guide[] = [...USAGE_GUIDES, ...WANDO_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES].map(enrichGuide)
+export const GUIDES: Guide[] = [...USAGE_GUIDES, ...WANDO_GUIDES, ...CURATED_ROUTE_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES].map(enrichGuide)
 
 export function getGuide(slug: string): Guide | undefined {
   return GUIDES.find((g) => g.slug === slug)
