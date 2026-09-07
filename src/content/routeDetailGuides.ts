@@ -141,6 +141,17 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     tourHref: "/tour/daeijakdo",
   },
+  gulupdo: {
+    title: "인천 · 굴업도 이용 안내",
+    intro: "굴업도 편은 순환 항로 데이터로 표시될 수 있습니다. 화면의 출발 시각과 함께 항로 안내에 굴업도 경유·하선 편이 맞는지 확인하세요.",
+    checks: [
+      { title: "운항일과 항로 확인", description: "굴업도는 운항일과 경유 섬에 따라 시간표 표기가 달라질 수 있습니다. 출발 전 당일 편별 운항 상태와 공식 예약 정보를 함께 확인하세요." },
+      { title: "섬 안 탐방", description: "개머리초지와 해변 등은 선착장 주변에만 모여 있지 않습니다. 숙소·픽업을 예약할 때 실제 하선 시각과 이동 시간을 전달하세요." },
+      { title: "귀항편 우선 확인", description: "귀항편은 별도 시간표입니다. 섬 안 탐방 계획을 세우기 전에 인천으로 나오는 편과 현장 승선 조건을 먼저 확인하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/gulupdo",
+  },
   baengnyeongdo: {
     title: "인천 · 백령도 이용 안내",
     intro: "백령도는 인천연안여객터미널에서 출발해 용기포항여객터미널로 들어가는 장거리 서해 항로입니다. 출발 당일 운항 상태 확인이 특히 중요합니다.",

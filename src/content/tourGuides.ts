@@ -377,6 +377,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "gulupdo",
+    region: "굴업도",
+    title: "굴업도 주요 관광지 — 선착장 도착 뒤 확인하는 4곳",
+    description: "굴업도에 도착한 뒤 찾아볼 수 있는 개머리초지, 목기미해변, 굴업리해변, 소굴업도 코끼리바위를 인천 섬포털 안내 기준으로 정리했습니다.",
+    arrivalPort: "굴업도 선착장",
+    intro: "굴업도는 자연 경관과 캠핑지로 알려진 섬입니다. 섬 안 탐방은 선착장 도착 시각과 귀항편을 먼저 확인해 여유 있게 계획하세요. 해변·초지·해안 탐방의 실제 이동 여건과 현장 운영 정보는 방문일에 확인해야 합니다.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 인천 섬포털의 굴업도 테마 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "인천 섬포털 굴업도 공식 안내",
+    officialHref: "https://isum.incheon.go.kr/theme/view.do?key=2407020012&themeSn=2409050007&themeType=105",
+    ferryGuideHref: "/incheon",
+    ferryGuideLabel: "인천 배편 시간표 보기",
+    places: [
+      {
+        name: "개머리초지",
+        category: "초지 · 탐방",
+        description: "굴업도를 대표하는 넓은 초지로 소개되는 탐방 장소입니다. 야생동물과 자연환경을 훼손하지 않도록 지정된 동선과 현장 안내를 따라 이동하세요.",
+        mapQuery: "굴업도 개머리초지",
+        officialHref: "https://isum.incheon.go.kr/theme/view.do?key=2407020012&themeSn=2409050007&themeType=105",
+      },
+      {
+        name: "목기미해변",
+        category: "해변 · 해안 풍경",
+        description: "인천 섬포털이 굴업도 대표 관광지로 소개하는 해변입니다. 해변 이용과 해안 이동은 기상·파고와 현장 안전 여건을 확인하세요.",
+        mapQuery: "굴업도 목기미해변",
+        officialHref: "https://isum.incheon.go.kr/theme/view.do?key=2407020012&themeSn=2409050007&themeType=105",
+      },
+      {
+        name: "굴업리해변",
+        category: "해변 · 산책",
+        description: "약 1km 길이의 모래 해변과 해안사구 풍경으로 소개되는 곳입니다. 선착장 귀항 시간을 고려해 해변 산책 동선을 잡는 편이 좋습니다.",
+        mapQuery: "굴업도 굴업리해변",
+        officialHref: "https://isum.incheon.go.kr/theme/view.do?key=2407020012&themeSn=2409050007&themeType=105",
+      },
+      {
+        name: "소굴업도 코끼리바위",
+        category: "해안 지형 · 조망",
+        description: "소굴업도 해안의 홍예문 형태 바위로 소개되는 경관입니다. 해상·해안 접근 가능 여부와 안전한 관람 위치는 현지 안내를 확인하세요.",
+        mapQuery: "굴업도 소굴업도 코끼리바위",
+        officialHref: "https://isum.incheon.go.kr/theme/view.do?key=2407020012&themeSn=2409050007&themeType=105",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
