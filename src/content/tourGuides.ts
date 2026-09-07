@@ -34,7 +34,7 @@ export type TourGroup = {
 export const TOUR_GROUPS: TourGroup[] = [
   {
     name: "완도 출발 섬 여행",
-    description: "완도항에서 배로 들어가는 청산도와 보길도 안내입니다.",
+    description: "완도항 출발 청산도와 화흥포항·노화도 동천항을 거쳐 가는 보길도 안내입니다.",
     slugs: ["cheongsando", "bogildo"],
   },
   {
@@ -74,14 +74,14 @@ export const TOUR_GUIDES: TourGuide[] = [
       {
         name: "서편제 촬영지",
         category: "촬영지 · 슬로길 풍경",
-        description: "영화 ‘서편제’의 장면이 촬영된 곳으로, 황토길과 주변 풍경을 함께 볼 수 있는 청산도의 대표 촬영지입니다.",
+        description: "영화 ‘서편제’의 길 위 장면으로 알려진 촬영지입니다. 건물 내부를 관람하는 곳과 달리 황토길·돌담·밭이 어우러지는 풍경을 걸으며 보는 장소입니다. 촬영 지점에서 사진만 찍기보다 길의 굽이와 주변 풍경을 함께 살펴보세요. 꽃과 들판의 색은 계절에 따라 달라집니다.",
         mapQuery: "청산도 서편제 촬영지",
         officialHref: "https://www.wando.go.kr/tour/sub.cs?m=106",
       },
       {
         name: "봄의 왈츠 촬영지",
         category: "촬영지 · 들판 풍경",
-        description: "드라마 ‘봄의 왈츠’ 촬영지로 소개된 장소입니다. 바닷가 언덕의 오픈세트장과 주변 돌담길 풍경을 함께 볼 수 있습니다.",
+        description: "바다가 보이는 언덕의 오픈세트장과 돌담길이 함께 소개되는 드라마 촬영지입니다. 서편제 촬영지와 함께 풍경 중심으로 둘러보는 후보로 삼을 수 있습니다. 외부 풍경을 보는 것과 세트장 내부 입장은 다르므로 건물 개방 여부는 현장 안내를 따르세요.",
         mapQuery: "청산도 봄의 왈츠 촬영지",
         officialHref: "https://www.wando.go.kr/tour/sub.cs?m=106",
       },
@@ -95,9 +95,9 @@ export const TOUR_GUIDES: TourGuide[] = [
       {
         name: "상서마을 옛담장",
         category: "마을 · 돌담길",
-        description: "상서리와 동촌리를 지나는 돌담 풍경으로 소개되는 마을 길입니다. 생활 공간이므로 주민과 차량 통행에 유의해 둘러보세요.",
+        description: "상서마을은 돌을 쌓아 만든 옛담장이 집과 골목을 잇는 풍경을 보는 곳입니다. 완도군은 흙을 섞지 않고 돌로 쌓는 강담을 바람 많은 섬의 생활에 적응한 담장으로 설명합니다. 돌을 쌓은 모양과 굽은 골목을 살펴보되 사람이 사는 마을이므로 집 안으로 들어가거나 출입구를 막지 마세요.",
         mapQuery: "청산도 상서마을 옛담장",
-        officialHref: "https://www.wando.go.kr/tour/sub.cs?m=106",
+        officialHref: "https://www.wando.go.kr/tour/sub.cs?m=162&tCfdMenuChoice=tCfdArea&tCimTitle=%EC%B2%AD%EC%82%B0%EB%8F%84+%EC%83%81%EC%84%9C%EB%A7%88%EC%9D%84+%EC%98%9B%EB%8B%B4%EC%9E%A5&tCimUniqId=TCIM_000000000004571",
       },
       {
         name: "신흥리해수욕장",
@@ -125,7 +125,7 @@ export const TOUR_GUIDES: TourGuide[] = [
       {
         name: "보길도 윤선도 원림",
         category: "역사 · 정원",
-        description: "고산 윤선도의 생활·창작 공간으로 소개되는 부용동 정원입니다. 낙서재, 세연정, 동천석실 등으로 이어지는 조선시대 별서정원의 구성을 볼 수 있습니다.",
+        description: "고산 윤선도의 생활·창작 공간인 부용동의 별서정원입니다. 세연정·낙서재·동천석실처럼 서로 다른 공간을 통해 자연 속에 머물고 풍경을 감상하던 정원의 구성을 살펴볼 수 있습니다. 원림 전체를 하나의 건물처럼 생각하지 말고 보고 싶은 구역을 정한 뒤 구역 사이 이동도 관람 시간에 포함하세요.",
         mapQuery: "보길도 윤선도 원림",
         officialHref: "https://www.wando.go.kr/tour/sub.cs?m=30",
       },
@@ -382,14 +382,14 @@ export const TOUR_GUIDES: TourGuide[] = [
       {
         name: "풀등",
         category: "모래톱 · 해양 생태",
-        description: "썰물 때만 모습을 드러내는 해중 모래톱입니다. 바닷물이 차오르면 잠기므로 방문 전 조석·기상과 현지 안내를 반드시 확인하세요.",
+        description: "물이 빠질 때 드러났다가 차오르면 잠기는 해중 모래톱입니다. 고정된 해변과 달리 방문 가능한 시간이 물때에 좌우됩니다. 인천 섬포털은 현지 소형 선박을 이용한 체험을 소개하므로 직접 방문하려면 운영처에 승선 장소·복귀 시간을 문의하세요. 여객선 승선권에 풀등 체험이 포함된 것은 아닙니다.",
         mapQuery: "대이작도 풀등",
         officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD21122709112053959",
       },
       {
         name: "부아산",
         category: "탐방 · 전망",
-        description: "대이작도의 섬과 해변을 조망할 수 있는 산으로 소개됩니다. 부아산 구름다리와 봉수대 주변 이동 여건은 현장 안내를 확인하세요.",
+        description: "구름다리와 봉수대 주변을 지나 바다와 주변 섬의 배치를 조망하는 탐방지입니다. 풀등을 직접 밟아 보는 체험과 달리 높은 곳에서 해변·모래톱의 모습을 살펴볼 수 있습니다. 선착장부터의 왕복 보행과 오르막을 고려하고, 전망이 목적이라면 당일 시야와 날씨도 함께 확인하세요.",
         mapQuery: "대이작도 부아산",
         officialHref: "https://itour.incheon.go.kr/thmtour/thmtour/detail.do?cotId=ITA25082615310498753&pgListMode=S",
       },
@@ -602,7 +602,7 @@ export const TOUR_GUIDES: TourGuide[] = [
       {
         name: "동문수산시장",
         category: "시장 · 먹거리",
-        description: "제주항 여객터미널에서 가까운 수산물 전문시장으로 소개됩니다. 점포별 운영 시간과 판매 품목은 현장 또는 공식 안내를 확인하세요.",
+        description: "제주산 은갈치·옥돔·전복 등 수산물과 건어물·젓갈을 살펴볼 수 있는 시장입니다. 비짓제주는 고른 수산물을 식당에서 조리해 먹거나 포장·배송하는 이용 방식도 소개합니다. 배로 가져갈 물건을 산다면 귀항까지의 보관 시간과 포장 방법을 점포에 문의하세요. 판매 품목과 운영 시간은 점포마다 다릅니다.",
         mapQuery: "제주 동문수산시장",
         officialHref: "https://www.visitjeju.net/kr/detail/view?contentsid=CONT_000000000500744&menuId=DOM_000001720003000000",
       },

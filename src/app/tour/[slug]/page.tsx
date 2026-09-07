@@ -2,6 +2,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { getRelatedTourGuides, getTourFerryLink, getTourGuide, TOUR_GUIDES } from "@/content/tourGuides"
+import { TOUR_PLANNING } from "@/content/tourPlanning"
 
 export function generateStaticParams() {
   return TOUR_GUIDES.map((guide) => ({ slug: guide.slug }))
@@ -33,6 +34,7 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
   if (!guide) notFound()
   const relatedGuides = getRelatedTourGuides(guide.slug)
   const ferryLink = getTourFerryLink(guide.slug)
+  const planning = TOUR_PLANNING[guide.slug]
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -82,6 +84,16 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
             ))}
           </ol>
         </section>
+
+        {planning && (
+          <section aria-labelledby="planning-heading" className="rounded-2xl border border-slate-200 bg-white p-4">
+            <h2 id="planning-heading" className="text-base font-bold text-slate-900">{planning.title}</h2>
+            <div className="mt-3 space-y-3 text-sm leading-6 text-slate-600">
+              {planning.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+            </div>
+            <p className="mt-3 text-xs leading-5 text-slate-500">FerryCast 이동 계획 제안 · 2026-09-07 보강. 장소별 공식 안내를 바탕으로 구성한 동선 제안이며, 교통 연결·개방·체험 운영을 보장하지 않습니다.</p>
+          </section>
+        )}
 
         <aside className="rounded-2xl border border-slate-200 bg-white p-4">
           <h2 className="text-sm font-bold text-slate-800">방문 전 확인</h2>

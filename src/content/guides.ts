@@ -1,5 +1,6 @@
 import { REGIONS, type RegionConfig, type RouteGroupConfig } from "@/config/regions"
 import { enrichGuide, USAGE_GUIDES } from "./guideEditorial"
+import { addRouteDetails } from "./routeGuideDetails"
 
 // ─────────────────────────────────────────────────────────────────────────
 // 항로 가이드(검색 유입용 고정 콘텐츠).
@@ -162,9 +163,9 @@ const WANDO_GUIDES: Guide[] = [
     regionName: "완도",
     destination: "소안도·보길도·노화도",
     liveGroupKey: "hwaheungpo-route",
-    title: "완도 소안도·보길도·노화도 배편 — 시간표·요금",
+    title: "완도 소안도·보길도·노화도 배편 — 참고 시간표·터미널·승선 안내",
     description:
-      "완도 화흥포항에서 노화도(동천)·소안도 가는 배편(여객선) 시간표, 요금, 매표소 연락처. 보길도는 노화도에서 연도교로 연결됩니다. 오늘 운항 여부는 실시간으로 확인하세요.",
+      "완도 화흥포항에서 노화도(동천)·소안도 가는 여객선의 참고 시간표와 매표소·승선 안내. 보길도는 노화도에서 연도교로 연결됩니다. 최신 운임은 공식 예약처에서 확인하세요.",
     keywords: ["소안도 배편", "보길도 배편", "노화도 배편", "완도 소안도 배", "화흥포 소안도", "보길도 가는 법", "노화도 배 시간표"],
     liveHref: "/",
     updated: UPDATED,
@@ -705,8 +706,8 @@ function hubOverviewGuide(config: RegionConfig, hubKeyword: string, blurb: strin
     regionSlug: config.slug,
     regionName: config.name,
     destination: config.name,
-    title: `${hubKeyword} 총정리 — 출발지별 시간표·소요시간 비교`,
-    description: `${hubKeyword} 총정리. ${originLabels.join("·")} 출발 ${config.name}행 여객선 시간표·소요시간·운항 현황을 한 화면에서 비교하세요.`,
+    title: `${hubKeyword} 총정리 — 출발항·터미널·소요시간 비교`,
+    description: `${originLabels.join("·")} 출발 ${config.name}행 여객선의 출발 터미널과 참고 소요시간을 비교합니다. 날짜별 시간표·운항 현황은 연결된 실시간 화면과 선사 안내에서 확인하세요.`,
     keywords: [
       hubKeyword,
       `${config.name} 여객선`,
@@ -775,7 +776,7 @@ const HUB_GUIDES: Guide[] = [
 const REGION_GUIDES: Guide[] = Object.values(REGIONS).flatMap(regionGuidesFrom)
 
 // 허브 총정리(제주도 배편·울릉도 배편)를 해당 지역 목록 맨 앞에 오도록 개별 노선 가이드보다 먼저 둔다.
-export const GUIDES: Guide[] = [...USAGE_GUIDES, ...WANDO_GUIDES, ...ALL_CURATED_ROUTE_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES].map(enrichGuide)
+export const GUIDES: Guide[] = [...USAGE_GUIDES, ...WANDO_GUIDES, ...ALL_CURATED_ROUTE_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES].map(enrichGuide).map(addRouteDetails)
 
 export function getGuide(slug: string): Guide | undefined {
   return GUIDES.find((g) => g.slug === slug)

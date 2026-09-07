@@ -5,15 +5,15 @@ import { guidesByRegion } from "@/content/guides"
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: "항로 가이드 — 배편 시간표·요금·가는 법 | FerryCast",
+  title: "항로 가이드 — 출발항·배편 선택·승선 준비 | FerryCast",
   description:
-    "제주도 배편, 울릉도 배편, 청산도 배편 등 전국 주요 섬 여객선 시간표, 요금, 소요시간 안내. 완도·울릉도·목포·인천 출발. 오늘 운항·결항은 실시간으로 확인하세요.",
+    "제주도·울릉도·청산도 등 섬 배편의 출발항, 도착항, 승선 준비와 귀항 계획을 안내합니다. 일부 항로의 참고 시간표와 소요시간을 제공하며 최신 운임은 공식 예약처에서 확인하세요.",
   alternates: { canonical: "/guide" },
   openGraph: {
     type: "website",
     siteName: "FerryCast",
-    title: "항로 가이드 — 배편 시간표·요금·가는 법 | FerryCast",
-    description: "제주도·울릉도·청산도 배편 등 전국 주요 섬 여객선 가는 법·시간표·요금 안내",
+    title: "항로 가이드 — 출발항·배편 선택·승선 준비 | FerryCast",
+    description: "출발·도착항 선택, 항로별 승선 준비와 귀항 계획. 일부 참고 시간표를 제공하며 최신 운임은 공식 예약처에서 확인하세요.",
     url: "https://ferrycast.kr/guide",
     locale: "ko_KR",
     images: [{ url: "/og-v2.jpg", width: 1200, height: 630, alt: "FerryCast — 실시간 운항·결항 정보" }],
@@ -33,7 +33,7 @@ export default function GuideIndexPage() {
           <div>
             <h1 className="text-lg font-bold leading-none tracking-tight text-slate-900">항로 가이드</h1>
             <p className="mt-1 text-xs font-medium tracking-wide text-slate-400">
-              Ferry<span className="text-blue-600">Cast</span> · 배 시간표·요금·가는 법
+              Ferry<span className="text-blue-600">Cast</span> · 출발항·배편 선택·승선 준비
             </p>
           </div>
         </div>
@@ -41,7 +41,8 @@ export default function GuideIndexPage() {
 
       <div className="mx-auto max-w-lg space-y-6 px-4 py-5">
         <p className="text-sm leading-relaxed text-slate-500">
-          완도·울릉도·목포·인천·제주 주요 섬으로 가는 여객선의 시간표, 요금, 소요시간, 터미널 정보를 정리했습니다.
+          완도·울릉도·목포·인천·제주 배편의 출발·도착항과 항로별 이동 준비를 정리했습니다.
+          일부 항로에는 참고 시간표와 소요시간이 있으며, 최신 운임은 공식 예약처에서 확인할 수 있습니다.
           결항 표시 읽는 법, 해무 때 확인 순서와 승선 준비도 함께 안내합니다.
           오늘 실제 운항·결항 여부는 각 지역 실시간 화면에서 확인하세요.
         </p>
@@ -65,7 +66,7 @@ export default function GuideIndexPage() {
                       {/* 타이틀은 "짧은 제목 — 부제" 형식이라 em dash 앞부분만 목록에 노출 */}
                       <p className="text-sm font-bold text-slate-800">{g.title.split(" — ")[0]}</p>
                       <p className="mt-0.5 text-xs leading-relaxed text-slate-600">
-                        {g.kind === "usage" ? g.title.split(" — ")[1] : g.facts.find((f) => f.label === "출발 터미널")?.value ?? "배 시간표·요금"}
+                        {g.kind === "usage" ? g.title.split(" — ")[1] : g.facts.find((f) => f.label === "출발 터미널")?.value ?? "출발항 비교·승선 준비"}
                       </p>
                     </div>
                     <span className="shrink-0 text-slate-300" aria-hidden="true">
