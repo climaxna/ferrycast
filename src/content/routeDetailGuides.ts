@@ -128,6 +128,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     guideHref: "/guide/incheon-deokjeokdo",
+    tourHref: "/tour/deokjeokdo",
   },
   baengnyeongdo: {
     title: "인천 · 백령도 이용 안내",

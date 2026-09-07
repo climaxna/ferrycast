@@ -289,6 +289,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "deokjeokdo",
+    region: "덕적도",
+    title: "덕적도 주요 관광지 — 진리항 도착 뒤 확인하는 4곳",
+    description: "진리항에 도착한 뒤 찾아볼 수 있는 비조봉, 서포리해수욕장, 밧지름해변, 도우끝 해안산책로를 인천관광 안내 기준으로 정리했습니다.",
+    arrivalPort: "진리항",
+    intro: "인천 출발편은 덕적도 진리항에 도착합니다. 관광지와 해변이 섬 안에 흩어져 있어 숙소·교통과 함께 이동 동선을 따로 계획하는 편이 좋습니다. 아래 장소는 인천관광 안내에 소개된 곳이며, 산책·탐방·해변 이용 여건은 방문일에 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 인천관광의 덕적도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "인천관광 덕적도 공식 안내",
+    officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD22012517101819417&pgListMode=S",
+    ferryGuideHref: "/guide/incheon-deokjeokdo",
+    ferryGuideLabel: "인천·덕적도 배편·승선 안내 보기",
+    places: [
+      {
+        name: "비조봉",
+        category: "탐방 · 전망",
+        description: "덕적도 남쪽의 봉우리로, 정상에서 서해와 덕적군도 부속 섬을 조망할 수 있는 곳으로 안내됩니다. 산책 수준의 코스가 아니므로 탐방 전 준비와 현장 여건을 확인하세요.",
+        mapQuery: "덕적도 비조봉",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD21122409240921519",
+      },
+      {
+        name: "서포리해수욕장",
+        category: "해변 · 소나무숲",
+        description: "해변과 소나무숲 산책로가 함께 소개되는 덕적도의 대표 해변입니다. 계절별 개장·안전·편의시설 운영 여부는 현지 안내를 확인하세요.",
+        mapQuery: "덕적도 서포리해수욕장",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD22012517101819417&pgListMode=S",
+      },
+      {
+        name: "밧지름해변",
+        category: "해변 · 휴식",
+        description: "비조봉 입구와 이어지는 해변으로 소개됩니다. 해변 이용 여건과 이동 가능 구간은 방문일에 확인하세요.",
+        mapQuery: "덕적도 밧지름해변",
+        officialHref: "https://itour.incheon.go.kr/thmtour/cardnews/detail.do?cotId=CAR24082810171485615",
+      },
+      {
+        name: "도우끝 해안산책로",
+        category: "산책 · 해안 풍경",
+        description: "진리항 인근에서 해안을 따라 이어지는 산책로입니다. 출발·도착 시간을 고려해 귀항편 전후의 짧은 동선으로 확인하기 좋습니다.",
+        mapQuery: "덕적도 도우끝 해안산책로",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=25fbe28a-15c7-42c8-8156-dbecc3ceb51c",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
