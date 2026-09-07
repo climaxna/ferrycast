@@ -287,7 +287,10 @@ const GUIDES: Record<string, RouteDetailGuide> = {
 
 export function getRouteDetailGuide(route: WandoRoute): RouteDetailGuide | null {
   const key = route.id.replace(/^(dep|arr|hop)-/, "")
-  const guide = GUIDES[key]
+  // 장봉도 귀항 카드는 삼목항을 목적지로 표시하지만, 이용자는 장봉도에서 출발한다.
+  // 출발 카드와 같은 관광·귀항 안내를 보여준다.
+  const guideKey = key === "jangbongdo-return" ? "jangbongdo" : key
+  const guide = GUIDES[guideKey]
     ?? (route.originName === "제주" ? GUIDES.jeju : undefined)
     ?? (route.originName === "울릉도" ? GUIDES.ulleung : undefined)
   if (!guide) return null
