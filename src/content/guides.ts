@@ -495,7 +495,115 @@ const CURATED_ROUTE_GUIDES: Guide[] = [
   },
 ]
 
-const CURATED_ROUTE_SLUGS = new Set(CURATED_ROUTE_GUIDES.map((guide) => guide.slug))
+type CuratedRouteInput = {
+  slug: string
+  regionSlug: string
+  regionName: string
+  origin: string
+  destination: string
+  terminal: string
+  arrival: string
+  liveGroupKey: string
+  liveHref: string
+  routePoint: string
+  arrivalPoint: string
+  bookingUrl?: string
+  source?: GuideLink & { note: string }
+}
+
+function createCuratedRouteGuide(input: CuratedRouteInput): Guide {
+  const bookingUrl = input.bookingUrl ?? "https://island.theksa.co.kr/page/booking"
+  const source = input.source ?? {
+    label: "한국해운조합 승선예약",
+    href: "https://island.theksa.co.kr/page/booking",
+    note: "출발일 운항·예매·승선 조건 최종 확인",
+  }
+
+  return {
+    slug: input.slug,
+    regionSlug: input.regionSlug,
+    regionName: input.regionName,
+    destination: input.destination,
+    liveGroupKey: input.liveGroupKey,
+    title: `${input.origin} ${input.destination} 배편 — 출발·도착·승선 전 확인`,
+    description: `${input.origin}에서 ${input.destination} 가는 여객선의 출발 터미널, 도착항, 항로별 확인 사항을 안내합니다. 실제 시간표와 운항 상태는 출발일 공식 안내를 확인하세요.`,
+    keywords: [`${input.origin} ${input.destination} 배편`, `${input.destination} 여객선`, `${input.destination} 가는 배`, `${input.destination} 배편 예약`],
+    liveHref: input.liveHref,
+    updated: "2026-09",
+    intro: [
+      `${input.origin} ${input.destination} 항로는 ${input.terminal}에서 출발해 ${input.arrival}으로 연결됩니다. 섬 항로는 출발 시각만 비교하기보다 승선 장소와 실제 하선 항구를 먼저 맞춰야 숙소·픽업·귀항 계획을 안전하게 세울 수 있습니다.`,
+      `${input.routePoint} 출발일에는 FerryCast의 편별 운항 상태를 확인하고, 결항·비운항·대기·조회 실패 표기가 있으면 예약한 선사 또는 터미널의 공지를 최종 기준으로 확인하세요.`,
+    ],
+    facts: [
+      { label: "출발 지역", value: input.origin },
+      { label: "출발 터미널", value: input.terminal },
+      { label: "도착 항구", value: input.arrival },
+      { label: "항로 확인", value: input.routePoint },
+      { label: "도착 뒤", value: input.arrivalPoint },
+      { label: "당일 기준", value: "편별 운항 상태와 예약한 선사의 공식 안내" },
+    ],
+    sections: [
+      {
+        id: "boarding",
+        title: "출발 전에 확인할 것",
+        paragraphs: [
+          `${input.destination}행은 ${input.terminal}에서 승선합니다. 같은 도시 또는 섬권 안에도 다른 터미널이 있을 수 있으므로, 예약 확인서의 출발 장소·집결 시각·승선 절차를 기준으로 이동하세요.`,
+          "승선권과 신분 확인에 필요한 준비물을 미리 챙기고, 차량을 함께 가져간다면 여객 예약과 차량 선적 가능 여부·접수 시각을 각각 확인해야 합니다.",
+        ],
+        checklist: ["승선권의 출발 날짜·터미널·집결 시각 확인", "신분증과 예약 정보 준비", "차량 동반 시 선적 조건·마감 시각 별도 확인"],
+      },
+      {
+        id: "route",
+        title: "이 항로에서 특히 볼 내용",
+        paragraphs: [
+          input.routePoint,
+          "여객선 시간표는 계절·요일·선박 운영과 해상 여건에 따라 달라질 수 있습니다. 참고 시간표가 보이더라도 당일 출항을 확정하는 정보로 보지 말고, 편별 상태와 공식 예약 화면을 함께 확인하세요.",
+        ],
+      },
+      {
+        id: "arrival",
+        title: "도착과 귀항편을 함께 계획하세요",
+        paragraphs: [
+          input.arrivalPoint,
+          `${input.destination}에서 나오는 귀항편은 별도 시간표입니다. 숙소·관광·연결 교통을 확정하기 전에는 ${input.arrival} 출발 편의 운항일·시각·기항지까지 확인하는 편이 안전합니다.`,
+        ],
+      },
+    ],
+    sourceNote: `2026년 9월 기준 FerryCast에 수록된 ${input.origin}-${input.destination} 항로 정보와 공식 예매·운항 안내를 바탕으로 정리했습니다. 실제 운항·터미널·승선 조건은 출발일의 선사와 터미널 공지가 우선합니다.`,
+    sources: [source],
+    tips: [
+      "출발 직전에 편별 운항 상태를 다시 확인하세요.",
+      "도착 직후 일정은 하선과 현지 이동 시간을 고려해 여유 있게 잡으세요.",
+      "기상 영향이 큰 날에는 귀항편과 다음 연결 일정을 함께 확인하세요.",
+    ],
+    faqs: [
+      { q: `${input.origin}에서 ${input.destination} 배는 어디서 타나요?`, a: `${input.terminal}에서 출발합니다. 실제 집결 장소와 수속 시각은 예약한 선편의 확인서를 우선해 확인하세요.` },
+      { q: `오늘 ${input.destination} 배가 뜨나요?`, a: `${input.regionName} 실시간 화면에서 ${input.destination} 편별 상태를 확인하세요. 최종 승선 가능 여부는 예약한 선사·터미널 안내가 우선입니다.` },
+      { q: `${input.destination}에서 돌아오는 배는 어떻게 확인하나요?`, a: `${input.arrival} 출발 귀항편은 별도 시간표입니다. 여행 전 공식 예매처와 당일 운항 상태에서 운항일·시각·기항지를 확인하세요.` },
+    ],
+    bookingUrl,
+    bookingNote: "출발일 운항 상태·예매·승선 조건은 공식 예약처와 예약한 선사 안내가 우선",
+  }
+}
+
+const ADDITIONAL_CURATED_ROUTE_GUIDES: Guide[] = [
+  createCuratedRouteGuide({ slug: "mokpo-hongdo", regionSlug: "mokpo", regionName: "목포", origin: "목포", destination: "홍도", terminal: "목포연안여객선터미널", arrival: "홍도항여객선터미널", liveGroupKey: "hongdo", liveHref: "/mokpo", routePoint: "홍도행은 목포 출발 도서 항로입니다. 홍도 안 숙소·유람선·탐방 일정은 실제 홍도항 하선 시각 이후로 잡고, 해상 여건에 따른 변동을 고려하세요.", arrivalPoint: "홍도는 섬 전체가 천연보호구역으로 알려진 관광 섬입니다. 도착 후 탐방·유람선 이용 가능 여부와 현장 규정은 별도로 확인하세요." }),
+  createCuratedRouteGuide({ slug: "mokpo-heuksando", regionSlug: "mokpo", regionName: "목포", origin: "목포", destination: "흑산도", terminal: "목포연안여객선터미널", arrival: "흑산항여객선터미널", liveGroupKey: "heuksando", liveHref: "/mokpo", routePoint: "흑산도행은 장거리 도서 항로라 기상과 운항 계획의 영향을 받습니다. 출발·도착 시각이 바뀌면 섬 안 교통과 숙소 일정도 함께 조정해야 합니다.", arrivalPoint: "흑산도 안 이동은 실제 하선 항구와 도착 시각을 기준으로 잡으세요. 귀항편을 먼저 확인한 뒤 섬 안 관광·교통 일정을 정하는 편이 좋습니다." }),
+  createCuratedRouteGuide({ slug: "mokpo-gageodo", regionSlug: "mokpo", regionName: "목포", origin: "목포", destination: "가거도", terminal: "목포연안여객선터미널", arrival: "가거도항", liveGroupKey: "gageodo", liveHref: "/mokpo", routePoint: "가거도행은 목포권 장거리 항로이며 순환 또는 경유 형태로 보일 수 있습니다. 시간표의 목적지뿐 아니라 편별 항로 안내와 실제 하선 가능 여부를 함께 확인하세요.", arrivalPoint: "가거도 일정은 귀항편에 따라 체류 가능 시간이 크게 달라질 수 있습니다. 숙박을 확정하기 전 목포로 나오는 운항일과 시각을 우선 확인하세요." }),
+  createCuratedRouteGuide({ slug: "incheon-deokjeokdo", regionSlug: "incheon", regionName: "인천", origin: "인천", destination: "덕적도", terminal: "인천항 연안여객터미널", arrival: "덕적도여객선터미널", liveGroupKey: "deokjeokdo", liveHref: "/incheon", routePoint: "덕적도 편은 자월·승봉·이작 등 다른 섬을 경유하는 형태가 섞일 수 있습니다. 출발 시각만 보지 말고 덕적도 하선 편인지 항로 안내를 함께 보세요.", arrivalPoint: "덕적도 안 숙소·픽업은 실제 하선 장소와 시각 기준으로 조율하세요. 차량 동반 시 차량 선적 가능 여부도 별도 확인이 필요합니다." }),
+  createCuratedRouteGuide({ slug: "incheon-daeijakdo", regionSlug: "incheon", regionName: "인천", origin: "인천", destination: "대이작도", terminal: "인천항 연안여객터미널", arrival: "대이작도 선착장", liveGroupKey: "daeijakdo", liveHref: "/incheon", routePoint: "대이작도 편은 자월·승봉 등 경유 섬이 함께 표시될 수 있습니다. 대이작도 하선 편인지 확인하고, 풀등 방문은 배편과 별도로 조석·현지 운영 안내를 확인해야 합니다.", arrivalPoint: "인천 섬포털은 인천-자월-이작-승봉 등 항로 정보를 안내합니다. 섬 안 관광은 실제 하선 시각과 귀항편을 기준으로 계획하세요.", source: { label: "인천 섬포털 대이작도", href: "https://isum.incheon.go.kr/isleInfo.do?isle=197&key=2407020003", note: "대이작도 교통·항로 정보와 현지 안내 확인" } }),
+  createCuratedRouteGuide({ slug: "ulleung-from-mukho", regionSlug: "ulleung", regionName: "울릉도", origin: "묵호(동해)", destination: "울릉도", terminal: "묵호항여객선터미널", arrival: "울릉 도동여객선터미널", liveGroupKey: "from-mukho", liveHref: "/ulleung", routePoint: "묵호 출발편은 울릉도 도동항 도착 기준으로 안내됩니다. 동해 장거리 항로는 해상 상태의 영향을 받으므로 출항일 편별 상태를 확인하세요.", arrivalPoint: "도동항과 숙소·교통의 거리를 확인하고, 귀항편의 출발 항구도 도동항인지 예약 내역에서 다시 확인하세요." }),
+  createCuratedRouteGuide({ slug: "ulleung-from-gangneung", regionSlug: "ulleung", regionName: "울릉도", origin: "강릉", destination: "울릉도", terminal: "강릉항여객터미널", arrival: "울릉 저동항여객선터미널", liveGroupKey: "from-gangneung", liveHref: "/ulleung", routePoint: "강릉 출발편은 울릉도 저동항 도착 기준으로 안내됩니다. 울릉도 안 항구는 서로 떨어져 있어 숙소·픽업은 저동항 도착을 기준으로 잡아야 합니다.", arrivalPoint: "저동항 하선 뒤 이동과 귀항편 항구를 함께 확인하세요. 같은 울릉도행이라도 선편마다 도착·출발 항구가 다를 수 있습니다." }),
+  createCuratedRouteGuide({ slug: "ulleung-from-pohang", regionSlug: "ulleung", regionName: "울릉도", origin: "포항", destination: "울릉도", terminal: "포항여객선터미널", arrival: "울릉 도동여객선터미널", liveGroupKey: "from-pohang", liveHref: "/ulleung", routePoint: "포항 출발편은 울릉도 도동항 도착 기준으로 안내됩니다. 영일만신항 출발편과 승선 장소가 다르므로, 포항이라는 지역명만 보고 이동하지 않도록 주의하세요.", arrivalPoint: "도동항 기준으로 숙소·교통을 조율하고, 왕복 여행이면 돌아오는 편의 실제 출발 항구와 시각도 출발 전에 확인하세요." }),
+  createCuratedRouteGuide({ slug: "ulleung-from-yeongilman", regionSlug: "ulleung", regionName: "울릉도", origin: "영일만신항(포항)", destination: "울릉도", terminal: "포항항국제여객터미널", arrival: "울릉 사동항여객선터미널", liveGroupKey: "from-yeongilman", liveHref: "/ulleung", routePoint: "영일만신항 출발편은 울릉도 사동항으로 연결되는 카페리 항로입니다. 포항여객선터미널 출발편과 터미널·도착항이 다르므로 예약 내역의 장소를 우선해야 합니다.", arrivalPoint: "울릉크루즈 공식 안내는 사동항 도착과 포항 영일만항 출발을 구분합니다. 도동항 숙소·교통을 이용한다면 사동항 하선 뒤 이동 시간을 별도로 확보하세요.", bookingUrl: "https://www.ulcruise.co.kr", source: { label: "울릉크루즈 운항·이용 FAQ", href: "https://www.ulcruise.co.kr/www/center/faq?category_1=%EC%9A%B4%ED%95%AD%2F%EC%9D%B4%EC%9A%A9", note: "영일만항·사동항, 발권·차량 선적·여객 승선 절차 확인" } }),
+  createCuratedRouteGuide({ slug: "jeju-from-wando", regionSlug: "jeju", regionName: "제주", origin: "완도", destination: "제주", terminal: "완도여객선터미널", arrival: "제주항 연안여객터미널", liveGroupKey: "from-wando", liveHref: "/jeju", routePoint: "완도 제주 항로는 완도여객선터미널에서 출발합니다. 장거리 항로의 출발 시각·선박·차량 선적 조건은 출발일 선사 안내를 기준으로 확인하세요.", arrivalPoint: "제주항 도착 뒤 숙소·렌터카·연결 교통은 실제 하선 시각 이후로 여유 있게 잡고, 귀항편도 함께 확인하세요.", bookingUrl: "https://www.hanilexpress.co.kr", source: { label: "한일고속 공식 홈페이지", href: "https://www.hanilexpress.co.kr", note: "완도 제주 운항·예매·차량 선적 조건 확인" } }),
+  createCuratedRouteGuide({ slug: "jeju-from-jindo", regionSlug: "jeju", regionName: "제주", origin: "진도", destination: "제주", terminal: "진도항여객선터미널", arrival: "제주항 연안여객터미널", liveGroupKey: "from-jindo", liveHref: "/jeju", routePoint: "진도 제주 항로는 진도항여객선터미널을 이용합니다. 완도·목포 출발 제주행과 다른 터미널이므로 예약 확인서의 출발지를 정확히 확인하세요.", arrivalPoint: "제주항 도착 뒤 일정과 귀항편은 별도로 계획해야 합니다. 기상과 선박 운영으로 운항 계획이 바뀔 수 있으므로 당일 상태를 다시 확인하세요.", bookingUrl: "https://www.seaferry.co.kr", source: { label: "씨월드고속훼리 공식 홈페이지", href: "https://www.seaferry.co.kr", note: "진도 제주 출발일 운항·예매 안내 확인" } }),
+  createCuratedRouteGuide({ slug: "jeju-from-nokdong", regionSlug: "jeju", regionName: "제주", origin: "녹동(고흥)", destination: "제주", terminal: "녹동신항여객선터미널", arrival: "제주항 연안여객터미널", liveGroupKey: "from-nokdong", liveHref: "/jeju", routePoint: "녹동 제주 항로는 녹동신항여객선터미널에서 출발합니다. 다른 제주 출발지와 터미널·선사·운항일이 다를 수 있으므로 출발일 공식 예약 화면을 확인하세요.", arrivalPoint: "제주항 하선 뒤 이동 일정과 녹동 귀항편을 함께 확인하세요. 정기 운항 여부와 시각은 계절·선박 사정에 따라 달라질 수 있습니다." }),
+  createCuratedRouteGuide({ slug: "jeju-from-samcheonpo", regionSlug: "jeju", regionName: "제주", origin: "삼천포(사천)", destination: "제주", terminal: "삼천포신항여객터미널", arrival: "제주항 연안여객터미널", liveGroupKey: "from-samcheonpo", liveHref: "/jeju", routePoint: "삼천포 제주 항로는 삼천포신항여객터미널에서 출발합니다. 제주행이라고 해도 목포·완도와 출발 항구가 다르므로 터미널과 차량 선적 절차를 예약 내역으로 확인하세요.", arrivalPoint: "제주항 도착 후 이동과 삼천포로 돌아오는 귀항편을 함께 계획하세요. 출발일에는 편별 운항 상태와 선사 공지를 확인해야 합니다.", bookingUrl: "https://www.oceanvista.co.kr", source: { label: "오션비스타 제주 공식 홈페이지", href: "https://www.oceanvista.co.kr", note: "삼천포 제주 운항·예매·승선 조건 확인" } }),
+]
+
+const ALL_CURATED_ROUTE_GUIDES = [...CURATED_ROUTE_GUIDES, ...ADDITIONAL_CURATED_ROUTE_GUIDES]
+const CURATED_ROUTE_SLUGS = new Set(ALL_CURATED_ROUTE_GUIDES.map((guide) => guide.slug))
 
 // ── 타 지역 — config에서 파생한 요약 가이드 (시간표는 지어내지 않음) ────────────────
 
@@ -667,7 +775,7 @@ const HUB_GUIDES: Guide[] = [
 const REGION_GUIDES: Guide[] = Object.values(REGIONS).flatMap(regionGuidesFrom)
 
 // 허브 총정리(제주도 배편·울릉도 배편)를 해당 지역 목록 맨 앞에 오도록 개별 노선 가이드보다 먼저 둔다.
-export const GUIDES: Guide[] = [...USAGE_GUIDES, ...WANDO_GUIDES, ...CURATED_ROUTE_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES].map(enrichGuide)
+export const GUIDES: Guide[] = [...USAGE_GUIDES, ...WANDO_GUIDES, ...ALL_CURATED_ROUTE_GUIDES, ...HUB_GUIDES, ...REGION_GUIDES].map(enrichGuide)
 
 export function getGuide(slug: string): Guide | undefined {
   return GUIDES.find((g) => g.slug === slug)
