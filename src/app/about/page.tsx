@@ -2,6 +2,7 @@ import Link from "next/link"
 
 export const metadata = {
   title: "FerryCast 소개 — 제공 정보와 데이터 출처",
+  alternates: { canonical: "/about" },
   description:
     "FerryCast는 전국 여객선 실시간 운항·결항 정보 서비스입니다. 제공 정보와 공공데이터 출처, 정확도 원칙을 안내합니다.",
 }

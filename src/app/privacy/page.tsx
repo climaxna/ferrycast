@@ -3,6 +3,7 @@ import Link from "next/link"
 export const metadata = {
   title: "개인정보처리방침 — FerryCast",
   description: "FerryCast 개인정보처리방침",
+  alternates: { canonical: "/privacy" },
 }
 
 export default function PrivacyPage() {
@@ -30,7 +31,7 @@ export default function PrivacyPage() {
             회원가입·로그인·사이트 내 결제 기능은 없지만, 방문 분석·광고 도구가 정보를 처리할 수 있으며
             이메일 문의 시 발신 주소와 문의 내용이 운영자에게 전달됩니다.
           </p>
-          <p className="mt-2 text-xs text-slate-400">최근 수정일: 2026년 9월 7일</p>
+          <p className="mt-2 text-xs text-slate-400">최근 수정일: 2026년 9월 8일</p>
         </div>
 
         <Section title="1. 수집하는 개인정보">
@@ -41,9 +42,14 @@ export default function PrivacyPage() {
         <Section title="2. 제3자 광고 서비스">
           <SubItem title="Google AdSense">
             Google 광고 스크립트가 설치되어 있으며, 실제 광고 게재 여부는 승인·설정에 따라 달라집니다.
-            Google과 광고 파트너는 광고 제공·측정·개인화를 위해 쿠키 등을 사용할 수 있습니다.
+            Google을 포함한 제3자 광고 제공업체는 이용자의 이 사이트 및 다른 사이트 방문 기록을 바탕으로
+            광고를 제공하기 위해 쿠키를 사용할 수 있습니다. Google의 광고 쿠키를 통해 Google과 광고 파트너가
+            이 사이트 및 다른 사이트 방문 기록에 따른 광고를 제공할 수 있으며, 쿠키 등은 광고 측정에도 사용될 수 있습니다.
             <ExternalLink href="https://policies.google.com/technologies/partner-sites?hl=ko">Google의 파트너 사이트 정보 이용 안내</ExternalLink>와{" "}
             <ExternalLink href="https://myadcenter.google.com/">광고 개인 최적화 설정</ExternalLink>을 확인할 수 있습니다.
+            Google 외 제3자 광고업체의 쿠키가 사용될 수도 있으며, 해당 업체의 개인정보 안내와 수신 거부 설정을 확인하거나{" "}
+            <ExternalLink href="https://optout.aboutads.info/">참여 광고업체의 맞춤 광고 수신 거부 도구</ExternalLink>를 이용할 수 있습니다.
+            수신 거부는 해당 도구에 참여하는 업체와 이용 중인 브라우저 등에 따라 적용 범위가 다르며, 모든 광고가 사라지는 것은 아닙니다.
           </SubItem>
           <SubItem title="카카오 AdFit">
             광고 단위가 설정된 경우 카카오 광고가 로드되며, 광고 제공을 위해 쿠키·브라우저 정보를 처리할 수 있습니다.

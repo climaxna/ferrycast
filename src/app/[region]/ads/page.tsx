@@ -22,6 +22,9 @@ export async function generateMetadata({
     title,
     description: desc,
     alternates: { canonical: `/${config.slug}/ads` },
+    // /ads와 동일한 광고주 안내 페이지: 검색 색인 제외, 링크 이동은 허용.
+    // noindex는 애드센스 심사 제외나 승인 보장을 의미하지 않는다.
+    robots: { index: false, follow: true },
     openGraph: {
       type: "website",
       siteName: "FerryCast",
