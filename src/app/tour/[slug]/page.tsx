@@ -56,10 +56,10 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
         <section aria-labelledby="places-heading">
           <div className="mb-3 flex items-end justify-between gap-3">
             <div>
-              <h2 id="places-heading" className="text-base font-bold text-slate-900">주요 관광지</h2>
-              <p className="mt-1 text-xs text-slate-500">장소별 위치와 공식 안내를 함께 확인하세요.</p>
+              <h2 id="places-heading" className="text-base font-bold text-slate-900">{guide.placesTitle ?? "주요 관광지"}</h2>
+              <p className="mt-1 text-xs text-slate-500">{guide.placesDescription ?? "장소별 위치와 공식 안내를 함께 확인하세요."}</p>
             </div>
-            <span className="shrink-0 text-sm font-semibold text-blue-700">{guide.places.length}곳</span>
+            <span className="shrink-0 text-sm font-semibold text-blue-700">{guide.places.length}{guide.placesTitle ? "개 항목" : "곳"}</span>
           </div>
           <ol className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             {guide.places.map((place, index) => (
@@ -84,8 +84,10 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
         <aside className="rounded-2xl border border-slate-200 bg-white p-4">
           <h2 className="text-sm font-bold text-slate-800">방문 전 확인</h2>
           <ul className="mt-2 space-y-2 text-sm leading-6 text-slate-600">
-            <li>관광지 운영시간·입장료·주차·안전 정보는 장소별 공식 안내를 확인하세요.</li>
-            <li>섬 안 이동과 귀항편은 별도입니다. 배편 시간표에서 {guide.arrivalPort} 출발 귀항편을 확인하세요.</li>
+            {(guide.visitChecks ?? [
+              "관광지 운영시간·입장료·주차·안전 정보는 장소별 공식 안내를 확인하세요.",
+              `섬 안 이동과 귀항편은 별도입니다. 배편 시간표에서 ${guide.arrivalPort} 출발 귀항편을 확인하세요.`,
+            ]).map((check) => <li key={check}>{check}</li>)}
           </ul>
         </aside>
 

@@ -36,7 +36,7 @@ const GROUPS: Array<{ name: string; description: string; slugs: string[] }> = [
   {
     name: "울릉도·제주",
     description: "장거리 여객선 여행 전 도착항과 섬 안 이동을 먼저 확인하세요.",
-    slugs: ["ulleungdo", "jeju-port"],
+    slugs: ["ulleungdo", "dokdo", "jeju-port"],
   },
 ]
 

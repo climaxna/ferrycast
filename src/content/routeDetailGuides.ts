@@ -96,6 +96,8 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     guideHref: "/guide/ulleung",
+    tourHref: "/tour/dokdo",
+    tourLabel: "독도 방문 전 확인 보기",
   },
   hongdo: {
     title: "목포 · 홍도 이용 안내",

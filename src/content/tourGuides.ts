@@ -19,6 +19,9 @@ export type TourGuide = {
   officialHref: string
   ferryGuideHref: string
   ferryGuideLabel: string
+  placesTitle?: string
+  placesDescription?: string
+  visitChecks?: string[]
   places: TourPlace[]
 }
 
@@ -858,6 +861,56 @@ export const TOUR_GUIDES: TourGuide[] = [
         description: "인천투어에서 울도 주변 관광지로 소개되는 해변입니다. 해변 이용 가능 기간과 시설 운영은 계절·기상에 따라 달라질 수 있어 방문일 기준으로 확인해야 합니다.",
         mapQuery: "인천 울도 해수욕장",
         officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=APD21112609183595790",
+      },
+    ],
+  },
+  {
+    slug: "dokdo",
+    region: "독도",
+    title: "독도 방문 전 확인 — 접안·상륙은 당일 해상 여건에 따라 달라집니다",
+    description: "울릉도에서 독도로 가는 여객선 이용 전 접안 여부, 선회 관람, 입도 신고, 출항 항구를 확인할 수 있도록 공식 안내 기준으로 정리했습니다.",
+    arrivalPort: "독도 동도 접안시설",
+    intro: "독도 여객선은 울릉도 저동·사동·도동항 등에서 출발합니다. 독도는 해상 여건 때문에 배가 접안하지 못하고 선회 관람으로 바뀔 수 있습니다. ‘독도에 간다’는 일정만 보고 출발하기보다, 당일 출항 상태와 접안 가능 여부를 먼저 확인하세요.",
+    sourceNote: "2026-09-07 작성. 방문·접안·입도 관련 안내는 독도 방문객 알림서비스와 독도 관련 공공 안내를 바탕으로 정리했습니다. 실제 운항·접안·입도 절차는 당일 선사와 관계 기관의 안내가 우선합니다.",
+    updated: "2026-09-07",
+    sourceLabel: "독도 방문객 알림서비스",
+    officialHref: "https://www.countdokdo.kr/",
+    ferryGuideHref: "/ulleung",
+    ferryGuideLabel: "울릉도·독도 배편 시간표 보기",
+    placesTitle: "방문 전 핵심 확인",
+    placesDescription: "독도행은 접안 여부와 실제 체류 가능 시간이 가장 중요합니다.",
+    visitChecks: [
+      "출항해도 현지 접안이 불가능하면 선회 관람으로 바뀔 수 있습니다. 당일 선사 안내를 최종 기준으로 확인하세요.",
+      "승선권·신분증·집결 시각은 예약한 선사의 안내를 확인하고, 울릉도 귀항편과 숙소 이동에 여유를 두세요.",
+    ],
+    places: [
+      {
+        name: "독도 동도 접안시설",
+        category: "접안 · 당일 해상 여건",
+        description: "여객선은 동도 접안시설 이용을 시도하지만, 파도와 바람 등 해상 여건에 따라 접안이 어려울 수 있습니다. 접안 가능 여부는 출발 당일 선사 안내를 확인하세요.",
+        mapQuery: "독도 동도 접안시설",
+        officialHref: "https://www.countdokdo.kr/",
+      },
+      {
+        name: "선회 관람 가능성",
+        category: "운항 방식 · 기상 영향",
+        description: "접안이 어려운 날에는 독도 주변을 둘러보고 울릉도로 돌아오는 선회 관람으로 운항 방식이 바뀔 수 있습니다. 상륙을 전제로 일정과 교통을 확정하지 않는 편이 안전합니다.",
+        mapQuery: "독도",
+        officialHref: "https://www.ilovesea.or.kr/img_upload/20160108/DA2655E82F5A45D5A9C7A5220C060EF1.pdf",
+      },
+      {
+        name: "입도 신고와 승선권",
+        category: "예약 · 신분 확인",
+        description: "일반 관람 목적의 방문은 여객선 승선권 예약 과정에서 선사가 입도 신고를 함께 처리하는 방식으로 안내됩니다. 신분증과 승선 조건은 예약한 선사의 최신 안내를 확인하세요.",
+        mapQuery: "울릉도 저동항여객선터미널",
+        officialHref: "https://dic.kumsung.co.kr/dokdo/dokdo_study_05_01.do",
+      },
+      {
+        name: "울릉도 출항 항구",
+        category: "출발 · 항구 확인",
+        description: "독도행 여객선은 울릉도 저동·사동·도동항 등에서 출발할 수 있습니다. 숙소 위치와 출항 항구가 다를 수 있으므로, 출발 전 터미널·집결 시각·귀항편을 함께 확인하세요.",
+        mapQuery: "울릉 저동항여객선터미널",
+        officialHref: "https://www.countdokdo.kr/",
       },
     ],
   },
