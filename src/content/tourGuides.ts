@@ -465,6 +465,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "jangbongdo",
+    region: "장봉도",
+    title: "장봉도 주요 관광지 — 옹암선착장 도착 뒤 확인하는 4곳",
+    description: "장봉도에 도착한 뒤 찾아볼 수 있는 옹암해수욕장, 진촌해변, 가막머리낙조대, 장봉도풀등을 인천 섬포털·인천관광 안내 기준으로 정리했습니다.",
+    arrivalPort: "장봉도 옹암선착장",
+    intro: "장봉도는 삼목항에서 들어가는 가까운 섬이지만, 해변과 산책·전망 장소가 섬 곳곳에 흩어져 있습니다. 선착장 도착 뒤 이동 시간과 삼목항으로 돌아오는 귀항편을 먼저 확인해 일정을 잡으세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 인천 섬포털 및 인천관광의 장봉도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "인천 섬포털 장봉도 공식 안내",
+    officialHref: "https://isum.incheon.go.kr/isleInfo.do?isle=179&key=2407020005",
+    ferryGuideHref: "/incheon",
+    ferryGuideLabel: "인천 배편 시간표 보기",
+    places: [
+      {
+        name: "옹암해수욕장",
+        category: "해변 · 산책",
+        description: "장봉도 대표 해변으로 소개되는 곳입니다. 해변 이용 가능 구간과 계절별 편의시설 운영 여부는 현장 안내를 확인하세요.",
+        mapQuery: "장봉도 옹암해수욕장",
+        officialHref: "https://isum.incheon.go.kr/isleInfo.do?isle=179&key=2407020005",
+      },
+      {
+        name: "진촌해변",
+        category: "해변 · 휴식",
+        description: "장봉도 여행지로 소개되는 해변입니다. 모래 해변 특성상 이동 여건과 해변 이용 가능 여부를 방문일에 확인하세요.",
+        mapQuery: "장봉도 진촌해변",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD21122415261761991",
+      },
+      {
+        name: "가막머리낙조대",
+        category: "전망 · 산책",
+        description: "장봉도 갯티길 종점의 전망 장소로 소개됩니다. 해안 산책은 일몰 전 귀항편과 안전한 복귀 동선을 고려해 계획하세요.",
+        mapQuery: "장봉도 가막머리낙조대",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD22010315032134299",
+      },
+      {
+        name: "장봉도풀등",
+        category: "모래톱 · 해양 생태",
+        description: "썰물 때 드러나는 모래톱으로 소개됩니다. 물때와 해상 여건에 따라 모습과 접근 가능 여부가 달라지므로 현지 안내를 우선 확인하세요.",
+        mapQuery: "장봉도 풀등",
+        officialHref: "https://isum.incheon.go.kr/spot/view.do?key=2407020020&spotSn=2407300059",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {

@@ -152,6 +152,17 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     tourHref: "/tour/gulupdo",
   },
+  jangbongdo: {
+    title: "삼목항 · 장봉도 이용 안내",
+    intro: "장봉도행은 영종도 삼목항에서 출발하며 신도를 경유해 표시될 수 있습니다. 인천연안여객터미널 출발편과 다른 항로이므로 출발 터미널을 먼저 확인하세요.",
+    checks: [
+      { title: "출발 터미널", description: "장봉도행은 삼목여객터미널 출발입니다. 인천연안여객터미널과 혼동하지 않도록 출발지·주차·승선 접수 위치를 예약 전 확인하세요." },
+      { title: "경유 섬 표기", description: "신도 등을 경유하는 항로로 표시될 수 있습니다. 장봉도 하선 편인지 시간표의 항로 안내를 함께 확인하세요." },
+      { title: "귀항편", description: "장봉도 옹암선착장에서 삼목항으로 나오는 편은 별도 시간표입니다. 섬 안 이동 전 귀항 시각을 먼저 확인하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/jangbongdo",
+  },
   baengnyeongdo: {
     title: "인천 · 백령도 이용 안내",
     intro: "백령도는 인천연안여객터미널에서 출발해 용기포항여객터미널로 들어가는 장거리 서해 항로입니다. 출발 당일 운항 상태 확인이 특히 중요합니다.",
