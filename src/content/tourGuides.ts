@@ -961,3 +961,13 @@ export function getRelatedTourGuides(slug: string, limit = 3): TourGuide[] {
   if (!group) return []
   return getTourGuidesForSlugs(group.slugs).filter((guide) => guide.slug !== slug).slice(0, limit)
 }
+
+export function getTourFerryLink(slug: string): { href: string; label: string } {
+  if (slug === "jeju-port") return { href: "/jeju", label: "제주 실시간 배편 보기" }
+  if (slug === "ulleungdo" || slug === "dokdo") return { href: "/ulleung", label: "울릉도·독도 실시간 배편 보기" }
+
+  const group = TOUR_GROUPS.find((item) => item.slugs.includes(slug))
+  if (group?.name === "완도 출발 섬 여행") return { href: "/", label: "완도 실시간 배편 보기" }
+  if (group?.name === "목포·신안 다도해") return { href: "/mokpo", label: "목포 실시간 배편 보기" }
+  return { href: "/incheon", label: "인천 실시간 배편 보기" }
+}

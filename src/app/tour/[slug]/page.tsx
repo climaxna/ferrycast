@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
-import { getRelatedTourGuides, getTourGuide, TOUR_GUIDES } from "@/content/tourGuides"
+import { getRelatedTourGuides, getTourFerryLink, getTourGuide, TOUR_GUIDES } from "@/content/tourGuides"
 
 export function generateStaticParams() {
   return TOUR_GUIDES.map((guide) => ({ slug: guide.slug }))
@@ -32,6 +32,7 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
   const guide = getTourGuide(slug)
   if (!guide) notFound()
   const relatedGuides = getRelatedTourGuides(guide.slug)
+  const ferryLink = getTourFerryLink(guide.slug)
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -117,9 +118,21 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
           </section>
         )}
 
-        <Link href={guide.ferryGuideHref} className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-          {guide.ferryGuideLabel} <span aria-hidden="true">→</span>
-        </Link>
+        <section aria-labelledby="ferry-links-heading">
+          <h2 id="ferry-links-heading" className="mb-3 text-sm font-bold text-slate-800">배편 이어서 확인</h2>
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <Link href={ferryLink.href} className="flex min-h-11 items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-600">
+              <span>{ferryLink.label}</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+            {guide.ferryGuideHref !== ferryLink.href && (
+              <Link href={guide.ferryGuideHref} className="flex min-h-11 items-center justify-between gap-3 border-t border-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-600">
+                <span>{guide.ferryGuideLabel}</span>
+                <span aria-hidden="true" className="text-slate-400">→</span>
+              </Link>
+            )}
+          </div>
+        </section>
       </article>
     </main>
   )
