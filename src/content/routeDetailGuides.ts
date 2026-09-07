@@ -156,6 +156,18 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     tourHref: "/tour/oedaldo",
     tourLabel: "외달도 관광지 안내 보기",
   },
+  "jangsan-haui": {
+    title: "목포 · 장산·하의·신의도 이용 안내",
+    intro: "장산·하의·신의도는 서로 다른 섬으로, 같은 항로권 안에서도 실제 하선 섬과 경유 순서가 다를 수 있습니다. 시간표의 도착지 표기를 먼저 확인하세요.",
+    checks: [
+      { title: "하선 섬 확인", description: "장산·하의·신의도는 각각 별도 섬입니다. 숙소·픽업·관광지는 실제 하선 섬 기준으로 예약하고, 이름이 비슷한 선착장을 혼동하지 않도록 하세요." },
+      { title: "섬 사이 이동", description: "섬 사이 이동은 별도 배편이나 현지 교통이 필요할 수 있습니다. 한 번의 방문에 여러 섬을 묶기 전 연결편과 귀항편을 먼저 확인하세요." },
+      { title: "귀항편", description: "목포로 돌아오는 편은 항로와 운항일에 따라 다를 수 있습니다. 섬 안 일정 전에 당일 귀항 시각과 운항 상태를 확인하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/jangsan-haui-sinui",
+    tourLabel: "장산·하의·신의도 관광지 안내 보기",
+  },
   deokjeokdo: {
     title: "인천 · 덕적도 이용 안내",
     intro: "덕적도행은 인천연안여객터미널에서 출발합니다. 자월·승봉·이작 등 경유 섬이 섞일 수 있어, 덕적도 하선 편인지 시간표의 항로 안내를 확인해야 합니다.",

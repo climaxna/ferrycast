@@ -729,6 +729,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "jangsan-haui-sinui",
+    region: "장산·하의·신의도",
+    title: "장산·하의·신의도 주요 관광지 — 섬별로 확인하는 4곳",
+    description: "목포에서 연결되는 장산·하의·신의도 항로 이용자를 위해 대성산성, 김대중 대통령 생가, 농민운동기념관, 황성금리해수욕장을 신안군 안내 기준으로 정리했습니다.",
+    arrivalPort: "장산·하의·신의도 각 선착장",
+    intro: "이 항로는 여러 섬을 경유하거나 편마다 하선 섬이 달라질 수 있습니다. 같은 항로 이름만 보고 이동하지 말고, 시간표의 실제 도착 섬과 선착장을 먼저 확인하세요. 관광지는 섬별로 떨어져 있어 당일 이동 가능 여부도 귀항편 기준으로 판단해야 합니다.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 신안군 문화관광·신안군 안내 자료를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "신안군 섬 관광 공식 안내",
+    officialHref: "https://cn.shinan.go.kr/home/tour/island/island_01",
+    ferryGuideHref: "/mokpo",
+    ferryGuideLabel: "목포 배편 시간표 보기",
+    places: [
+      {
+        name: "장산도 대성산성 일대",
+        category: "역사 · 산 능선",
+        description: "장산도의 산줄기와 대성산성 유적으로 알려진 곳입니다. 산길과 유적지 접근 가능 구간은 현장 안내를 확인하고, 하선 섬이 장산도인지 먼저 확인하세요.",
+        mapQuery: "장산도 대성산성",
+        officialHref: "https://encykorea.aks.ac.kr/Article/E0048512",
+      },
+      {
+        name: "김대중 대통령 생가",
+        category: "역사 · 하의도",
+        description: "하의도의 대표 역사 공간으로 소개됩니다. 하의도 하선 편인지 확인한 뒤 방문하고, 관람 가능 여부와 이동 정보는 공식 안내를 확인하세요.",
+        mapQuery: "하의도 김대중 대통령 생가",
+        officialHref: "https://cn.shinan.go.kr/download/etc1/2016/02.pdf",
+      },
+      {
+        name: "하의3도 농민운동기념관",
+        category: "역사 · 하의도",
+        description: "하의·상태·하태도 농민들의 토지 투쟁사를 기념하는 공간으로 소개됩니다. 관람 전 운영 시간과 위치를 현지 안내에서 확인하세요.",
+        mapQuery: "하의3도 농민운동기념관",
+        officialHref: "https://cn.shinan.go.kr/download/etc1/2016/02.pdf",
+      },
+      {
+        name: "황성금리해수욕장",
+        category: "해변 · 신의도",
+        description: "신의도의 해변으로 소개되는 장소입니다. 하선 섬이 신의도인지와 해변 이용 가능 기간·현장 안전 여건을 확인한 뒤 이동하세요.",
+        mapQuery: "신의도 황성금리해수욕장",
+        officialHref: "https://cn.shinan.go.kr/download/etc1/2016/02.pdf",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
