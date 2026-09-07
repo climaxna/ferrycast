@@ -641,6 +641,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "bigeum-docho",
+    region: "비금·도초도",
+    title: "비금·도초도 주요 관광지 — 선착장 도착 뒤 확인하는 4곳",
+    description: "비금·도초도에 도착한 뒤 찾아볼 수 있는 대동염전, 하트해변, 도초 수국공원, 시목해수욕장을 신안군 안내 기준으로 정리했습니다.",
+    arrivalPort: "비금·도초도 선착장",
+    intro: "비금도와 도초도는 서남문대교로 연결된 두 섬입니다. 같은 항로에서도 실제 하선 선착장과 섬 안 이동 동선이 달라질 수 있어, 숙소·렌터카·관광 일정을 잡기 전 도착 항구와 귀항편을 함께 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 신안군 문화관광·국가유산 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "신안군 비금·도초도 공식 안내",
+    officialHref: "https://cn.shinan.go.kr/home/tour/island/island_01",
+    ferryGuideHref: "/mokpo",
+    ferryGuideLabel: "목포 배편 시간표 보기",
+    places: [
+      {
+        name: "비금도 대동염전",
+        category: "국가등록유산 · 염전 풍경",
+        description: "비금 주민들이 조합을 만들어 조성한 천일염전으로 소개되는 국가등록유산입니다. 염전 내부 출입과 관람 가능 구역은 현장 안내를 확인하세요.",
+        mapQuery: "비금도 대동염전",
+        officialHref: "https://cn.shinan.go.kr/home/www/about/cultural/cultural_03/show/126?page=1",
+      },
+      {
+        name: "하트해변",
+        category: "해변 · 해안 풍경",
+        description: "비금도의 대표 해변으로 소개되는 장소입니다. 해변 접근과 산책은 날씨·파고·현장 안전 여건을 확인한 뒤 계획하세요.",
+        mapQuery: "비금도 하트해변",
+        officialHref: "https://cn.shinan.go.kr/home/www/openinfo/participation_07/participation_07_01/show/28938",
+      },
+      {
+        name: "도초 수국공원",
+        category: "정원 · 계절 관광",
+        description: "폐교 부지에 수국을 테마로 조성된 공원으로 소개됩니다. 개화 시기와 행사·시설 운영은 해마다 달라질 수 있으므로 방문 전 확인하세요.",
+        mapQuery: "도초 수국공원",
+        officialHref: "https://cn.shinan.go.kr/download/etc1/2016/02.pdf",
+      },
+      {
+        name: "시목해수욕장",
+        category: "해변 · 휴식",
+        description: "도초도의 해변으로 소개되는 장소입니다. 계절별 해변 이용 가능 여부와 이동 여건은 현장 또는 신안군 안내를 확인하세요.",
+        mapQuery: "도초도 시목해수욕장",
+        officialHref: "https://cn.shinan.go.kr/download/etc1/2016/02.pdf",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {

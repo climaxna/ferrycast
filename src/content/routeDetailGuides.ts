@@ -133,6 +133,17 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     guideHref: "/guide/mokpo-gageodo",
     tourHref: "/tour/gageodo",
   },
+  "bigeum-docho": {
+    title: "목포 · 비금·도초도 이용 안내",
+    intro: "비금·도초도행은 같은 섬권을 잇는 항로지만 실제 하선 선착장과 경유 표기가 편마다 다를 수 있습니다. 출발 전 시간표의 도착 항구를 확인하세요.",
+    checks: [
+      { title: "도착 선착장", description: "비금도와 도초도는 다리로 연결되어 있지만 선착장은 다를 수 있습니다. 숙소·픽업 예약 시 실제 하선 장소를 전달하세요." },
+      { title: "섬 사이 이동", description: "두 섬을 함께 둘러볼 계획이라면 선착장 도착 시각과 섬 안 이동 시간을 먼저 확보해야 합니다. 귀항편에 맞춰 동선을 잡으세요." },
+      { title: "귀항편 확인", description: "목포로 나오는 편은 별도 시간표입니다. 섬 안 관광에 앞서 귀항 시각과 당일 운항 상태를 확인하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/bigeum-docho",
+  },
   deokjeokdo: {
     title: "인천 · 덕적도 이용 안내",
     intro: "덕적도행은 인천연안여객터미널에서 출발합니다. 자월·승봉·이작 등 경유 섬이 섞일 수 있어, 덕적도 하선 편인지 시간표의 항로 안내를 확인해야 합니다.",
