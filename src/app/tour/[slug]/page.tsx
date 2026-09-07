@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
-import { getTourGuide, TOUR_GUIDES } from "@/content/tourGuides"
+import { getRelatedTourGuides, getTourGuide, TOUR_GUIDES } from "@/content/tourGuides"
 
 export function generateStaticParams() {
   return TOUR_GUIDES.map((guide) => ({ slug: guide.slug }))
@@ -31,6 +31,7 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
   const { slug } = await params
   const guide = getTourGuide(slug)
   if (!guide) notFound()
+  const relatedGuides = getRelatedTourGuides(guide.slug)
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -96,6 +97,25 @@ export default async function TourGuidePage({ params }: { params: Promise<{ slug
           <p className="mt-2 text-xs leading-5 text-slate-600">{guide.sourceNote}</p>
           <a href={guide.officialHref} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">{guide.sourceLabel} ↗</a>
         </section>
+
+        {relatedGuides.length > 0 && (
+          <section aria-labelledby="related-guides-heading">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 id="related-guides-heading" className="text-sm font-bold text-slate-800">함께 보는 섬 안내</h2>
+              <Link href="/tour" className="inline-flex min-h-11 items-center text-xs font-semibold text-blue-700 hover:underline focus-visible:outline-blue-600">전체 보기 →</Link>
+            </div>
+            <ul className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              {relatedGuides.map((related) => (
+                <li key={related.slug}>
+                  <Link href={`/tour/${related.slug}`} className="flex min-h-11 items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-blue-600">
+                    <span>{related.region}</span>
+                    <span aria-hidden="true" className="shrink-0 text-slate-400">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <Link href={guide.ferryGuideHref} className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-blue-200 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
           {guide.ferryGuideLabel} <span aria-hidden="true">→</span>

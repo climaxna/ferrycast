@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { TOUR_GUIDES, type TourGuide } from "@/content/tourGuides"
+import { TOUR_GROUPS, getTourGuidesForSlugs } from "@/content/tourGuides"
 
 export const metadata: Metadata = {
   title: "섬 관광지 안내 모아보기",
@@ -15,36 +15,6 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     images: [{ url: "/og-v2.jpg", width: 1200, height: 630, alt: "FerryCast — 실시간 운항·결항 정보" }],
   },
-}
-
-const GROUPS: Array<{ name: string; description: string; slugs: string[] }> = [
-  {
-    name: "완도 출발 섬 여행",
-    description: "완도항에서 배로 들어가는 청산도와 보길도 안내입니다.",
-    slugs: ["cheongsando", "bogildo"],
-  },
-  {
-    name: "목포·신안 다도해",
-    description: "홍도·흑산도부터 신안과 조도면 경유 섬까지, 실제 하선 섬을 확인하세요.",
-    slugs: ["hongdo", "heuksando", "gageodo", "bigeum-docho", "oedaldo", "jangsan-haui-sinui", "seogeocha-gwanmaedo"],
-  },
-  {
-    name: "인천 서해 섬",
-    description: "인천과 삼목항에서 연결되는 서해 섬 여행 안내입니다.",
-    slugs: ["baengnyeongdo", "deokjeokdo", "daeijakdo", "gulupdo", "yeonpyeongdo", "jangbongdo", "pungdo", "uldo"],
-  },
-  {
-    name: "울릉도·제주",
-    description: "장거리 여객선 여행 전 도착항과 섬 안 이동을 먼저 확인하세요.",
-    slugs: ["ulleungdo", "dokdo", "jeju-port"],
-  },
-]
-
-function guidesFor(slugs: string[]): TourGuide[] {
-  return slugs.flatMap((slug) => {
-    const guide = TOUR_GUIDES.find((item) => item.slug === slug)
-    return guide ? [guide] : []
-  })
 }
 
 export default function TourIndexPage() {
@@ -70,8 +40,8 @@ export default function TourIndexPage() {
         </header>
 
         <nav aria-label="지역별 관광지 안내" className="space-y-7">
-          {GROUPS.map((group) => {
-            const guides = guidesFor(group.slugs)
+          {TOUR_GROUPS.map((group) => {
+            const guides = getTourGuidesForSlugs(group.slugs)
             if (guides.length === 0) return null
 
             return (

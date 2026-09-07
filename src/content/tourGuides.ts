@@ -25,6 +25,35 @@ export type TourGuide = {
   places: TourPlace[]
 }
 
+export type TourGroup = {
+  name: string
+  description: string
+  slugs: string[]
+}
+
+export const TOUR_GROUPS: TourGroup[] = [
+  {
+    name: "완도 출발 섬 여행",
+    description: "완도항에서 배로 들어가는 청산도와 보길도 안내입니다.",
+    slugs: ["cheongsando", "bogildo"],
+  },
+  {
+    name: "목포·신안 다도해",
+    description: "홍도·흑산도부터 신안과 조도면 경유 섬까지, 실제 하선 섬을 확인하세요.",
+    slugs: ["hongdo", "heuksando", "gageodo", "bigeum-docho", "oedaldo", "jangsan-haui-sinui", "seogeocha-gwanmaedo"],
+  },
+  {
+    name: "인천 서해 섬",
+    description: "인천과 삼목항에서 연결되는 서해 섬 여행 안내입니다.",
+    slugs: ["baengnyeongdo", "deokjeokdo", "daeijakdo", "gulupdo", "yeonpyeongdo", "jangbongdo", "pungdo", "uldo"],
+  },
+  {
+    name: "울릉도·제주",
+    description: "장거리 여객선 여행 전 도착항과 섬 안 이동을 먼저 확인하세요.",
+    slugs: ["ulleungdo", "dokdo", "jeju-port"],
+  },
+]
+
 // 관광지 설명은 완도문화관광이 안내한 명칭과 범위만 정리한다.
 // 운영시간·요금·교통편처럼 수시로 달라지는 정보는 이 목록에 고정하지 않는다.
 export const TOUR_GUIDES: TourGuide[] = [
@@ -918,4 +947,17 @@ export const TOUR_GUIDES: TourGuide[] = [
 
 export function getTourGuide(slug: string): TourGuide | undefined {
   return TOUR_GUIDES.find((guide) => guide.slug === slug)
+}
+
+export function getTourGuidesForSlugs(slugs: string[]): TourGuide[] {
+  return slugs.flatMap((slug) => {
+    const guide = getTourGuide(slug)
+    return guide ? [guide] : []
+  })
+}
+
+export function getRelatedTourGuides(slug: string, limit = 3): TourGuide[] {
+  const group = TOUR_GROUPS.find((item) => item.slugs.includes(slug))
+  if (!group) return []
+  return getTourGuidesForSlugs(group.slugs).filter((guide) => guide.slug !== slug).slice(0, limit)
 }
