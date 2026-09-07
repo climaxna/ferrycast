@@ -509,6 +509,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "pungdo",
+    region: "풍도",
+    title: "풍도 주요 관광지 — 선착장 도착 뒤 확인하는 4곳",
+    description: "풍도에 도착한 뒤 찾아볼 수 있는 동무재, 비밀정원, 은행나무, 청옆골해변을 경기바다 공식 안내 기준으로 정리했습니다.",
+    arrivalPort: "풍도 선착장",
+    intro: "풍도는 야생화와 해안 풍경으로 알려진 작은 섬입니다. 섬 안 이동과 관람 가능 구간은 계절·기상·현장 여건에 따라 달라질 수 있으므로, 출발 전 공식 안내와 현지 안내를 함께 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 경기바다의 풍도 공식 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "경기바다 풍도 공식 안내",
+    officialHref: "https://www.ggbada.co.kr/home/kor/contents.do?menuPos=7",
+    ferryGuideHref: "/incheon",
+    ferryGuideLabel: "인천 배편 시간표 보기",
+    places: [
+      {
+        name: "동무재",
+        category: "산길 · 조망",
+        description: "하늘과 맞닿은 길로 소개되는 풍도의 산길입니다. 탐방 전 날씨와 산길 상태를 확인하고, 귀항편을 고려해 여유 있게 이동하세요.",
+        mapQuery: "풍도 동무재",
+        officialHref: "https://www.ggbada.co.kr/home/kor/contents.do?menuPos=7",
+      },
+      {
+        name: "풍도 비밀정원",
+        category: "야생화 · 자연",
+        description: "야생화 풍경으로 소개되는 장소입니다. 개화 시기와 탐방 가능 구간은 매년 달라질 수 있으므로 방문일 현장 안내를 우선 확인하세요.",
+        mapQuery: "풍도 비밀정원",
+        officialHref: "https://www.ggbada.co.kr/home/kor/contents.do?menuPos=7",
+      },
+      {
+        name: "풍도 은행나무",
+        category: "고목 · 마을 풍경",
+        description: "수령 500년 이상으로 소개되는 풍도의 은행나무입니다. 마을 생활 공간과 인접할 수 있어 조용한 관람과 현장 안내 준수가 필요합니다.",
+        mapQuery: "풍도 은행나무",
+        officialHref: "https://www.ggbada.co.kr/home/kor/contents.do?menuPos=7",
+      },
+      {
+        name: "청옆골해변",
+        category: "해변 · 해안 풍경",
+        description: "풍도해전과 관련된 해안으로 소개되는 곳입니다. 해안 접근과 산책은 파고·물때·현장 안전 여건을 확인한 뒤 계획하세요.",
+        mapQuery: "풍도 청옆골해변",
+        officialHref: "https://www.ggbada.co.kr/home/kor/contents.do?menuPos=7",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {

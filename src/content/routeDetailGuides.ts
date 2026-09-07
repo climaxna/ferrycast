@@ -163,6 +163,17 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     tourHref: "/tour/jangbongdo",
   },
+  pungdo: {
+    title: "인천 · 풍도 이용 안내",
+    intro: "풍도 편은 운항일에 따라 인천·대부도와 연결되는 순환 항로로 표시될 수 있습니다. 출발 시각뿐 아니라 풍도 하선 편인지 항로 안내를 함께 확인하세요.",
+    checks: [
+      { title: "운항일 확인", description: "풍도 항로는 날짜에 따라 경유지와 시간표 표기가 달라질 수 있습니다. 출발 전 당일 편별 운항 상태와 공식 예약 정보를 함께 확인하세요." },
+      { title: "야생화·해안 탐방", description: "풍도 탐방은 계절과 해상 여건의 영향을 받습니다. 야생화 개화와 해안 이동 가능 구간은 현지 안내를 확인해 계획하세요." },
+      { title: "귀항편 우선 확인", description: "풍도에서 나오는 편은 별도 시간표입니다. 섬 안 탐방에 앞서 귀항 시각과 승선 조건을 먼저 확인하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/pungdo",
+  },
   baengnyeongdo: {
     title: "인천 · 백령도 이용 안내",
     intro: "백령도는 인천연안여객터미널에서 출발해 용기포항여객터미널로 들어가는 장거리 서해 항로입니다. 출발 당일 운항 상태 확인이 특히 중요합니다.",
