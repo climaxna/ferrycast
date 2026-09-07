@@ -597,6 +597,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "ulleungdo",
+    region: "울릉도",
+    title: "울릉도 도착 뒤 둘러볼 곳 — 도동·저동 일대 4곳",
+    description: "울릉도에 도착한 뒤 찾아볼 수 있는 행남해안산책로, 독도전망대, 촛대바위, 내수전일출전망대를 한국관광공사 안내 기준으로 정리했습니다.",
+    arrivalPort: "울릉도 도동·저동·사동항",
+    intro: "울릉도는 출발지에 따라 도동·저동·사동 등 서로 다른 항구에 도착할 수 있습니다. 숙소와 관광지 이동 전에 실제 하선 항구를 먼저 확인하세요. 해안 산책과 전망대 이동은 기상·현장 통행 여건에 따라 달라질 수 있습니다.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 한국관광공사 대한민국 구석구석의 울릉도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·통행·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "대한민국 구석구석 울릉도 공식 안내",
+    officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=1cb11f9f-21e8-4394-94da-164d9bf60916",
+    ferryGuideHref: "/ulleung",
+    ferryGuideLabel: "울릉도 배편 시간표 보기",
+    places: [
+      {
+        name: "행남해안산책로",
+        category: "해안 산책 · 절경",
+        description: "도동에서 행남을 거쳐 저동까지 이어지는 해안 산책 구간으로 소개됩니다. 통행 가능 구간은 파도·기상·정비 상황에 따라 달라질 수 있어 출발 전 확인이 필요합니다.",
+        mapQuery: "울릉도 행남해안산책로",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=1cb11f9f-21e8-4394-94da-164d9bf60916",
+      },
+      {
+        name: "독도전망대",
+        category: "전망 · 도동 일대",
+        description: "도동항과 해안 풍경을 조망할 수 있는 전망 장소로 소개됩니다. 관람 및 케이블카 운영 여부는 날씨와 현장 안내를 확인하세요.",
+        mapQuery: "울릉도 독도전망대",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=1cb11f9f-21e8-4394-94da-164d9bf60916",
+      },
+      {
+        name: "촛대바위",
+        category: "해안 지형 · 저동",
+        description: "저동항 인근의 대표 해안 경관으로 소개됩니다. 실제 하선 항구와 이동 시간을 확인해 귀항편에 무리가 없도록 동선을 잡으세요.",
+        mapQuery: "울릉도 촛대바위",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=1cb11f9f-21e8-4394-94da-164d9bf60916",
+      },
+      {
+        name: "내수전일출전망대",
+        category: "전망 · 해안 풍경",
+        description: "저동항과 죽도·관음도 일대를 조망할 수 있는 전망 장소로 소개됩니다. 날씨와 도로 여건을 확인한 뒤 이동하세요.",
+        mapQuery: "울릉도 내수전일출전망대",
+        officialHref: "https://korean.visitkorea.or.kr/detail/rem_detail.do?cotid=1cb11f9f-21e8-4394-94da-164d9bf60916",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {

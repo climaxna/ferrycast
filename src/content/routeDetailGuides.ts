@@ -51,6 +51,17 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     tourHref: "/tour/jeju-port",
     tourLabel: "제주항 도착 뒤 관광지 안내 보기",
   },
+  ulleung: {
+    title: "울릉도 항로 이용 안내",
+    intro: "울릉도행은 출발지에 따라 도동·저동·사동 등 도착 항구가 다릅니다. 숙소·교통 예약 전에 시간표의 실제 하선 항구를 확인하세요.",
+    checks: [
+      { title: "도착 항구", description: "같은 울릉도행이라도 도동·저동·사동으로 도착지가 달라질 수 있습니다. 항구가 섬 안에서 떨어져 있어 숙소·픽업은 실제 도착 항구 기준으로 잡아야 합니다." },
+      { title: "기상과 귀항편", description: "동해 장거리 항로는 해상 상태 영향이 큽니다. 출항 당일 편별 운항 상태와 돌아오는 편의 항구·시각을 함께 확인하세요." },
+      { title: "섬 안 이동", description: "해안 산책·전망대 이동은 날씨와 현장 통행 여건에 따라 달라질 수 있습니다. 도착 후 현지 안내를 확인해 일정을 조정하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/ulleungdo",
+  },
   "from-pohang": {
     title: "포항 · 울릉도 이용 안내",
     intro: "포항 출발 울릉도 편은 도착 항구와 선박에 따라 섬 안 이동 동선이 달라질 수 있습니다. 숙소·렌터카 예약 전 도착 항구를 먼저 확인하세요.",
@@ -61,6 +72,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
     guideHref: "/guide/ulleung-from-pohang",
+    tourHref: "/tour/ulleungdo",
   },
   "from-yeongilman": {
     title: "영일만 · 울릉도 이용 안내",
@@ -72,6 +84,7 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     ],
     source: { label: "울릉크루즈 공식 안내", href: "https://www.ulcruise.co.kr" },
     guideHref: "/guide/ulleung-from-yeongilman",
+    tourHref: "/tour/ulleungdo",
   },
   dokdo: {
     title: "울릉도 · 독도 이용 안내",
@@ -203,7 +216,9 @@ const GUIDES: Record<string, RouteDetailGuide> = {
 
 export function getRouteDetailGuide(route: WandoRoute): RouteDetailGuide | null {
   const key = route.id.replace(/^(dep|arr|hop)-/, "")
-  const guide = GUIDES[key] ?? (route.originName === "제주" ? GUIDES.jeju : undefined)
+  const guide = GUIDES[key]
+    ?? (route.originName === "제주" ? GUIDES.jeju : undefined)
+    ?? (route.originName === "울릉도" ? GUIDES.ulleung : undefined)
   if (!guide) return null
   return { ...guide, guideHref: getRouteGuideHref(route) ?? undefined }
 }
