@@ -48,6 +48,8 @@ const GUIDES: Record<string, RouteDetailGuide> = {
       { title: "차량 동반", description: "여객 좌석과 차량 선적은 별도 확인 대상입니다. 차량을 가져간다면 선사·예매처의 차량 접수 조건과 마감 시각을 먼저 확인하세요." },
     ],
     source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/jeju-port",
+    tourLabel: "제주항 도착 뒤 관광지 안내 보기",
   },
   "from-pohang": {
     title: "포항 · 울릉도 이용 안내",

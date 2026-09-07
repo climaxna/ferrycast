@@ -553,6 +553,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "jeju-port",
+    region: "제주",
+    title: "제주항 도착 뒤 둘러볼 곳 — 원도심 4곳",
+    description: "제주항 연안여객터미널에 도착한 뒤 찾아볼 수 있는 동문수산시장, 동문재래시장, 제주목관아, 용연·용두암 해안 일대를 제주관광 공식 안내 기준으로 정리했습니다.",
+    arrivalPort: "제주항 연안여객터미널",
+    intro: "제주행 배편의 도착지는 제주항 연안여객터미널입니다. 장거리 항로 뒤 바로 이동하기 좋은 제주 원도심 중심의 장소를 정리했습니다. 운영 시간과 이동 수단은 수시로 바뀔 수 있으므로 방문 전 공식 안내를 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 제주관광공사 Visit Jeju의 관광지·공식 가이드북 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "Visit Jeju 제주 원도심 공식 안내",
+    officialHref: "https://www.visitjeju.net/pdf/Official%20Jeju%20Tourism%20Guidebook_kr.pdf",
+    ferryGuideHref: "/jeju",
+    ferryGuideLabel: "제주 배편 시간표 보기",
+    places: [
+      {
+        name: "동문수산시장",
+        category: "시장 · 먹거리",
+        description: "제주항 여객터미널에서 가까운 수산물 전문시장으로 소개됩니다. 점포별 운영 시간과 판매 품목은 현장 또는 공식 안내를 확인하세요.",
+        mapQuery: "제주 동문수산시장",
+        officialHref: "https://www.visitjeju.net/kr/detail/view?contentsid=CONT_000000000500744&menuId=DOM_000001720003000000",
+      },
+      {
+        name: "동문재래시장",
+        category: "전통시장 · 원도심",
+        description: "제주 원도심의 대표 전통시장입니다. 시장과 야시장 운영은 점포·계절에 따라 달라질 수 있으므로 방문 전 공식 안내를 확인하세요.",
+        mapQuery: "제주 동문재래시장",
+        officialHref: "https://www.visitjeju.net/kr/detail/view?contentsid=CONT_000000000500745&menuId=DOM_000001820000000001",
+      },
+      {
+        name: "제주목관아",
+        category: "역사 · 문화",
+        description: "제주 원도심의 역사 공간으로, 제주항과 동문시장 일대 이동 동선에서 함께 찾아볼 수 있습니다. 관람 가능 시간은 공식 안내를 확인하세요.",
+        mapQuery: "제주목관아",
+        officialHref: "https://www.visitjeju.net/pdf/Official%20Jeju%20Tourism%20Guidebook_kr.pdf",
+      },
+      {
+        name: "용연·용두암 해안",
+        category: "해안 풍경 · 산책",
+        description: "제주 원도심 해안 풍경을 볼 수 있는 장소입니다. 해안 산책은 날씨와 파도 등 현장 안전 여건을 확인한 뒤 이동하세요.",
+        mapQuery: "제주 용연 용두암",
+        officialHref: "https://www.visitjeju.net/pdf/Official%20Jeju%20Tourism%20Guidebook_kr.pdf",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
