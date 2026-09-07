@@ -67,7 +67,8 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
     route.arrivals?.[t] ?? (route.durationMin ? addMinutes(t, route.durationMin) : null)
   const hasArrival = !!route.arrivals || !!route.durationMin
   const guide = getRouteDetailGuide(route)
-  const guideHref = getRouteGuideHref(route)
+  const guideHref = guide?.guideHref ?? getRouteGuideHref(route)
+  const isStatusGuide = guideHref === "/guide/ferry-status"
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-white" style={{ height: "100dvh" }}>
@@ -450,7 +451,7 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
                   onClick={onClose}
                   className="mt-3 flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:text-blue-700"
                 >
-                  항로별 시간표·터미널 안내 자세히 보기
+                  {isStatusGuide ? "운항·결항 표시 읽는 법" : "항로별 시간표·터미널 안내 자세히 보기"}
                   <span aria-hidden="true">→</span>
                 </Link>
               )}
@@ -472,7 +473,7 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
           {!guide && guideHref && (
             <Link href={guideHref} prefetch={false} onClick={onClose}
               className="flex min-h-11 items-center justify-between rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-semibold text-slate-700 hover:border-blue-200 hover:text-blue-700">
-              항로별 시간표·터미널 안내 자세히 보기
+              {isStatusGuide ? "운항·결항 표시 읽는 법" : "항로별 시간표·터미널 안내 자세히 보기"}
               <span aria-hidden="true">→</span>
             </Link>
           )}

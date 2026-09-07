@@ -296,11 +296,13 @@ export function getRouteDetailGuide(route: WandoRoute): RouteDetailGuide | null 
     ?? (route.originName === "제주" ? GUIDES.jeju : undefined)
     ?? (route.originName === "울릉도" ? GUIDES.ulleung : undefined)
   if (!guide) return null
-  return { ...guide, guideHref: getRouteGuideHref(route) ?? undefined }
+  // 개별 항로 가이드가 있으면 우선 사용하고, 없는 생활·순환 항로도
+  // 상태 읽는 법으로 이어져 상세 화면에서 안내 흐름이 끊기지 않게 한다.
+  return { ...guide, guideHref: guide.guideHref ?? getRouteGuideHref(route) }
 }
 
 // originName은 화면의 지역이다. 귀항편의 from은 섬 이름이므로 지역 판정에 쓰지 않는다.
-export function getRouteGuideHref(route: WandoRoute): string | null {
+export function getRouteGuideHref(route: WandoRoute): string {
   const key = route.id.replace(/^(dep|arr|hop)-/, "")
   const region = route.originName ?? "완도"
   if (route.id.startsWith("yaksan-")) return "/guide/wando-yaksan-islands"
@@ -308,7 +310,7 @@ export function getRouteGuideHref(route: WandoRoute): string | null {
     if (key === "jeju") return "/guide/jeju-from-wando"
     if (key === "cheongsando") return "/guide/wando-cheongsando"
     if (key === "hwaheungpo-route") return "/guide/wando-soan-bogil-nohwa"
-    return null
+    return "/guide/ferry-status"
   }
   const config = Object.values(REGIONS).find(item => item.name === region)
   if (config?.routeGroups.some(group => group.key === key)) {
@@ -318,5 +320,7 @@ export function getRouteGuideHref(route: WandoRoute): string | null {
   }
   // 독도는 관련 설명이 있는 울릉도 종합 가이드로 연결한다.
   if (region === "울릉도" && key === "dokdo") return "/guide/ulleung"
-  return null
+  // 개별 항로 가이드가 아직 없는 생활·순환 항로의 공통 안내.
+  // 실시간 화면의 상태를 어떻게 읽어야 하는지 바로 이어서 확인할 수 있다.
+  return "/guide/ferry-status"
 }
