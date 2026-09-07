@@ -773,6 +773,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "seogeocha-gwanmaedo",
+    region: "서거차도·관매도",
+    title: "서거차도·관매도 해역 안내 — 경유 항로를 이용할 때 확인할 4곳",
+    description: "율목·서거차 항로 이용자를 위해 서거차도와 관매도 해변·곰솔 숲, 경유 항로 확인 방법을 진도군 관광문화 공식 안내 기준으로 정리했습니다.",
+    arrivalPort: "서거차도·관매도 등 조도면 각 선착장",
+    intro: "율목·서거차 편은 여러 섬을 길게 경유하는 생활 항로입니다. 모든 편이 같은 섬에 기항하는 것은 아니며, 여객 요청에 따라 기항 여부가 달라질 수 있습니다. 여행 목적이라면 시간표의 실제 기항지와 하선 가능 여부를 먼저 확인한 뒤 관광지를 정하세요.",
+    sourceNote: "2026-09-07 작성. 관광지와 운항 유의사항은 진도군 관광문화의 섬·바다 및 여객선 운항시간표 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 기항·운항·시설 운영 여부는 출발 전 공식 안내와 현지 운영처에서 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "진도군 관광문화 조도·관매도 공식 안내",
+    officialHref: "https://www.jindo.go.kr/tour/sub.cs?m=81",
+    ferryGuideHref: "/mokpo",
+    ferryGuideLabel: "목포 배편 시간표 보기",
+    places: [
+      {
+        name: "서거차도 해안과 어촌",
+        category: "섬 풍경 · 어촌",
+        description: "다도해해상국립공원 안에 있는 서거차도는 어업 전진기지와 낚시 방문지로 알려진 섬입니다. 관광 시설 중심의 섬은 아니므로, 하선 가능 편·숙박·현지 이동 여부를 먼저 확인한 뒤 찾는 편이 좋습니다.",
+        mapQuery: "서거차도",
+        officialHref: "https://jindo.go.kr/home/board/B0016.cs?act=read&articleId=223&categoryId=0&m=22&pageIndex=1611&searchCondition=&searchKeyword=",
+      },
+      {
+        name: "관매도 해변",
+        category: "해변 · 가족 휴식",
+        description: "부드러운 모래사장과 얕은 수심, 소나무 숲으로 소개되는 관매도의 대표 해변입니다. 서거차 항로의 경유지로 표시될 수 있으므로 관매도에서 실제로 내릴 수 있는 편인지 먼저 확인하세요.",
+        mapQuery: "관매도 해변",
+        officialHref: "https://www.jindo.go.kr/tour/tour/info/nature/002.cs?act=view&category=002&infoId=4&m=&pageIndex=1&searchCondition=&searchKeyword=",
+      },
+      {
+        name: "관매도 곰솔 숲과 해변길",
+        category: "숲 · 해안 산책",
+        description: "관매도 해변 주변의 오래된 곰솔 숲과 해안 풍경은 진도군 관광 안내에서 함께 소개됩니다. 숲길·해변 이동은 일몰 전 귀항편과 기상, 현장 안전 여건을 고려해 계획하세요.",
+        mapQuery: "관매도 곰솔 숲",
+        officialHref: "https://jindo.go.kr/tour/content/print.cs?m=57&qry=RwM55YMYpaNqZ+E4UbOTChWytMpQ3YuUIAj1clRs2hRXiCvBSw5ZE6yy4H5mxki2r%2FfJBR80HMrsSFUPW46J3Q%3D%3D",
+      },
+      {
+        name: "관매도·서거차 경유 항로",
+        category: "여객선 · 일정 계획",
+        description: "진도군 공식 시간표에는 관매도·동거차도·서거차도를 잇는 경유 항로가 안내됩니다. 계절·조석·기상에 따라 시간이 달라질 수 있고 사전 요청이 필요한 기항도 있어, 섬 방문 전 최신 시간표를 확인해야 합니다.",
+        mapQuery: "서거차도 선착장",
+        officialHref: "https://www.jindo.go.kr/tour/sub.cs?m=81",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {

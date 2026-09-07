@@ -180,6 +180,18 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     tourHref: "/tour/jangsan-haui-sinui",
     tourLabel: "신의도·하의3도 관광지 안내 보기",
   },
+  seogeocha: {
+    title: "목포 · 율목·서거차 이용 안내",
+    intro: "율목·서거차 편은 여러 섬을 경유하는 생활 항로입니다. 섬 이름만 보고 승선하지 말고, 당일 시간표에서 실제 기항지·하선 가능 여부를 먼저 확인하세요.",
+    checks: [
+      { title: "요청 기항 확인", description: "일부 기항지는 사전 예약 또는 여객 요청에 따라 들르지 않을 수 있습니다. 목적지가 율목·서거차·관매도 등이라면 출발 전 선사·터미널에 하선 가능 여부를 확인하세요." },
+      { title: "긴 경유 시간", description: "경유지가 많아 같은 항로라도 실제 이동 시간이 길어질 수 있습니다. 섬 안 숙소·픽업은 도착 예정 시각보다 여유 있게 조율하세요." },
+      { title: "귀항편 확인", description: "목포 귀항편 역시 여러 섬을 경유합니다. 당일 관광 계획 전 귀항 시각과 당일 운항 상태를 먼저 확인하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/seogeocha-gwanmaedo",
+    tourLabel: "서거차도·관매도 해역 안내 보기",
+  },
   deokjeokdo: {
     title: "인천 · 덕적도 이용 안내",
     intro: "덕적도행은 인천연안여객터미널에서 출발합니다. 자월·승봉·이작 등 경유 섬이 섞일 수 있어, 덕적도 하선 편인지 시간표의 항로 안내를 확인해야 합니다.",
