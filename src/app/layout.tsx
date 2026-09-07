@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import Script from "next/script"
 import InstallBanner from "@/components/InstallBanner"
 import PwaTracker from "@/components/PwaTracker"
+import SiteFooter from "@/components/SiteFooter"
 import "./globals.css"
 
 // Pretendard Variable — 한글·라틴·숫자를 단일 패밀리로 (자체 호스팅, tabular-nums 지원)
@@ -82,6 +83,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         {children}
+        <SiteFooter />
         <InstallBanner />
         <PwaTracker />
         <Analytics />
