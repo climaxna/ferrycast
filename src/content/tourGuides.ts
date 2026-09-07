@@ -817,6 +817,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "uldo",
+    region: "울도",
+    title: "울도 주요 관광지 — 덕적도에서 이어지는 작은 섬 여행",
+    description: "덕적도에서 배로 연결되는 울도 여행자를 위해 해안절벽, 기암괴석, 소나무 숲, 마을 벽화와 해수욕장을 인천투어 공식 안내 기준으로 정리했습니다.",
+    arrivalPort: "울도 선착장",
+    intro: "울도는 덕적도 진리선착장에서 다시 배로 이어지는 섬입니다. 인천에서 바로 들어가는 항로와 다르므로, 덕적도 도착 시각·울도행 연결편·귀항편을 한 일정으로 확인해야 합니다. 섬 안 시설과 숙박은 제한적일 수 있어 출발 전 현지 운영 정보를 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 인천투어의 울도 공식 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 실제 배편·시설 운영·현지 이동 정보는 출발 전 공식 안내와 현지 운영처에서 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "인천투어 울도 공식 안내",
+    officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=APD21112609183595790",
+    ferryGuideHref: "/incheon",
+    ferryGuideLabel: "인천 배편 시간표 보기",
+    places: [
+      {
+        name: "울도 해안절벽과 기암괴석",
+        category: "해안 경관 · 조망",
+        description: "울도는 해안절벽과 기암괴석, 바다 풍경이 어우러진 섬으로 소개됩니다. 해안 이동은 기상·파도와 현장 안전 여건의 영향을 받으므로 무리한 접근은 피하세요.",
+        mapQuery: "인천 울도 해안",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=APD21112609183595790",
+      },
+      {
+        name: "울도 소나무 숲",
+        category: "숲 · 산책",
+        description: "해안 풍경과 함께 소나무 숲이 어우러진 울도의 자연 경관입니다. 정비된 탐방 동선과 접근 가능 구간은 현지에서 확인하고, 귀항편에 맞춰 이동 시간을 잡으세요.",
+        mapQuery: "인천 울도",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=APD21112609183595790",
+      },
+      {
+        name: "울도 마을 벽화",
+        category: "마을 · 지명 이야기",
+        description: "울도라는 이름의 유래를 담아 마을에 조성된 벽화가 소개됩니다. 섬의 이름과 생활 이야기를 함께 볼 수 있는 마을 공간으로, 주민 생활공간을 존중해 조용히 둘러보세요.",
+        mapQuery: "울도 마을 벽화",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=APD21112609183595790",
+      },
+      {
+        name: "울도 해수욕장",
+        category: "해변 · 계절 여행",
+        description: "인천투어에서 울도 주변 관광지로 소개되는 해변입니다. 해변 이용 가능 기간과 시설 운영은 계절·기상에 따라 달라질 수 있어 방문일 기준으로 확인해야 합니다.",
+        mapQuery: "인천 울도 해수욕장",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=APD21112609183595790",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
