@@ -130,6 +130,17 @@ const GUIDES: Record<string, RouteDetailGuide> = {
     guideHref: "/guide/incheon-deokjeokdo",
     tourHref: "/tour/deokjeokdo",
   },
+  daeijakdo: {
+    title: "인천 · 대이작도 이용 안내",
+    intro: "대이작도행은 인천연안여객터미널에서 출발하며, 자월·승봉 등 경유 섬이 함께 표시될 수 있습니다. 출발 시각만 보지 말고 대이작도 하선 편인지 항로 안내를 함께 확인하세요.",
+    checks: [
+      { title: "도착 후 이동", description: "대이작도 관광지는 선착장 주변에만 모여 있지 않습니다. 숙소·픽업을 잡을 때에는 실제 하선 장소와 이동 시간을 함께 전달하세요." },
+      { title: "풀등 방문", description: "풀등은 썰물 때만 드러나는 모래톱입니다. 배 시간표와 별개로 조석·현지 운영 안내를 확인한 뒤 일정을 잡아야 합니다." },
+      { title: "귀항편", description: "대이작도에서 인천으로 나오는 편은 별도 시간표입니다. 당일 일정이라면 관광지 이동 전에 귀항 시각을 먼저 확인하세요." },
+    ],
+    source: { label: "한국해운조합 승선예약에서 최종 확인", href: BOOKING },
+    tourHref: "/tour/daeijakdo",
+  },
   baengnyeongdo: {
     title: "인천 · 백령도 이용 안내",
     intro: "백령도는 인천연안여객터미널에서 출발해 용기포항여객터미널로 들어가는 장거리 서해 항로입니다. 출발 당일 운항 상태 확인이 특히 중요합니다.",

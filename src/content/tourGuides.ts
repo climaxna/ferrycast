@@ -333,6 +333,50 @@ export const TOUR_GUIDES: TourGuide[] = [
       },
     ],
   },
+  {
+    slug: "daeijakdo",
+    region: "대이작도",
+    title: "대이작도 주요 관광지 — 선착장 도착 뒤 확인하는 4곳",
+    description: "대이작도에 도착한 뒤 찾아볼 수 있는 풀등, 부아산, 큰풀안·작은풀안해변, 계남일출전망대를 인천관광 안내 기준으로 정리했습니다.",
+    arrivalPort: "대이작도 선착장",
+    intro: "인천 출발편은 대이작도 선착장에 도착합니다. 풀등은 썰물 때만 드러나는 모래톱이라 방문 시간과 해상 여건을 함께 확인해야 합니다. 아래 장소는 인천관광 안내에 소개된 곳이며, 해변·탐방·현장 프로그램의 운영 여부는 방문일에 확인하세요.",
+    sourceNote: "2026-09-07 작성. 관광지 명칭과 소개 범위는 인천관광과 인천 섬포털의 대이작도 안내를 바탕으로 정리했습니다. 지도 링크는 장소를 찾기 위한 검색 링크이며, 정확한 위치·운영 정보는 연결된 안내와 현지 운영처를 확인하세요.",
+    updated: "2026-09-07",
+    sourceLabel: "인천관광 대이작도 공식 안내",
+    officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD22012116245038060",
+    ferryGuideHref: "/incheon",
+    ferryGuideLabel: "인천 배편 시간표 보기",
+    places: [
+      {
+        name: "풀등",
+        category: "모래톱 · 해양 생태",
+        description: "썰물 때만 모습을 드러내는 해중 모래톱입니다. 바닷물이 차오르면 잠기므로 방문 전 조석·기상과 현지 안내를 반드시 확인하세요.",
+        mapQuery: "대이작도 풀등",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD21122709112053959",
+      },
+      {
+        name: "부아산",
+        category: "탐방 · 전망",
+        description: "대이작도의 섬과 해변을 조망할 수 있는 산으로 소개됩니다. 부아산 구름다리와 봉수대 주변 이동 여건은 현장 안내를 확인하세요.",
+        mapQuery: "대이작도 부아산",
+        officialHref: "https://itour.incheon.go.kr/thmtour/thmtour/detail.do?cotId=ITA25082615310498753&pgListMode=S",
+      },
+      {
+        name: "큰풀안·작은풀안해변",
+        category: "해변 · 산책",
+        description: "대이작도 대표 해변으로 소개되는 곳입니다. 두 해변 사이에는 산책로가 이어지며, 계절별 해변 이용 여건은 현지 안내를 확인하세요.",
+        mapQuery: "대이작도 큰풀안해변",
+        officialHref: "https://itour.incheon.go.kr/ssst/ssst/detail.do?cotId=ITD22012116245038060",
+      },
+      {
+        name: "계남일출전망대",
+        category: "전망 · 해안 풍경",
+        description: "인천 섬포털이 대이작도 대표 관광지로 소개하는 전망 장소입니다. 이동 전 도로와 날씨 여건을 확인하세요.",
+        mapQuery: "대이작도 계남일출전망대",
+        officialHref: "https://isum.incheon.go.kr/isleInfo.do?isle=197&key=2407020009",
+      },
+    ],
+  },
 ]
 
 export function getTourGuide(slug: string): TourGuide | undefined {
