@@ -17,7 +17,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/terms`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/privacy`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${BASE}/ads`, lastModified: now, changeFrequency: "monthly", priority: 0.3 },
   ]
 
   const regions: MetadataRoute.Sitemap = Object.keys(REGIONS).map((slug) => ({
