@@ -339,10 +339,30 @@ export function enrichGuide(guide: Guide): Guide {
   const isWando = guide.regionSlug === ""
   const sources = EDITORIAL_SOURCES[guide.slug] ?? [{ label: "한국해양교통안전공단 — 완도 항로 조회", href: WANDO_ROUTES, note: "출발항·기항지 등 항로 구성을 확인합니다." }]
   return {
-    ...guide, sections, sources, thin: false, updated: reviewedCore.has(guide.slug) ? "2026-09-07" : EDITED,
+    ...guide, sections, sources: guide.slug === "jeju" ? [...sources,
+      { label: "씨월드고속훼리 — 주간 스케줄", href: "https://www.seaferry.co.kr/bbs/content.php?co_id=p703", note: "2026-09-08 본문에서 퀸제누비아 계열 4시간 30분, 퀸메리 4시간 50분 안내 확인. 휴항 표시와 소요시간은 별개입니다." },
+      { label: "씨월드고속훼리 — 산타모니카", href: "https://seaferry.co.kr/bbs/content.php?co_id=p303", note: "공식 선박 소개의 제주까지 90분 안내를 참고했습니다. 경유편 전체에 적용하지 않습니다." },
+      { label: "남해고속 — 운항시간표", href: "https://www.namhaegosok.co.kr/s2/s2_1.php", note: "2026-09-08 공식 페이지 검색 수집본에서 아리온제주 3시간 40분 안내 확인. 실시간 원문 접속은 되지 않아 현재 날짜의 운항은 확인하지 않았습니다." },
+      { label: "오션비스타제주 — 공식 채널 운항 안내", href: "https://pf.kakao.com/_vxdxjTs/111441194", note: "공식 채널 검색 수집본의 6시간~6시간 30분 안내를 참고했습니다. 방향·기상에 따라 달라지는 참고 범위입니다." },
+      { label: "한일고속 — 운항스케줄", href: "https://www.hanilexpress.co.kr/service/sailingSchedule.do", note: "날짜와 선박을 선택해 출발·도착시각을 확인하세요. 이번 점검에서 소요시간 수치를 검증하지 못해 임의로 기입하지 않았습니다." },
+    ] : sources, thin: false, updated: guide.slug === "jeju" ? "2026-09-08" : reviewedCore.has(guide.slug) ? "2026-09-07" : EDITED,
+    timetables: guide.slug === "jeju" ? [{
+      title: "출발지별 참고 소요시간",
+      columns: ["출발지 · 터미널", "참고 소요시간", "비교 기준"],
+      rows: [
+        ["목포 · 국제여객터미널 / 삼학부두(선박별)", "약 4시간 30분~4시간 50분", "퀸제누비아 계열 4시간 30분 · 퀸메리 4시간 50분"],
+        ["완도 · 완도여객선터미널", "수치 검증 보류", "직항과 추자 경유를 구분해 선택한 선편의 출발·도착시각 비교"],
+        ["진도 · 진도항여객선터미널", "직항 기준 약 1시간 30분", "산타모니카 선박 소개 기준 · 추자 경유편은 별도 확인"],
+        ["녹동(고흥) · 녹동신항여객선터미널", "약 3시간 40분", "아리온제주 · 선사 운항안내의 참고시간"],
+        ["삼천포(사천) · 삼천포신항여객선터미널", "약 6시간~6시간 30분", "오션비스타제주 · 방향·기상에 따른 차이 확인"],
+      ],
+      note: "2026-09-08 자료 확인. 출항부터 도착까지의 참고시간이며 차량 접수·승선 대기·하선 시간은 포함하지 않습니다. 현재 운항 중이라는 뜻이 아니며 선박 교체·경유·기상에 따라 달라집니다. 확인 범위와 공식 링크는 아래 출처에 표시했습니다. 완도는 공식 수치 검증 후 보완할 예정입니다.",
+    }] : guide.timetables,
     faqs: coreFaqs[guide.slug] ?? guide.faqs,
     sourceNote: guide.slug === "wando-cheongsando"
       ? "2026-09-06 공식 웹페이지의 검색 수집본과 대조했습니다. 기본 시간표·연락처의 게시 내용을 확인한 것으로, 오늘 실제 운항이나 최신 운임을 확인했다는 뜻은 아닙니다. 요금과 차량 접수 조건은 청산농협에 확인하세요. 일정 계산과 문의 순서는 FerryCast의 이용 제안입니다."
+      : guide.slug === "jeju"
+      ? "2026-09-08 소요시간 비교표 보강. 선사 원문 열람과 검색 수집본 참고를 출처별로 구분했습니다. 소요시간은 여행 계획용이며 오늘 운항·최신 운임·차량 접수 마감을 보장하지 않습니다. 완도 소요시간은 수치 검증을 보류했습니다."
       : reviewedCore.has(guide.slug)
       ? "이용 안내 보강: 2026-09-07. 출처별로 본문 열람과 검색 수집본 참고를 구분했습니다. 이번 확인 범위는 승선 준비·연락 경로이며, 기존 시간표·운임 전체를 재검증하거나 오늘의 출항을 확인한 것은 아닙니다. 구간별 일정과 비용 비교 방법은 FerryCast의 이용 제안입니다."
       : isWando
