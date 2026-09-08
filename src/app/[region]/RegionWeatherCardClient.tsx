@@ -6,6 +6,7 @@ import type { TidalForecast, TidalDayForecast } from "@/lib/tide"
 import type { DailyForecast } from "@/lib/forecast"
 import WeatherCardShell from "@/components/WeatherCardShell"
 import WeatherTideDetail from "@/components/WeatherTideDetail"
+import { useWeatherDetails } from "@/hooks/useWeatherDetails"
 
 interface Props {
   weather: WeatherData | null
@@ -18,17 +19,24 @@ interface Props {
 
 export default function RegionWeatherCardClient({ weather, tidal, forecast5, tidal5, regionName, regionSlug }: Props) {
   const [open, setOpen] = useState(false)
+  const details = useWeatherDetails(open, regionSlug)
   // 빌드/콜드 프리렌더에 빈 날씨가 구워졌을 때, 동적 API로 자가복구
   const [w, setW] = useState(weather)
   const [tried, setTried] = useState(false)
 
   useEffect(() => {
+    setW(weather)
+    setTried(false)
     if (weather) return
-    fetch(`/api/weather?region=${regionSlug}`)
+    const controller = new AbortController()
+    let active = true
+    const timer = setTimeout(() => controller.abort(), 20_000)
+    fetch(`/api/weather?region=${regionSlug}`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => { if (d && typeof d.temp === "number") setW(d) })
+      .then((d) => { if (active && d && typeof d.temp === "number") setW(d) })
       .catch(() => {})
-      .finally(() => setTried(true))
+      .finally(() => { clearTimeout(timer); if (active) setTried(true) })
+    return () => { active = false; clearTimeout(timer); controller.abort() }
   }, [weather, regionSlug])
 
   if (!w) {
@@ -48,9 +56,12 @@ export default function RegionWeatherCardClient({ weather, tidal, forecast5, tid
         <WeatherTideDetail
           regionName={regionName}
           w={w}
-          tidal={tidal}
-          forecast5={forecast5}
-          tidal5={tidal5}
+          tidal={details.data?.tidal ?? tidal}
+          forecast5={details.data?.forecast5 ?? forecast5}
+          tidal5={details.data?.tidal5 ?? tidal5}
+          loading={details.loading}
+          detailsUnavailable={details.failed || details.data?.partial}
+          onRetry={details.retry}
           onClose={() => setOpen(false)}
         />
       )}

@@ -1,3 +1,5 @@
+import { fetchPublicData as fetch } from "./publicDataFetch"
+
 export interface WeatherData {
   temp: number
   humidity: number
@@ -60,6 +62,7 @@ export function weatherIconKind(pty: number, sky = 1): WeatherIconKind {
   if (pty > 0) return "fog"                     // 미지 코드 → 안개형으로 안전 처리
   if (sky === 4) return "cloud"
   if (sky === 3) return "partly"
+  if (sky !== 1) return "cloud"
   return "sun"
 }
 
@@ -80,6 +83,7 @@ export function ptyLabel(pty: number, sky = 1): { text: string; kind: WeatherIco
   // PTY=0: 강수 없음 → SKY 코드로 날씨 판단
   if (sky === 4) return { text: "흐림",     kind }
   if (sky === 3) return { text: "구름많음", kind }
+  if (sky !== 1) return { text: "하늘정보 확인 불가", kind }
   return               { text: "맑음",     kind }
 }
 
@@ -123,15 +127,15 @@ async function fetchSky(key: string): Promise<number> {
       `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${params}`,
       { next: { revalidate: 600 } }
     )
-    if (!res.ok) return 1
+    if (!res.ok) return -1
     const json = await res.json()
     const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
-    if (resultCode !== "00") return 1
+    if (resultCode !== "00") return -1
     const items: Array<{ category: string; fcstValue: string }> =
       json?.response?.body?.items?.item ?? []
     const skyItem = items.find((i) => i.category === "SKY")
-    return skyItem ? parseInt(skyItem.fcstValue) : 1
-  } catch { return 1 }
+    return skyItem ? parseInt(skyItem.fcstValue) : -1
+  } catch { return -1 }
 }
 
 async function fetchWaveHeight(key: string): Promise<number | null> {
@@ -157,7 +161,7 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
       })
       const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
       const res = await fetch(url, { next: { revalidate: 1800 } })
-      if (!res.ok) continue
+      if (!res.ok) return null
       const json = await res.json()
       const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
       if (resultCode !== "00") continue
@@ -167,7 +171,7 @@ async function fetchWaveHeight(key: string): Promise<number | null> {
         .filter((i) => i.category === "WAV")
         .sort((a, b) => parseInt(a.fcstDate + a.fcstTime) - parseInt(b.fcstDate + b.fcstTime))
       if (wavItems.length) return parseFloat(wavItems[0].fcstValue)
-    } catch { continue }
+    } catch { return null }
   }
   return null
 }

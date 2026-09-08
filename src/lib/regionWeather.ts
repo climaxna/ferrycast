@@ -1,4 +1,5 @@
 import type { RegionConfig } from "@/config/regions"
+import { fetchPublicData as fetch } from "./publicDataFetch"
 
 export type { WeatherData } from "@/lib/weather"
 export { windDirLabel, waveLabel, ptyLabel } from "@/lib/weather"
@@ -60,14 +61,14 @@ async function fetchSkySrc(
       `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?${params}`,
       { next: { revalidate: 600 } },
     )
-    if (!res.ok) return 1
+    if (!res.ok) return -1
     const json = await res.json()
-    if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") return 1
+    if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") return -1
     const items: Array<{ category: string; fcstValue: string }> =
       json?.response?.body?.items?.item ?? []
     const skyItem = items.find((i) => i.category === "SKY")
-    return skyItem ? parseInt(skyItem.fcstValue) : 1
-  } catch { return 1 }
+    return skyItem ? parseInt(skyItem.fcstValue) : -1
+  } catch { return -1 }
 }
 
 async function fetchWaveHeightSrc(
@@ -85,7 +86,7 @@ async function fetchWaveHeightSrc(
         `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`,
         { next: { revalidate: 1800 } },
       )
-      if (!res.ok) continue
+      if (!res.ok) return null
       const json = await res.json()
       if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") continue
       const items: Array<{ category: string; fcstValue: string; fcstDate: string; fcstTime: string }> =
@@ -94,7 +95,7 @@ async function fetchWaveHeightSrc(
         .filter((i) => i.category === "WAV")
         .sort((a, b) => parseInt(a.fcstDate + a.fcstTime) - parseInt(b.fcstDate + b.fcstTime))
       if (wavItems.length) return parseFloat(wavItems[0].fcstValue)
-    } catch { continue }
+    } catch { return null }
   }
   return null
 }

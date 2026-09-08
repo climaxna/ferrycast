@@ -1,4 +1,5 @@
 import { kstDateStr, dayLabel } from "@/lib/utils"
+import { fetchPublicData as fetch } from "./publicDataFetch"
 import type { TidalEvent, TidalForecast, TidalDayForecast } from "@/lib/tide"
 
 export type { TidalEvent, TidalForecast, TidalDayForecast } from "@/lib/tide"

@@ -1,4 +1,5 @@
 import { cache } from "react"
+import { fetchPublicData as fetch } from "./publicDataFetch"
 import type { RouteStatus } from "./types"
 
 // ────────────────────────────────────────────────────────────
@@ -173,8 +174,8 @@ async function fetchMtisPage(
   let res: Response
   try {
     res = await fetch(`${MTIS_BASE}?${params}`, { next: { revalidate: 600 } })
-  } catch (e) {
-    console.error(`[mtis] ${date} p${pageNo} fetch 실패(네트워크·타임아웃):`, e)
+  } catch {
+    console.error(`[mtis] ${date} p${pageNo} 응답 수신 실패(네트워크·타임아웃)`)
     return empty
   }
   if (res.status === 429 && attempt < MTIS_RETRY) {

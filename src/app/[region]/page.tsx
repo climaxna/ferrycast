@@ -6,8 +6,6 @@ import Link from "next/link"
 import { REGIONS } from "@/config/regions"
 import { OG_TITLE, OG_DESCRIPTION } from "@/lib/seo"
 import { getWeatherForRegion } from "@/lib/regionWeather"
-import { getTidalForRegion, get5DayTidalForRegion } from "@/lib/regionTide"
-import { get5DayForecastForRegion } from "@/lib/regionForecast"
 import { getRoutesForRegion, getArrivalsForRegion, getIslandHopsForRegion, getRegionStatusSummaries } from "@/lib/regionFerry"
 import { getTrainsForRegion } from "@/lib/regionTrain"
 import RegionWeatherCardClient from "./RegionWeatherCardClient"
@@ -77,18 +75,13 @@ async function RegionWeatherCard({
   region: string
 }) {
   const config = REGIONS[region]
-  const [weather, tidal, forecast5, tidal5] = await Promise.all([
-    getWeatherForRegion(config),
-    config.tidalObsCode ? getTidalForRegion(config.tidalObsCode) : Promise.resolve(null),
-    get5DayForecastForRegion([config.weatherGrid, ...config.seaGrids]),
-    config.tidalObsCode ? get5DayTidalForRegion(config.tidalObsCode) : Promise.resolve([]),
-  ])
+  const weather = await getWeatherForRegion(config)
   return (
     <RegionWeatherCardClient
       weather={weather}
-      tidal={tidal}
-      forecast5={forecast5}
-      tidal5={tidal5}
+      tidal={null}
+      forecast5={[]}
+      tidal5={[]}
       regionName={config.name}
       regionSlug={config.slug}
     />
@@ -172,11 +165,9 @@ export default async function RegionPage({
       </header>
 
       <div className="mx-auto max-w-lg space-y-3 px-4 pb-4 pt-2">
-        {region === "incheon" && (
-          <Suspense fallback={<WeatherSkeleton />}>
-            <RegionWeatherCard region={region} />
-          </Suspense>
-        )}
+        <Suspense fallback={<WeatherSkeleton />}>
+          <RegionWeatherCard region={region} />
+        </Suspense>
 
         <RegionNav current={config.slug} />
 

@@ -18,6 +18,9 @@ export default function WeatherTideDetail({
   forecast5,
   tidal5,
   onClose,
+  loading = false,
+  detailsUnavailable = false,
+  onRetry,
 }: {
   regionName: string
   w: WeatherData
@@ -25,6 +28,9 @@ export default function WeatherTideDetail({
   forecast5: DailyForecast[]
   tidal5: TidalDayForecast[]
   onClose: () => void
+  loading?: boolean
+  detailsUnavailable?: boolean
+  onRetry?: () => void
 }) {
   useModalClose(onClose)
 
@@ -58,6 +64,11 @@ export default function WeatherTideDetail({
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-lg px-4 py-5 space-y-6">
+          <div role="status" className="text-sm text-slate-500">
+            {loading ? "상세 예보·물때를 불러오는 중입니다…" : detailsUnavailable ? (
+              <>일부 정보를 가져오지 못했습니다. <button type="button" className="font-semibold text-blue-600 underline" onClick={onRetry}>다시 시도</button></>
+            ) : null}
+          </div>
 
           {/* ① 지금 실황 */}
           <section>
@@ -94,7 +105,7 @@ export default function WeatherTideDetail({
               날짜별 날씨{hasTidal ? " · 물때" : ""} 예보
             </h3>
             {forecast5.length === 0 ? (
-              <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-400">날씨 예보를 불러올 수 없습니다</p>
+              <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-400">{loading ? "날씨 예보 확인 중…" : "날씨 예보를 불러올 수 없습니다"}</p>
             ) : (
               <div className="space-y-2">
                 {forecast5.map((day) => (

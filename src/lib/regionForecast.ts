@@ -1,4 +1,5 @@
 import { kstDateStr, dayLabel } from "@/lib/utils"
+import { fetchPublicData as fetch } from "./publicDataFetch"
 import type { DailyForecast } from "@/lib/forecast"
 
 export type { DailyForecast } from "@/lib/forecast"
@@ -47,7 +48,7 @@ export async function get5DayForecastForRegion(
         })
         const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
         const res = await fetch(url, { next: { revalidate: 600 } })
-        if (!res.ok) continue
+        if (!res.ok) return []
         const json = await res.json()
         if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") continue
 
@@ -87,7 +88,7 @@ export async function get5DayForecastForRegion(
 
           return { date, dateLabel: dayLabel(date, today), tempMin, tempMax, sky, pty, popMax }
         })
-      } catch { continue }
+      } catch { return [] }
     }
   }
   return []

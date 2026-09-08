@@ -1,4 +1,5 @@
 import { kstDateStr, dayLabel } from "@/lib/utils"
+import { fetchPublicData as fetch } from "./publicDataFetch"
 import { weatherIconKind, type WeatherIconKind } from "@/lib/weather"
 
 export interface DailyForecast {
@@ -81,7 +82,7 @@ export async function get5DayForecast(): Promise<DailyForecast[]> {
         })
         const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`
         const res = await fetch(url, { next: { revalidate: 600 } })
-        if (!res.ok) continue
+        if (!res.ok) return []
         const json = await res.json()
         const resultCode = json?.response?.header?.resultCode ?? json?.header?.resultCode
         if (resultCode !== "00") continue
@@ -139,7 +140,7 @@ export async function get5DayForecast(): Promise<DailyForecast[]> {
           }
         })
       } catch {
-        continue
+        return []
       }
     }
   }
