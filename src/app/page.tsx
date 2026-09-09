@@ -9,9 +9,10 @@ import AdFitBanner from "@/components/AdFitBanner"
 import RegionNav from "@/components/RegionNav"
 import RegionGuideLinks from "@/components/RegionGuideLinks"
 
-// ISR 재생성 주기 — 데이터가 어차피 5~10분 캐시라 60초는 낭비(동일 결과 반복 write).
-// Vercel ISR Writes 절감을 위해 600초(10분)로. 상대시간 카운트다운은 클라이언트가 60초마다 갱신.
-export const revalidate = 600
+// ⚠️ export const revalidate 를 두지 않는다 — 아래 connection() 때문에 이 페이지는 요청마다
+// 렌더되고(빌드 로그 `ƒ /`), 그 상태에서 revalidate 는 효력이 없다. 값이 남아 있으면 읽는 사람이
+// "10분 캐시된다"고 오해한다. 외부 API 응답 캐시는 각 lib의 fetch 단위
+// (next: { revalidate }) Data Cache가 계속 담당한다.
 
 // 브라우저 탭 제목·검색 결과용. og(링크 미리보기)는 layout.tsx가 담당한다.
 // 루트는 전국 진입점이면서 화면 내용은 완도라, 제목은 전국 틀로 통일하고

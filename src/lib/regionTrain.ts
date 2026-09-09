@@ -1,4 +1,6 @@
 import type { RegionConfig } from "@/config/regions"
+// 공공 API GET은 요청당 8초 제한 래퍼를 거친다(publicDataFetch).
+import { fetchPublicData as fetch } from "./publicDataFetch"
 
 const BASE = "https://apis.data.go.kr/1613000/TrainInfo"
 

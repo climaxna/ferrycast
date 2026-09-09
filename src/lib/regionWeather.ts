@@ -71,12 +71,19 @@ async function fetchSkySrc(
   } catch { return -1 }
 }
 
+// 파고 격자 순회 총예산(ms). 개별 요청 8초 제한과 별개로, 느린 격자가 쌓여
+// 날씨 카드가 늦게 뜨는 것을 막는다.
+const WAVE_GRID_BUDGET_MS = 5_000
+
 async function fetchWaveHeightSrc(
   key: string,
   seaGrids: Array<{ nx: number; ny: number }>,
 ): Promise<number | null> {
   const { baseDate, baseTime } = getVilageFcstBase()
+  // 파고는 보조 정보 — 느린 격자가 쌓여 날씨 카드를 붙잡지 않도록 순회 총예산을 둔다.
+  const deadline = Date.now() + WAVE_GRID_BUDGET_MS
   for (const { nx, ny } of seaGrids) {
+    if (Date.now() > deadline) break
     try {
       const params = new URLSearchParams({
         serviceKey: key, dataType: "JSON", numOfRows: "300", pageNo: "1",
@@ -86,7 +93,9 @@ async function fetchWaveHeightSrc(
         `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst?${params}`,
         { next: { revalidate: 1800 } },
       )
-      if (!res.ok) return null
+      // 이 격자만 실패했을 수 있으므로 다음 격자로 넘어간다.
+      // (기존엔 즉시 return null이라 seaGrids 폴백이 사실상 동작하지 않았다.)
+      if (!res.ok) continue
       const json = await res.json()
       if ((json?.response?.header?.resultCode ?? json?.header?.resultCode) !== "00") continue
       const items: Array<{ category: string; fcstValue: string; fcstDate: string; fcstTime: string }> =
@@ -95,7 +104,11 @@ async function fetchWaveHeightSrc(
         .filter((i) => i.category === "WAV")
         .sort((a, b) => parseInt(a.fcstDate + a.fcstTime) - parseInt(b.fcstDate + b.fcstTime))
       if (wavItems.length) return parseFloat(wavItems[0].fcstValue)
-    } catch { return null }
+    } catch {
+      // 타임아웃·네트워크 오류는 격자가 아니라 API 자체가 아픈 것 —
+      // 나머지 격자도 같은 서버라 사용자 대기만 늘린다 → 즉시 포기.
+      return null
+    }
   }
   return null
 }

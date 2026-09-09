@@ -1,4 +1,7 @@
 import { cache } from "react"
+// 공공 API GET은 요청당 8초 제한 래퍼를 거친다(publicDataFetch).
+// 이 모듈은 배편 렌더 경로에서 호출되므로, 무제한 대기가 배편 표시를 붙잡지 않게 한다.
+import { fetchPublicData as fetch } from "./publicDataFetch"
 
 // ────────────────────────────────────────────────────────────
 // TAGO 여객선 운항정보 — 도착 예정시각 enrich 전용 (MTIS 보충)
