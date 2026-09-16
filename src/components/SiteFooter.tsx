@@ -13,7 +13,8 @@ export default function SiteFooter() {
           <a href="mailto:climaxna@naver.com" className="inline-flex min-h-11 items-center text-xs font-semibold text-slate-600 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">문의</a>
         </nav>
         <div className="mt-2 border-t border-slate-100 pt-2">
-          <a href="https://portal.ferrycast.kr/" className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+          {/* 2026-09-16 바로답이 portal.ferrycast.kr에서 u-jeverse.com(독립 도메인)으로 이전 — 리다이렉트를 한 번 더 거치지 않게 새 주소로 직접 연결 */}
+          <a href="https://u-jeverse.com/" className="inline-flex min-h-11 items-center text-sm font-semibold text-blue-700 hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
             바로답 — FerryCast 포털 바로가기 →
           </a>
           <p className="text-xs leading-5 text-slate-500">FerryCast와 함께 운영하는 콘텐츠 포털입니다.</p>
