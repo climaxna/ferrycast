@@ -6,6 +6,7 @@ import RouteSection from "@/components/RouteSection"
 import YaksanRouteSection from "@/components/YaksanRouteSection"
 import AppHeaderTitle from "@/components/AppHeaderTitle"
 import AdFitBanner from "@/components/AdFitBanner"
+import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
 import RegionGuideLinks from "@/components/RegionGuideLinks"
 
@@ -86,8 +87,9 @@ export default async function Page() {
         <RegionGuideLinks region="" />
 
         <div className="space-y-2">
-          {/* 지역 광고는 시간표 직후 단락으로 이동(RouteSection adSlot). 하단은 애드핏.
-              쿠팡 섹션은 완도 지역광고 컨택 중이라 잠시 숨김(<CoupangSection />). */}
+          {/* 지역 광고는 시간표 직후 단락으로 이동(RouteSection adSlot). 하단은 특산물+애드핏.
+              쿠팡 섹션은 완도 지역광고 컨택 중이라 잠시 숨겼다가 2026-09-17 복원. */}
+          <CoupangSection />
           <AdFitBanner />
         </div>
 
