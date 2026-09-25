@@ -1,7 +1,5 @@
 import { Suspense } from "react"
-import { connection } from "next/server"
 import Link from "next/link"
-import WeatherCard from "@/components/WeatherCard"
 import RouteSection from "@/components/RouteSection"
 import YaksanRouteSection from "@/components/YaksanRouteSection"
 import AppHeaderTitle from "@/components/AppHeaderTitle"
@@ -10,21 +8,18 @@ import CoupangSection from "@/components/CoupangSection"
 import RegionNav from "@/components/RegionNav"
 import RegionGuideLinks from "@/components/RegionGuideLinks"
 
-// ⚠️ export const revalidate 를 두지 않는다 — 아래 connection() 때문에 이 페이지는 요청마다
-// 렌더되고(빌드 로그 `ƒ /`), 그 상태에서 revalidate 는 효력이 없다. 값이 남아 있으면 읽는 사람이
-// "10분 캐시된다"고 오해한다. 외부 API 응답 캐시는 각 lib의 fetch 단위
-// (next: { revalidate }) Data Cache가 계속 담당한다.
+// 날씨 카드 폐기(2026-09) 이전에는 날씨 조회 신뢰성 문제로 매 요청 동적 렌더(connection())가
+// 필요했다. 날씨를 걷어낸 지금은 배편 데이터만 남았고, mtis.ts가 fetch 단위 Data Cache
+// (revalidate: 300~600)로 신선도를 이미 관리하므로 페이지 단위 ISR로 되돌린다.
+// Vercel 함수 호출 수를 줄이는 효과도 있다(동적 렌더 `ƒ /` → 정적 재생성 `●`).
+export const revalidate = 600
 
 // 브라우저 탭 제목·검색 결과용. og(링크 미리보기)는 layout.tsx가 담당한다.
 // 루트는 전국 진입점이면서 화면 내용은 완도라, 제목은 전국 틀로 통일하고
 // 완도 키워드는 description에 남겨 "완도 배편" 검색 유입을 지킨다.
 export const metadata = {
   title: "FerryCast — 실시간 여객선 정보",
-  description: "완도·울릉도·목포·인천·제주 여객선 시간표와 결항 현황을 실시간으로. 완도 날씨·조석 정보 포함",
-}
-
-function WeatherSkeleton() {
-  return <div className="h-36 animate-pulse rounded-2xl bg-slate-100" />
+  description: "완도·울릉도·목포·인천·제주 여객선 시간표와 결항 현황을 실시간으로",
 }
 
 function RouteSkeleton() {
@@ -38,9 +33,7 @@ function RouteSkeleton() {
   )
 }
 
-export default async function Page() {
-  await connection()
-
+export default function Page() {
   return (
     <main className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
@@ -70,10 +63,6 @@ export default async function Page() {
       </header>
 
       <div className="mx-auto max-w-lg space-y-3 px-4 pb-4 pt-2">
-        <Suspense fallback={<WeatherSkeleton />}>
-          <WeatherCard />
-        </Suspense>
-
         <RegionNav current="" />
 
         <Suspense fallback={<RouteSkeleton />}>

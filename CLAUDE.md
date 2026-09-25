@@ -10,7 +10,20 @@
 
 **M2 진행 중 — 서비스 정식 운영(ferrycast.kr) + 수익화 진행**
 
-최근 완료: **목적지 허브 탭 2종 신설** — `/jeju`(목포·완도·진도·녹동·삼천포 ← 제주)와
+최근 완료(2026-09): **날씨·조석 기능 전면 폐기.** 사용자에게 더 이상 필요 없다는 판단으로
+날씨 카드·5일 예보·조석(물때) 화면과 그 API 연동(기상청 초단기실황·단기예보, KHOA 조석예보)을
+전부 제거했다 — `lib/weather.ts`·`forecast.ts`·`tide.ts`·`regionWeather.ts`·`regionForecast.ts`·
+`regionTide.ts`, `components/WeatherCard*`·`WeatherTideDetail`·`WeatherIcon`, `/api/weather/*`,
+`hooks/useWeatherDetails.ts`, `regions.ts`의 `weatherGrid`/`seaGrids`/`tidalObsCode` 필드까지
+전부 삭제. 날씨 조회 불안정 때문에 걸어뒀던 `connection()` 강제 동적 렌더(완도·지역 페이지)도
+같이 걷어내 ISR(10분 재생성)로 복귀시켰다 — Vercel 함수 호출도 줄어든다.
+**`publicDataFetch.ts`는 삭제하지 않았다** — mtis.ts·shipArrival.ts·regionTrain.ts 등 배편
+데이터 전반이 쓰는 공용 타임아웃 래퍼로 이미 편입돼 있었다.
+날씨를 "제공 정보"로 내세우던 카피(about·ads 안내·광고 문의 메일·QR·manifest·지역별
+metaDescription)도 전부 정리. `content/`(가이드·투어 에디토리얼)의 일반적인 여행 조언성
+"날씨 확인하세요" 문장은 우리 기능과 무관해 손대지 않았다.
+
+이전 최근 완료: **목적지 허브 탭 2종 신설** — `/jeju`(목포·완도·진도·녹동·삼천포 ← 제주)와
 `/ulleung`(묵호·강릉·포항·영일만 ← 울릉도, **구 포항 탭 흡수**). 전국에서 제주·울릉도로 가는
 배편을 한 화면에 모았고, 진도·녹동·삼천포·묵호·강릉이 새로 들어왔다.
 그전에 **목포 9편→25편**(순환항로 `seawayKeywords` 엔진 + 외달도·생활항로),
@@ -35,7 +48,7 @@
 
 ## 프로젝트 한 줄 요약
 
-완도에서 배를 타야 하는 주민·여행객이 앱을 열면 **클릭 없이 즉시** 오늘 날씨·조석예보·항로 시간표·운항/결항 상태를 한 화면에서 확인하는 웹앱.
+완도에서 배를 타야 하는 주민·여행객이 앱을 열면 **클릭 없이 즉시** 오늘 항로 시간표·운항/결항 상태를 한 화면에서 확인하는 웹앱. (날씨·조석 기능은 2026-09 폐기)
 
 ---
 
@@ -58,7 +71,7 @@
 - [x] API 키 발급 + 응답 테스트 완료
 - [x] Vercel Analytics 설치
 - [x] 메인 화면 구현 (M1 완료)
-- [x] 기상청 API 연동 (날씨 카드 — 초단기실황 + 5일 단기예보)
+- [x] ~~기상청 API 연동 (날씨 카드 — 초단기실황 + 5일 단기예보)~~ (2026-09 폐기)
 - [x] MTIS 운항 스케줄 API 실시간 연동 완료 (제주·청산도·소안도·보길도 시간표 + 결항 통합)
 - [x] 결항 판정 **`nvg_se_nm`(운항구분) 기반 전환** — `nvg_stts_nm="결항"`만 보던 버그 수정(전국 미운항 267편 오표시 해결)
 - [x] **결항(기상)/비운항(선박검사·정비·휴항) 구분 표시** + **부분 결항**(일부 편만 결항인 노선의 개별 편·경유 라벨)
@@ -68,15 +81,15 @@
 - [x] **지역 광고 게재 파이프라인** — `LOCAL_ADS` → `AdArea`(만료 자동 하차) → GA4 `ad_click` 집계
 - [x] **MTIS 코어 `lib/mtis.ts` 공용 모듈 추출** (ferry.ts·regionFerry.ts 중복 제거)
 - [x] TAGO + KOMSA → MTIS 단일 API 마이그레이션 완료 (청산도 정적 fallback 제거, 6편 실시간 수신)
-- [x] KHOA 조석예보 연동 완료 (DT_0027, 만조·간조 시각·높이, 5일 예보)
+- [x] ~~KHOA 조석예보 연동 완료 (DT_0027, 만조·간조 시각·높이, 5일 예보)~~ (2026-09 폐기)
 - [x] RouteDetail 전체화면 상세 페이지 (시간표 과거/현재/미래 구분, 운임 링크, 터미널 지도)
 - [x] QR 코드 페이지 (/qr) — 앱 URL 즉시 공유
-- [x] 5일 날씨·조석 예보 상세 화면
+- [x] ~~5일 날씨·조석 예보 상세 화면~~ (2026-09 폐기)
 - [x] 소안도·보길도·노화 경유 노선 통합 (단일 카드로 표시)
 - [x] 도착 탭 — 섬 출발 터미널("타는 곳") 표시 및 카카오지도 연결
-- [x] 날씨 카드 compact 레이아웃 (한 줄 가로 배치)
+- [x] ~~날씨 카드 compact 레이아웃 (한 줄 가로 배치)~~ (2026-09 폐기)
 - [x] 제주 직항/경유(추자도) 구분 표시 (MTIS nvg_seawy_nm 기반)
-- [x] 5일 조석 곡선 그래프 (TideCurve), 내일 시간표 바텀시트
+- [x] ~~5일 조석 곡선 그래프 (TideCurve)~~ (2026-09 폐기), 내일 시간표 바텀시트
 - [x] 카카오 AdFit 광고 연동 (배편 아래, 라벨+옅은 배경)
 - [x] 쿠팡 파트너스 완도 특산물 섹션 (배너 3개 자동교체, 카카오 광고 위)
 - [x] 완도군청 협력 제안서 v2 (docs/, 현장 시범 부착 사진 포함)
@@ -98,9 +111,7 @@
 ```
 [FerryCast 헤더]
 
-[날씨 카드]
- 기온 | 날씨 | 풍속 | 습도 | 파고  (한 줄 compact)
- 조석 — 다음 만조/간조 시각
+[지역 탭 · 운항 요약 바]
 
 [항로 목록]
  🟢 완도 → 제주              06:00 / 13:00 / 18:00
@@ -120,9 +131,10 @@
 | 데이터         | API                          | 비고                          |
 | -------------- | ---------------------------- | ----------------------------- |
 | 항로 시간표 + 운항/결항 | 한국해양교통안전공단 MTIS (data.go.kr) | 운항 스케줄 통합 (시간표·결항 단일 API) |
-| 날씨           | 기상청 오픈API               | 초단기실황 (5분 캐시)         |
-| 5일 예보·파고  | 기상청 단기예보              | getVilageFcst (600초 캐시)    |
-| 조석예보       | 국립해양조사원 KHOA          | 만조·간조 시각·높이, 5일 예보 |
+
+> 날씨(기상청 초단기실황·단기예보)·조석예보(KHOA)는 2026-09 폐기. `DATAGOKR_API_KEY`로 이 두
+> 기관 API도 호출할 수 있었지만 지금은 MTIS만 쓴다. 아래 완도 기준 좌표의 "기상청 격자"도
+> 폐기된 날씨 조회 전용 값이라 더 이상 쓰이지 않는다(참고용으로만 남김).
 
 ### 완도 기준 좌표
 
@@ -203,23 +215,17 @@ ferrycast/
 │   │   ├── qr/                  ← QR 코드 페이지
 │   │   └── globals.css
 │   ├── components/
-│   │   ├── WeatherCard.tsx      ← 날씨 카드 (서버)
-│   │   ├── WeatherCardClient.tsx← 날씨 카드 (클라이언트)
-│   │   ├── WeatherDetail.tsx    ← 날씨/조석 상세 모달
-│   │   ├── ForecastDetail.tsx   ← 5일 날씨 예보
-│   │   ├── TidalForecastDetail.tsx ← 5일 조석 예보
 │   │   ├── RouteList.tsx        ← 항로 목록
 │   │   ├── RouteItem.tsx        ← 항로 카드
 │   │   └── RouteDetail.tsx      ← 항로 상세 전체화면
 │   └── lib/
-│       ├── weather.ts           ← 기상청 초단기실황 API
-│       ├── forecast.ts          ← 기상청 단기예보 (5일)
 │       ├── mtis.ts              ← MTIS 코어(조회·캐시·결항판정·시각파싱) — ferry/regionFerry 공용
 │       ├── ferry.ts             ← 완도·약산 항로 매핑 + 정적 fallback (mtis.ts 소비)
 │       ├── regionFerry.ts       ← 다지역(울릉도·목포·인천·제주) 항로 — config/regions 기반 (mtis.ts 소비)
 │       ├── shipArrival.ts       ← TAGO 도착 예정시각 enrich (MTIS 보충)
-│       ├── tide.ts              ← KHOA 조석예보 API
+│       ├── publicDataFetch.ts   ← 공공 API 공용 fetch 래퍼(8초 타임아웃) — mtis·shipArrival 등이 사용
 │       └── types.ts             ← 공통 타입 정의
+│   (날씨·조석 관련 lib·컴포넌트는 2026-09 전량 삭제됨 — 위 "최근 완료" 참고)
 ├── public/
 │   └── manifest.json            ← PWA 설정
 ├── .env.local                   ← API 키 (Git에 올리지 말 것!)
@@ -232,12 +238,12 @@ ferrycast/
 ## 환경변수 (.env.local)
 
 ```
-DATAGOKR_API_KEY=발급받은_키   # MTIS + KHOA 조석 + 기상청까지 **전부 이 키 하나**로 호출한다
+DATAGOKR_API_KEY=발급받은_키   # MTIS 운항 스케줄 조회 전용
 ```
 
-> ⚠️ `KMA_API_KEY`가 `.env.local`에 남아 있지만 **코드 어디에서도 쓰지 않는다**(전량 `DATAGOKR_API_KEY` 사용).
-> 22자짜리 값이라 data.go.kr 서비스키도 아니다. 기상청 호출을 이 키로 시도하면
-> `SERVICE_KEY_IS_NOT_REGISTERED_ERROR`가 난다 — 디버깅할 때 헷갈리지 말 것.
+> ⚠️ `KMA_API_KEY`가 `.env.local`에 남아 있지만 **코드 어디에서도 쓰지 않는다**. 날씨 기능이
+> 있던 시절에도 실제로는 안 쓰였다(기상청 호출도 `DATAGOKR_API_KEY`로 했다). 22자짜리 값이라
+> data.go.kr 서비스키도 아니다 — 삭제해도 무방하나 남겨둬도 해는 없다.
 
 > ⚠️ `.env.local`은 반드시 `.gitignore`에 포함되어 있어야 합니다. GitHub에 키가 올라가면 즉시 폐기하고 재발급하세요.
 
@@ -255,12 +261,15 @@ DATAGOKR_API_KEY=발급받은_키   # MTIS + KHOA 조석 + 기상청까지 **전
 
 ### M1 — 핵심 기능 ✅ 완료
 
+> ⚠️ 아래 WeatherCard·TidalCard 항목은 **2026-09 전면 폐기됨** — 당시엔 실제로 동작했던
+> 기록으로 남겨두되, 지금 코드베이스엔 없다. 참고해 복원 작업을 시작하지 말 것(위 "최근 완료" 참고).
+
 - [x] 메인 레이아웃 (모바일 375px, max-w-lg, sticky 헤더)
-- [x] WeatherCard — 기상청 초단기실황 연동 (기온·날씨·풍속·습도·파고)
-- [x] TidalCard — KHOA 조석예보 연동 (DT_0027, 만조·간조, 5일 예보)
+- [x] ~~WeatherCard — 기상청 초단기실황 연동 (기온·날씨·풍속·습도·파고)~~ (2026-09 폐기)
+- [x] ~~TidalCard — KHOA 조석예보 연동 (DT_0027, 만조·간조, 5일 예보)~~ (2026-09 폐기)
 - [x] RouteList + RouteItem — MTIS 실시간 연동, fallback 자동 전환
 - [x] 운항/결항 배지 — MTIS 시간표 + 결항(nvg_stts_nm) 단일 API 실시간 연동
-- [x] API 오류 fallback — 날씨·항로 각각 안내 박스
+- [x] API 오류 fallback — 항로 안내 박스
 - [x] 면책 문구 + 공식 링크 (완도군청, 해운조합)
 - [x] 광고 슬롯 placeholder
 
@@ -271,8 +280,8 @@ DATAGOKR_API_KEY=발급받은_키   # MTIS + KHOA 조석 + 기상청까지 **전
 - [x] 터미널 카카오지도 연결 (출발: 완도터미널, 도착: 섬 출발 터미널)
 - [x] 소안도·보길도·노화 경유 노선 통합 (groupKey 기반)
 - [x] QR 코드 페이지 (/qr) — 앱 URL 공유
-- [x] 5일 날씨 / 5일 조석 상세 전체화면
-- [x] 날씨 카드 compact 한 줄 레이아웃 (파고 포함)
+- [x] ~~5일 날씨 / 5일 조석 상세 전체화면~~ (2026-09 폐기)
+- [x] ~~날씨 카드 compact 한 줄 레이아웃 (파고 포함)~~ (2026-09 폐기)
 - [x] 시간표 4열 그리드 레이아웃
 
 ### M2 — 배포·확산
@@ -302,7 +311,10 @@ DATAGOKR_API_KEY=발급받은_키   # MTIS + KHOA 조석 + 기상청까지 **전
 > ⚠️ 2026.06 MTIS 전환으로 더 이상 사용하지 않음. MTIS `nvg_stts_nm`이 결항을 함께 제공하므로 별도 결항 조회 불필요.
 > 과거 참고: `https://apis.data.go.kr/B554035/ferry-route-info-v4/get-ferry-route-info-v4`, `rlvtYmd`, `psnshpNm` 필터, `resultCode: "200"`, `nvg_stts_nm === "결항"`
 
-### KHOA 조석예보 ✅ 완료
+### (폐기) KHOA 조석예보 + 기상청 날씨 API
+
+> ⚠️ 2026-09 날씨·조석 기능 전면 폐기로 더 이상 호출하지 않음. 아래는 재구현이 필요해질 때를
+> 위한 과거 연동 기록이다 — 지금 코드에는 없다.
 
 - **Base URL**: `https://apis.data.go.kr/1192136/tideFcstHghLw/GetTideFcstHghLwApiService`
 - **사용 키**: `DATAGOKR_API_KEY` (별도 KHOA 키 불필요!)
@@ -312,6 +324,8 @@ DATAGOKR_API_KEY=발급받은_키   # MTIS + KHOA 조석 + 기상청까지 **전
   - `predcDt`: "YYYY-MM-DD HH:MM" (예측 시각)
   - `predcTdlvVl`: 조위 높이 (cm)
   - `extrSe`: 홀수(1,3)=고조, 짝수(2,4)=저조
+- 기상청 초단기실황·단기예보(`getUltraSrtNcst`/`getVilageFcst`)도 같은 `DATAGOKR_API_KEY`로 호출했다.
+  완도 기상청 격자는 위 "완도 기준 좌표"에 참고로 남아 있다.
 
 ### 청산도 시간표 (MTIS 전환 후)
 

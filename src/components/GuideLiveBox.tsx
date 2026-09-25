@@ -16,7 +16,7 @@ export default async function GuideLiveBox({ guide }: { guide: Guide }) {
       >
         <div>
           <p className="text-sm font-bold">오늘 {guide.destination} 배 뜨나요?</p>
-          <p className="mt-0.5 text-xs text-blue-100">실시간 운항·결항·날씨 바로 확인 →</p>
+          <p className="mt-0.5 text-xs text-blue-100">실시간 운항·결항 바로 확인 →</p>
         </div>
         <span className="text-2xl" aria-hidden="true">
           ⛴️
@@ -89,7 +89,7 @@ export default async function GuideLiveBox({ guide }: { guide: Guide }) {
         href={guide.liveHref}
         className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition-colors hover:text-blue-700"
       >
-        시간표·날씨·상세 보기 →
+        시간표·상세 보기 →
       </Link>
     </div>
   )

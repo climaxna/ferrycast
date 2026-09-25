@@ -54,7 +54,7 @@ export default function AdsPageContent({
         {/* 소개 — 지역명 포함 */}
         <section className="rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 px-5 py-6 text-white shadow-lg shadow-blue-900/10">
           <h2 className="text-xl font-bold leading-snug">
-            {regionName} 배편·날씨를 보러 온
+            {regionName} 배편을 보러 온
             <br />
             손님에게 가게를 알려보세요
           </h2>
@@ -62,7 +62,7 @@ export default function AdsPageContent({
             📢 월 5만원부터 · 배너 무료 제작
           </div>
           <ul className="mt-4 space-y-2 text-sm leading-relaxed text-blue-50">
-            <li>· {regionName} 배편·날씨·물때를 확인하러 <strong className="font-bold text-white">매일 방문</strong>합니다</li>
+            <li>· {regionName} 배편 시간표·결항 여부를 확인하러 <strong className="font-bold text-white">매일 방문</strong>합니다</li>
             <li>· 방문자 상당수가 <strong className="font-bold text-white">여행·이동을 준비하는 손님</strong>입니다</li>
             <li>· 배 시간을 보러 하루에도 여러 번 다시 여는 화면 — <strong className="font-bold text-white">반복 노출</strong></li>
           </ul>
@@ -143,7 +143,7 @@ export default function AdsPageContent({
         </section>
 
         <p className="pb-4 text-center text-xs text-slate-400">
-          FerryCast(페리캐스트) · 배편·날씨·물때 서비스 ·{" "}
+          FerryCast(페리캐스트) · 배편 정보 서비스 ·{" "}
           <Link href={homePath} className="text-blue-500 underline">
             메인으로
           </Link>

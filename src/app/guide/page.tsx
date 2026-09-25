@@ -80,7 +80,7 @@ export default function GuideIndexPage() {
         ))}
 
         <p className="pb-4 text-center text-xs text-slate-400">
-          FerryCast · 배편·날씨·물때 서비스 ·{" "}
+          FerryCast · 배편 정보 서비스 ·{" "}
           <Link href="/" className="text-blue-500 underline">
             메인으로
           </Link>

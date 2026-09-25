@@ -1,14 +1,11 @@
 import { Suspense } from "react"
-import { connection } from "next/server"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { REGIONS } from "@/config/regions"
 import { OG_TITLE, OG_DESCRIPTION } from "@/lib/seo"
-import { getWeatherForRegion } from "@/lib/regionWeather"
 import { getRoutesForRegion, getArrivalsForRegion, getIslandHopsForRegion, getRegionStatusSummaries } from "@/lib/regionFerry"
 import { getTrainsForRegion } from "@/lib/regionTrain"
-import RegionWeatherCardClient from "./RegionWeatherCardClient"
 import RegionRouteTabs from "./RegionRouteTabs"
 import RegionIslandHopSection from "@/components/RegionIslandHopSection"
 import AppHeaderTitle from "@/components/AppHeaderTitle"
@@ -54,10 +51,6 @@ export async function generateMetadata({
   }
 }
 
-function WeatherSkeleton() {
-  return <div className="h-36 animate-pulse rounded-2xl bg-slate-100" />
-}
-
 function RouteSkeleton() {
   return (
     <div className="space-y-2.5">
@@ -66,25 +59,6 @@ function RouteSkeleton() {
         <div key={i} className="h-24 animate-pulse rounded-2xl bg-slate-100" />
       ))}
     </div>
-  )
-}
-
-async function RegionWeatherCard({
-  region,
-}: {
-  region: string
-}) {
-  const config = REGIONS[region]
-  const weather = await getWeatherForRegion(config)
-  return (
-    <RegionWeatherCardClient
-      weather={weather}
-      tidal={null}
-      forecast5={[]}
-      tidal5={[]}
-      regionName={config.name}
-      regionSlug={config.slug}
-    />
   )
 }
 
@@ -134,14 +108,12 @@ export default async function RegionPage({
   const config = REGIONS[region]
   if (!config) notFound()
 
-  await connection()
-
   return (
     <main className="min-h-screen bg-slate-50">
       <header className="sticky top-0 z-10 border-b border-slate-100 bg-white/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center gap-2.5 px-4 py-3">
           {/* 로고+제목 = 새로고침 (수동 새로고침 아이콘을 없앤 뒤의 갱신 수단) */}
-          <AppHeaderTitle subtitle={region === "incheon" ? "인천 날씨 · 여객선 현황" : `${config.name} 실시간 여객선 현황`} />
+          <AppHeaderTitle subtitle={`${config.name} 실시간 여객선 현황`} />
           <Link
             href={`/${config.slug}/qr`}
             aria-label="QR 코드"
@@ -165,10 +137,6 @@ export default async function RegionPage({
       </header>
 
       <div className="mx-auto max-w-lg space-y-3 px-4 pb-4 pt-2">
-        <Suspense fallback={<WeatherSkeleton />}>
-          <RegionWeatherCard region={region} />
-        </Suspense>
-
         <RegionNav current={config.slug} />
 
         <Suspense fallback={<RouteSkeleton />}>

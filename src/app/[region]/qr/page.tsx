@@ -17,7 +17,7 @@ export async function generateMetadata({
   if (!config) return {}
   return {
     title: `FerryCast ${config.name} QR 코드`,
-    description: `FerryCast ${config.name} 배 시간표·결항·날씨 QR 코드`,
+    description: `FerryCast ${config.name} 배 시간표·결항 QR 코드`,
   }
 }
 

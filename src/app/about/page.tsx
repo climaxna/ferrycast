@@ -29,8 +29,7 @@ export default function AboutPage() {
         <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
           <p className="text-sm leading-relaxed text-slate-600">
             FerryCast는 완도·울릉도·목포·인천·제주를 오가는 여객선의 오늘 운항 여부, 결항 상태,
-            시간표와 여행 준비 정보를 모아 보여주는 서비스입니다. 조회가 지연되거나 실패할 수 있으며,
-            날씨·조석 화면은 현재 인천 지역에서만 제공하고 있습니다.
+            시간표와 여행 준비 정보를 모아 보여주는 서비스입니다. 조회가 지연되거나 실패할 수 있습니다.
           </p>
         </div>
 
@@ -39,7 +38,6 @@ export default function AboutPage() {
             <li>오늘 각 항로의 운항·결항·비운항 실시간 현황</li>
             <li>출항 시각, 소요시간, 도착 예정시각</li>
             <li>제공된 운항 구분과 사유에 따른 결항·비운항 표시</li>
-            <li>인천 지역 날씨·조석 정보(조회 결과에 따라 일부 항목 미제공)</li>
             <li>출발·도착 터미널 위치(지도 연결)</li>
           </ul>
         </Section>
@@ -86,18 +84,12 @@ export default function AboutPage() {
 
         <Section title="데이터 출처">
           <p className="mb-2">
-            운항·기상 화면은 아래 공공기관의 데이터를 정리합니다. 조회 실패 시에는
+            운항 화면은 아래 공공기관의 데이터를 정리합니다. 조회 실패 시에는
             보관한 참고 시간표가 표시될 수 있습니다. 참고 시간표와 계산한 도착 예정시각은
             실제 출항·도착을 확인한 정보가 아닙니다. 가이드의 자료 출처와 확인 범위는 각 글에 표시합니다.
           </p>
           <SubItem title="한국해양교통안전공단(KOMSA)">
             여객선 운항 스케줄 및 운항·결항 현황(MTIS) — 전국 여객선 시간표의 기준 데이터입니다.
-          </SubItem>
-          <SubItem title="기상청">
-            초단기실황·단기예보(날씨, 풍속, 파고) — 항로별 인근 해역 기상 정보입니다.
-          </SubItem>
-          <SubItem title="국립해양조사원(KHOA)">
-            조석예보 — 만조·간조 시각과 높이의 5일 예보입니다.
           </SubItem>
           <p className="mt-2 text-xs text-slate-400">
             제공기관 데이터와 서비스의 조회·가공 과정에 지연·오류가 있을 수 있습니다.

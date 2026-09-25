@@ -52,40 +52,6 @@ test("HTTP failures are preserved for existing retry/fallback decisions", async 
   assert.equal(await result.text(), "rate limited")
 })
 
-const routeSource = await readFile(new URL("../src/app/api/weather/details/route.ts", import.meta.url), "utf8")
-const routeCode = ts.transpileModule(routeSource, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText
-function detailsRoute({ forecast = [{ date: "20260908" }], tideFailure = false } = {}) {
-  const tides = Array.from({ length: 5 }, () => ({ events: [{ time: "12:00" }] }))
-  const mocks = {
-    NextResponse: Response,
-    REGIONS: { incheon: { weatherGrid: {}, seaGrids: [], tidalObsCode: "test" } },
-    get5DayForecast: async () => forecast,
-    get5DayForecastForRegion: async () => forecast,
-    getTidalForecast: async () => tides[0],
-    getTidalForRegion: async () => tides[0],
-    get5DayTidalForecast: async () => tideFailure ? Array.from({ length: 5 }, () => ({ events: [] })) : tides,
-    get5DayTidalForRegion: async () => { if (tideFailure) throw new Error("upstream failed"); return tides },
-  }
-  const module = { exports: {} }
-  new Function("require", "module", "exports", routeCode)(() => mocks, module, module.exports)
-  return module.exports.GET
-}
-const request = (region = "") => ({ nextUrl: new URL(`https://test.invalid/api/weather/details${region ? `?region=${region}` : ""}`) })
-
-test("complete details can be cached; unknown regions are rejected", async () => {
-  const get = detailsRoute()
-  const response = await get(request("incheon"))
-  assert.equal((await response.json()).partial, false)
-  assert.match(response.headers.get("cache-control"), /s-maxage=600/)
-  assert.equal((await get(request("unknown"))).status, 400)
-})
-
-test("failed tide data keeps successful forecasts, is retryable and not cached", async () => {
-  for (const region of ["", "incheon"]) {
-    const response = await detailsRoute({ tideFailure: true })(request(region))
-    const data = await response.json()
-    assert.equal(data.forecast5.length, 1)
-    assert.equal(data.partial, true)
-    assert.equal(response.headers.get("cache-control"), "no-store")
-  }
-})
+// 날씨 상세 API(/api/weather/details)를 검증하던 테스트 2개는 2026-09 날씨 기능 폐기와 함께
+// 제거했다 — 대상 라우트 파일(src/app/api/weather/details/route.ts)이 더 이상 존재하지 않는다.
+// publicDataFetch.ts는 mtis.ts 등 배편 데이터 경로가 계속 쓰는 공용 유틸이라 위 4개는 유지한다.

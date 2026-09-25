@@ -1,12 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import WeatherCardShell from "@/components/WeatherCardShell"
+import { useState } from "react"
 import RouteTabs from "@/components/RouteTabs"
 import LocalAdCard from "@/components/LocalAdCard"
 import LocalAdSlot from "@/components/LocalAdSlot"
 import Logo from "@/components/Logo"
-import type { WeatherData } from "@/lib/weather"
 import type { WandoRoute } from "@/lib/types"
 import type { DirSummary } from "@/lib/mtis"
 import { PREVIEW_AD } from "@/config/localAds"
@@ -14,12 +12,14 @@ import { PREVIEW_AD } from "@/config/localAds"
 // 광고주에게 "배너가 실제로 이렇게 들어갑니다"를 보여주는 미리보기.
 //
 // 설계 원칙: **메인 페이지(src/app/page.tsx)는 건드리지 않는다.**
-// 대신 메인이 쓰는 것과 **같은 컴포넌트**(WeatherCardShell·RouteTabs·LocalAdCard)에
+// 대신 메인이 쓰는 것과 **같은 컴포넌트**(RouteTabs·LocalAdCard)에
 // 고정 목업 데이터를 넣어 화면을 재현한다. 스크린샷이 아니라 실제 렌더라
 //  - 모바일에서 열어도 그대로 반응형이고
 //  - 메인 디자인이 바뀌면 미리보기도 자동으로 따라간다(스샷처럼 낡지 않음).
 //
 // 데이터는 전부 가짜다. 실시간 API를 호출하지 않으므로 쿼터에도 영향이 없다.
+// 날씨 카드는 2026-09 폐기됐다(WeatherCardShell 등 제거) — 이 미리보기도 그에 맞춰
+// 시간표만 보여준다.
 
 const MOCK_DEP: WandoRoute[] = [
   {
@@ -89,26 +89,6 @@ const MOCK_SUMMARIES: DirSummary = {
 export default function PreviewClient() {
   const [showAd, setShowAd] = useState(true)
 
-  // 관측시각은 "오늘"로 보여야 미리보기가 낡아 보이지 않는다.
-  // SSR/CSR 불일치를 피하려고 초기값은 고정하고 마운트 후 실제 KST로 교체한다.
-  const [stamp, setStamp] = useState({ baseDate: "20260101", baseTime: "1000" })
-  useEffect(() => {
-    const k = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString()
-    setStamp({ baseDate: k.slice(0, 10).replace(/-/g, ""), baseTime: `${k.slice(11, 13)}00` })
-  }, [])
-
-  const weather: WeatherData = {
-    temp: 24,
-    humidity: 62,
-    windSpeed: 3.1,
-    windDir: 225,
-    pty: 0,
-    sky: 1,
-    rain1h: 0,
-    waveHeight: 0.4,
-    ...stamp,
-  }
-
   return (
     <main className="min-h-screen bg-slate-50">
       {/* 미리보기 안내 바 — 실제 서비스와 혼동하지 않도록 상단 고정 */}
@@ -128,7 +108,7 @@ export default function PreviewClient() {
             </button>
           </div>
           <p className="mt-1 text-[11px] leading-relaxed text-amber-700">
-            아래 시간표·날씨는 배치를 보여주기 위한 예시 데이터입니다.
+            아래 시간표는 배치를 보여주기 위한 예시 데이터입니다.
           </p>
         </div>
       </div>
@@ -142,15 +122,13 @@ export default function PreviewClient() {
               Ferry<span className="text-blue-600">Cast</span>
             </p>
             <p className="mt-1 truncate text-xs font-medium tracking-wide text-slate-400">
-              완도 날씨 · 여객선 현황
+              실시간 여객선 현황
             </p>
           </div>
         </div>
       </header>
 
       <div className="mx-auto max-w-lg space-y-3 px-4 pb-8 pt-2">
-        <WeatherCardShell w={weather} onOpen={() => {}} />
-
         <RouteTabs
           departures={{ routes: MOCK_DEP, isLive: true }}
           arrivals={{ routes: MOCK_ARR, isLive: true }}

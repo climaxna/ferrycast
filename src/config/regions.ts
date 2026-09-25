@@ -35,9 +35,6 @@ export interface IslandHopConfig {
 export interface RegionConfig {
   slug: string
   name: string
-  weatherGrid: { nx: number; ny: number }
-  seaGrids: Array<{ nx: number; ny: number }>
-  tidalObsCode: string | null   // null이면 조석 섹션 비표시
   mainTerminal: string
   routeGroups: RouteGroupConfig[]
   // 목적지 허브 지역(제주 등) — 이 지역이 "출발지"가 아니라 "도착지"다.
@@ -69,7 +66,6 @@ export interface RegionConfig {
 // 지역 설정
 // ✅ KMA 격자: 공식 LCC 좌표변환으로 검증 (포항 102,94 / 목포 50,67 / 인천 55,124)
 // ✅ KHOA obsCode: obsvtrNm 응답으로 검증 (목포 DT_0007 / 인천 DT_0001, 포항은 전용 관측소 없어 null)
-// ✅ seaGrids: getVilageFcst WAV 수신 셀로 검증
 // ✅ MTIS depPortKeywords: 3개 지역 모두 실시간(LIVE) 매칭 확인
 // ──────────────────────────────────────────────────────────────
 export const REGIONS: Record<string, RegionConfig> = {
@@ -80,9 +76,6 @@ export const REGIONS: Record<string, RegionConfig> = {
   ulleung: {
     slug: "ulleung",
     name: "울릉도",
-    weatherGrid: { nx: 127, ny: 127 },   // 울릉도 (초단기실황 수신 검증)
-    seaGrids: [{ nx: 126, ny: 127 }, { nx: 128, ny: 127 }, { nx: 127, ny: 126 }],  // 동해 WAV 수신 셀(검증)
-    tidalObsCode: null,   // 울릉도 전용 KHOA 예보지점 없음 + 동해 조차 미미 → 조석 비표시 (포항과 동일)
     mainTerminal: "울릉 도동여객선터미널",
     inbound: true,
     // 출발항 4곳 → 울릉도. label=출발항, islandTerminal=도착하는 울릉 항구.
@@ -129,7 +122,7 @@ export const REGIONS: Record<string, RegionConfig> = {
       },
     ],
     adAfterKey: "from-gangneung",   // 묵호·강릉 = 편수 상위 2개 뒤 단락 구분점
-    metaDescription: "울릉도 배편 총정리 — 묵호·강릉·포항·영일만항 출발 울릉도 여객선 시간표·결항 현황·날씨. 울릉도→독도 배편 포함",
+    metaDescription: "울릉도 배편 총정리 — 묵호·강릉·포항·영일만항 출발 울릉도 여객선 시간표·결항 현황. 울릉도→독도 배편 포함",
     train: {
       stationName: "포항역",
       localName: "포항",
@@ -158,9 +151,6 @@ export const REGIONS: Record<string, RegionConfig> = {
   mokpo: {
     slug: "mokpo",
     name: "목포",
-    weatherGrid: { nx: 50, ny: 67 },  // 목포시 KMA 격자 (LCC 변환 검증)
-    seaGrids: [{ nx: 49, ny: 66 }, { nx: 48, ny: 66 }, { nx: 49, ny: 65 }],  // 다도해 WAV 수신 셀(검증)
-    tidalObsCode: "DT_0007",  // 목포 KHOA 관측소 (obsvtrNm="목포" 검증)
     mainTerminal: "목포연안여객선터미널",  // 흑산·홍도·가거 등 신안 다도해 출발
     // ⚠️ 목포는 출발 터미널이 3종 — 연안(다도해)/북항(비금·도초 차도선)/국제·삼학부두(제주 대형카페리)
     //    MTIS oport_nm은 대부분 "목포"(+북항)로만 구분되므로 항로별 depTerminal로 보정 (실데이터 검증)
@@ -267,15 +257,12 @@ export const REGIONS: Record<string, RegionConfig> = {
     adAfterKey: "heuksando",   // 제주·홍도·흑산 = 목포 3대 관광 노선이 끝나는 단락 구분점
     islandHopTitle: "신안·진도 생활 항로",
     islandHopNote: "섬 주민이 주로 이용하는 노선입니다. 경유지가 많고 편수가 적어 출발 전 확인을 권합니다.",
-    metaDescription: "목포 제주·홍도·흑산도·비금도초·가거도·외달도 여객선 시간표·운항 현황·날씨·조석 예보",
+    metaDescription: "목포 제주·홍도·흑산도·비금도초·가거도·외달도 여객선 시간표·운항 현황",
   },
 
   incheon: {
     slug: "incheon",
     name: "인천",
-    weatherGrid: { nx: 55, ny: 124 },  // 인천시 KMA 격자 (검증)
-    seaGrids: [{ nx: 54, ny: 123 }, { nx: 52, ny: 123 }, { nx: 51, ny: 123 }],  // 서해 WAV 수신 셀(검증)
-    tidalObsCode: "DT_0001",  // 인천 KHOA 관측소 (obsvtrNm="인천" 검증)
     mainTerminal: "인천연안여객터미널",
     routeGroups: [
       {
@@ -371,7 +358,7 @@ export const REGIONS: Record<string, RegionConfig> = {
     adAfterKey: "baengnyeongdo",
     islandHopTitle: "그 밖의 인천 섬 배편",
     islandHopNote: "출발 항구가 다르거나 순환 항로로 운항하는 배편입니다. 격일 운항이 있어 출발 전 확인을 권합니다.",
-    metaDescription: "인천 백령도·연평도·덕적도·대이작도·장봉도·굴업도·풍도 여객선 시간표·운항 현황·날씨·조석 예보",
+    metaDescription: "인천 백령도·연평도·덕적도·대이작도·장봉도·굴업도·풍도 여객선 시간표·운항 현황",
   },
 
   // ── 목적지 허브 탭 ──────────────────────────────────────────
@@ -382,9 +369,6 @@ export const REGIONS: Record<string, RegionConfig> = {
   jeju: {
     slug: "jeju",
     name: "제주",
-    weatherGrid: { nx: 53, ny: 38 },   // 제주시 (초단기실황 수신 검증)
-    seaGrids: [{ nx: 52, ny: 39 }, { nx: 51, ny: 39 }, { nx: 53, ny: 39 }],  // 제주해협 — 육지↔제주 항로가 지나는 바다 (WAV 수신 검증)
-    tidalObsCode: "DT_0004",   // KHOA 제주 (obsvtrNm="제주" 검증)
     mainTerminal: "제주항 연안여객터미널",
     inbound: true,
     // 편수 많은 순. depTerminal=육지측 승선 터미널, islandTerminal=제주항(도착 탭에서 '타는 곳')
@@ -438,6 +422,6 @@ export const REGIONS: Record<string, RegionConfig> = {
       },
     ],
     adAfterKey: "from-wando",   // 목포·완도 = 편수 상위 2개 뒤 단락 구분점
-    metaDescription: "제주도 배편 총정리 — 목포·완도·진도·녹동·삼천포 출발 제주행 여객선 시간표·결항 현황·날씨",
+    metaDescription: "제주도 배편 총정리 — 목포·완도·진도·녹동·삼천포 출발 제주행 여객선 시간표·결항 현황",
   },
 }

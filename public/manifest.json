@@ -1,7 +1,7 @@
 {
-  "name": "FerryCast — 완도 여객선 정보",
+  "name": "FerryCast — 실시간 여객선 정보",
   "short_name": "FerryCast",
-  "description": "완도 날씨·조석·항로 시간표·운항 현황을 한 화면에",
+  "description": "완도·울릉도·목포·인천·제주 여객선 시간표와 결항 현황을 실시간으로",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

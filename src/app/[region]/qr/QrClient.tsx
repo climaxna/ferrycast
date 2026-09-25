@@ -22,7 +22,7 @@ export default function RegionQrClient({
             {regionName} 배 시간표
           </h1>
           <p className="mt-2 text-2xl font-bold text-blue-600 print:text-4xl">
-            결항 · 날씨 한눈에
+            실시간 결항 확인
           </p>
         </div>
 

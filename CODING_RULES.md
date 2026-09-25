@@ -65,7 +65,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ## 5. FerryCast 전용 규칙
 
 ### 파일 위치 규칙
-- API 호출 코드 → `src/lib/` 폴더에만 작성 (weather.ts, forecast.ts, ferry.ts, tide.ts)
+- API 호출 코드 → `src/lib/` 폴더에만 작성 (mtis.ts, ferry.ts, regionFerry.ts 등)
 - UI 컴포넌트 → `src/components/` 폴더에만 작성
 - 타입 정의 → `src/lib/types.ts` 한 곳에만 작성
 - 페이지 → `src/app/page.tsx` 하나만 (MVP는 단일 페이지)
