@@ -9,6 +9,8 @@ import { ROUTE_THEME, type AccentTheme } from "@/lib/routeTheme"
 import AlarmSheet from "@/components/AlarmSheet"
 import TomorrowSheet from "@/components/TomorrowSheet"
 import { getRouteDetailGuide, getRouteGuideHref } from "@/content/routeDetailGuides"
+import LocalAdCard from "@/components/LocalAdCard"
+import { getHouseAd } from "@/config/localAds"
 
 interface Props {
   route: WandoRoute
@@ -67,6 +69,7 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
     route.arrivals?.[t] ?? (route.durationMin ? addMinutes(t, route.durationMin) : null)
   const hasArrival = !!route.arrivals || !!route.durationMin
   const guide = getRouteDetailGuide(route)
+  const houseAd = getHouseAd()
   const guideHref = guide?.guideHref ?? getRouteGuideHref(route)
   const isStatusGuide = guideHref === "/guide/ferry-status"
 
@@ -416,6 +419,9 @@ export default function RouteDetail({ route, isDeparture, accent, onClose }: Pro
               <span aria-hidden="true">→</span>
             </a>
           )}
+
+          {/* 자사 광고(바로답) — 시간표·예약 버튼 아래, 이용 안내 위. 판단에 필요한 정보를 다 본 뒤라 방해가 적다 */}
+          {houseAd && <LocalAdCard ad={houseAd} placement="detail" />}
 
           {guide && (
             <section className="border-t border-slate-100 pt-5" aria-labelledby="route-guide-heading">

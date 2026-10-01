@@ -111,6 +111,14 @@ export function getActiveAds(region: string): LocalAd[] {
   return LOCAL_ADS.filter((ad) => (ad.region === region || ad.showOnAllRegions) && ad.until >= today)
 }
 
+// 배편 상세 화면(RouteDetail)용 — 자사 광고(house) 하나만 노출한다.
+// 상세는 "이 배를 탈지" 판단하는 화면이라 광고를 여러 개 쌓지 않는다. 유료 광고주가 생기면
+// 계약 조건에 따라 여기에 넣을지 따로 정할 것(지금은 목록 중간 슬롯만 판매 중).
+export function getHouseAd(): LocalAd | undefined {
+  const today = kstDateStr()
+  return LOCAL_ADS.find((ad) => ad.house && ad.until >= today)
+}
+
 // ── 미리보기 전용 ────────────────────────────────────────────
 // /ads/preview 에서 광고주에게 "이렇게 들어갑니다"를 보여줄 때 쓰는 샘플.
 // 광고주가 정해지면 이 객체만 실제 정보로 채우면 그대로 미리보기가 완성된다.

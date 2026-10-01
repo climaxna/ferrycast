@@ -9,11 +9,13 @@ import { AD_SLOT_RATIO, type LocalAd } from "@/config/localAds"
 //
 // 새 탭(target=_blank)으로 열리므로 현재 페이지가 살아 있고, 전송이 중간에 끊기지 않는다.
 // ⚠️ 광고 차단기를 쓰는 방문자는 gtag 자체가 로드되지 않아 집계에서 빠진다(실제보다 적게 잡힘).
-function trackAdClick(ad: LocalAd) {
+// ad_placement: 노선 목록 중간(list)인지 배편 상세 화면(detail)인지 — 같은 광고가 두 곳에 걸려서 구분한다.
+function trackAdClick(ad: LocalAd, placement: AdPlacement) {
   window.gtag?.("event", "ad_click", {
     ad_id: ad.id,
     ad_region: ad.region,
     ad_dest: ad.href ? "site" : "tel",
+    ad_placement: placement,
   })
 }
 
@@ -22,7 +24,9 @@ function trackAdClick(ad: LocalAd) {
 // 흰 카드 + 그림자를 쓴다. 대신 우상단 "광고" 라벨로 정보와 구분한다(표시 의무).
 //
 // 광고주가 없으면 아예 렌더되지 않는다 — 호출부에서 목록이 비면 LocalAdSlot으로 대체.
-export default function LocalAdCard({ ad }: { ad: LocalAd }) {
+export type AdPlacement = "list" | "detail"
+
+export default function LocalAdCard({ ad, placement = "list" }: { ad: LocalAd; placement?: AdPlacement }) {
   const isBenefit = ad.variant === "benefit"
   const href = ad.href ?? (ad.tel ? `tel:${ad.tel.replace(/[^0-9+]/g, "")}` : undefined)
 
@@ -37,7 +41,7 @@ export default function LocalAdCard({ ad }: { ad: LocalAd }) {
       <a
         href={href}
         {...(ad.href ? { target: "_blank", rel: "noopener noreferrer sponsored" } : {})}
-        onClick={() => trackAdClick(ad)}
+        onClick={() => trackAdClick(ad, placement)}
         // 배편 카드(흰 배경 + 옅은 slate 테두리)들 사이에서 눈에 안 띈다는 피드백 반영 —
         // 테두리 + 옅은 발광으로 "스폰서 배너"임을 은근히 알린다.
         // (3px+amber-400 → "너무 튄다" → 2px+amber-300 → 그런데 바로 위/아래에 "비운항" 카드가
