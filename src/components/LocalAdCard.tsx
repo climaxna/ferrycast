@@ -56,7 +56,8 @@ export default function LocalAdCard({ ad }: { ad: LocalAd }) {
           style={ad.imagePos ? { objectPosition: ad.imagePos } : undefined}
           sizes="(max-width: 512px) 100vw, 512px"
         />
-        <AdLabel tone="onImage" />
+        {/* 자사 광고(house)는 운영자 본인 사이트 홍보라 "광고" 라벨을 달지 않는다 */}
+        {!ad.house && <AdLabel tone="onImage" />}
       </a>
     )
   }
