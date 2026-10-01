@@ -80,6 +80,24 @@ export const LOCAL_ADS: LocalAd[] = [
     href: "https://m.place.naver.com/accommodation/2060185439/home?entry=pll&bk_query=36%EC%8A%A4%ED%85%8C%EC%9D%B4&businessCategory=pension",
     tel: "0507-1361-3484",
   },
+  {
+    // 자사 광고(하우스 애드) — 운영자의 생활 계산기 사이트 바로답(u-jeverse.com) 유입용.
+    // 유료 광고주(36스테이) 뒤에 둔다. 배 타러 차로 오는 사람이 많아 통행료·유류비 계산기로 바로 보낸다.
+    // utm_*: 바로답 GA4에서 페리캐스트발 유입을 따로 본다(클릭 수는 페리캐스트 GA4 ad_click으로 집계).
+    id: "house-barodab",
+    variant: "image",
+    region: "wando",
+    showOnAllRegions: true,
+    until: "20991231",
+    title: "바로답",
+    desc: "통행료·유류비 · 더치페이 · 택시요금 계산기",
+    imageSrc: "/ads/barodab-3x1.jpg",
+    imageW: 1200,
+    imageH: 400,
+    alt: "바로답 — 배 타러 가는 길, 기름값·통행료 얼마 나올까? 통행료·유류비·더치페이·택시요금 무료 계산",
+    labelPos: "br",  // 우상단은 "바로답" 로고와 겹친다
+    href: "https://u-jeverse.com/auto/toll?utm_source=ferrycast&utm_medium=banner&utm_campaign=house_ad",
+  },
 ]
 
 // 오늘 기준으로 아직 유효한 해당 지역 광고만 추린다.
