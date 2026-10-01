@@ -52,6 +52,8 @@ export interface LocalAd {
   href?: string           // 홈페이지·네이버플레이스
   ctaLabel?: string       // "자세히 보기" | "메뉴 보기" 등
   benefitLine?: string    // benefit 시안 전용 강조 줄 (예: "아메리카노 500원 할인")
+  house?: boolean         // 자사 광고(운영자 본인 사이트 홍보) — "광고" 라벨을 숨긴다(image 시안).
+                          // 돈 받는 광고주 배너에는 절대 쓰지 말 것(유료 광고는 광고 표시 필수).
 }
 
 // 실제 게재 중인 광고. 빈 배열이면 모집 슬롯(LocalAdSlot)이 그대로 노출된다.
@@ -95,7 +97,7 @@ export const LOCAL_ADS: LocalAd[] = [
     imageW: 1200,
     imageH: 400,
     alt: "바로답 — 배 타러 가는 길, 기름값·통행료 얼마 나올까? 통행료·유류비·더치페이·택시요금 무료 계산",
-    labelPos: "br",  // 우상단은 "바로답" 로고와 겹친다
+    house: true,
     href: "https://u-jeverse.com/auto/toll?utm_source=ferrycast&utm_medium=banner&utm_campaign=house_ad",
   },
 ]
